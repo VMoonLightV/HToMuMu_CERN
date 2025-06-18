@@ -1,0 +1,35 @@
+#ifndef PhysicsTools_NanoAODTools_LeptonEfficiencyCorrector_h
+#define PhysicsTools_NanoAODTools_LeptonEfficiencyCorrector_h
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <TH2.h>
+#include <TFile.h>
+
+#include "WeightCalculatorFromHistogram.h"
+
+class LeptonEfficiencyCorrector {
+ public:
+
+  LeptonEfficiencyCorrector() {effmaps_.clear();}
+  //LeptonEfficiencyCorrector(std::vector<std::string> files, std::vector<std::string> histos);
+  ~LeptonEfficiencyCorrector() {}
+
+  void init(std::vector<std::string> files, std::vector<std::string> histos);
+  void setLeptons(int nLep, int *lepPdgId, float *lepPt, float *lepEta);
+
+  float getSF(int pdgid, float pt, float eta);
+  float getSFAve(int pdgid, float pt, float eta, float weight); 
+  float getSFErr(int pdgid, float pt, float eta);
+  const std::vector<float> & run();
+
+private:
+  std::vector<TH2F*> effmaps_;
+  std::vector<float> ret_;
+  int nLep_;
+  float *Lep_eta_, *Lep_pt_;
+  int *Lep_pdgId_;
+};
+
+#endif

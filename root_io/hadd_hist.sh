@@ -1,0 +1,16 @@
+hadd Data_2022EE_histograms.root Muon_2022E_2022_histograms.root Muon_2022F_2022_histograms.root Muon_2022G_2022_histograms.root
+
+hadd Data_2022_histograms.root DoubleMuon_2022C_2022_histograms.root Muon_2022C_2022_histograms.root Muon_2022D_2022_histograms.root
+
+hadd DiBoson_2022_histograms.root WWto2L2Nu_2022_histograms.root WZto2L2Q_2022_histograms.root WZto3LNu_2022_histograms.root ZZto2L2Q_2022_histograms.root ZZto2L2Nu_2022_histograms.root ZZto4L_2022_histograms.root
+
+hadd DiBoson_2022EE_histograms.root WWto2L2Nu_2022EE_histograms.root WZto2L2Q_2022EE_histograms.root WZto3LNu_2022EE_histograms.root ZZto2L2Q_2022EE_histograms.root ZZto2L2Nu_2022EE_histograms.root ZZto4L_2022EE_histograms.root 
+
+hadd TT_2022_histograms.root TTto2L2Nu_2022_histograms.root TTtoLNu2Q_2022_histograms.root
+
+hadd TT_2022EE_histograms.root TTto2L2Nu_2022EE_histograms.root TTtoLNu2Q_2022EE_histograms.root
+
+hadd DY_2022_histograms.root DY50to120_2022_histograms.root DY120to200_2022_histograms.root
+
+hadd DY_2022EE_histograms.root DY50to120_2022EE_histograms.root DY120to200_2022EE_histograms.root
+
