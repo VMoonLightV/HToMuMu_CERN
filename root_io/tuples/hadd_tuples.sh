@@ -44,18 +44,16 @@
 
 
 #Combined
-hadd Data_Combined_tuples.root Data_2022_tuples.root Data_2022EE_tuples.root Data_2023_tuples.root Data_2023BPix_tuples.root Data_2024_tuples.root
+#hadd Data_Combined_tuples.root Data_2022_tuples.root Data_2022EE_tuples.root Data_2023_tuples.root Data_2023BPix_tuples.root
 
-hadd DiBoson_Combined_tuples.root DiBoson_2022_tuples.root DiBoson_2022EE_tuples.root DiBoson_2023_tuples.root DiBoson_2023BPix_tuples.root
+#hadd DiBoson_Combined_tuples.root DiBoson_2022_tuples.root DiBoson_2022EE_tuples.root DiBoson_2023_tuples.root DiBoson_2023BPix_tuples.root
 
-hadd TT_Combined_tuples.root TT_2022_tuples.root TT_2022EE_tuples.root TT_2023_tuples.root TT_2023BPix_tuples.root
+#hadd TT_Combined_tuples.root TT_2022_tuples.root TT_2022EE_tuples.root TT_2023_tuples.root TT_2023BPix_tuples.root
 
-hadd DY_Combined_tuples.root DY_2022_tuples.root DY_2022EE_tuples.root DY_2023_tuples.root DY_2023BPix_tuples.root
+#hadd DY_Combined_tuples.root DY_2022_tuples.root DY_2022EE_tuples.root DY_2023_tuples.root DY_2023BPix_tuples.root
 
-hadd EWK_Combined_tuples.root EWK_2022_tuples.root EWK_2022EE_tuples.root EWK_2023_tuples.root EWK_2023BPix_tuples.root
+#hadd EWK_Combined_tuples.root EWK_2022_tuples.root EWK_2022EE_tuples.root EWK_2023_tuples.root EWK_2023BPix_tuples.root
 
 hadd ggH_Combined_tuples.root ggH_2022_tuples.root ggH_2022EE_tuples.root ggH_2023_tuples.root ggH_2023BPix_tuples.root
 hadd VBF_Combined_tuples.root VBF_2022_tuples.root VBF_2022EE_tuples.root VBF_2023_tuples.root VBF_2023BPix_tuples.root
 hadd ttH_Combined_tuples.root ttH_2022_tuples.root ttH_2022EE_tuples.root ttH_2023_tuples.root ttH_2023BPix_tuples.root
-
-

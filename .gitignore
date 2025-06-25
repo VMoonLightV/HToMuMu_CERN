@@ -2,3 +2,11 @@
 *__pycache__*
 *.pyc
 plots/
+*.root
+*.pdf
+rootFiles/
+testPlots/
+ZPeakCompTest.ipynb
+ZPeakCompMuon1_2024B.pdf
+/.ipynb_checkpoints
+scripts/

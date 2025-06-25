@@ -154,7 +154,7 @@ public :
    Float_t         Electron_scEtOverPt[4];   //[nElectron]
    Float_t         Electron_sieie[4];   //[nElectron]
    Float_t         Electron_sip3d[4];   //[nElectron]
-   //Float_t         Electron_mvaTTH[4];   //[nElectron]
+   Float_t         Electron_mvaTTH[4];   //[nElectron]
    Int_t           nFatJet;
    UChar_t         FatJet_jetId[3];   //[nFatJet]
    UChar_t         FatJet_nConstituents[3];   //[nFatJet]
@@ -311,10 +311,10 @@ public :
    Float_t         Jet_btagPNetCvL[14];   //[nJet]
    Float_t         Jet_btagPNetQvG[14];   //[nJet]
    Float_t         Jet_btagPNetTauVJet[14];   //[nJet]
-   //Float_t         Jet_btagRobustParTAK4B[14];   //[nJet]
-   //Float_t         Jet_btagRobustParTAK4CvB[14];   //[nJet]
-   //Float_t         Jet_btagRobustParTAK4CvL[14];   //[nJet]
-   //Float_t         Jet_btagRobustParTAK4QG[14];   //[nJet]
+   Float_t         Jet_btagRobustParTAK4B[14];   //[nJet]
+   Float_t         Jet_btagRobustParTAK4CvB[14];   //[nJet]
+   Float_t         Jet_btagRobustParTAK4CvL[14];   //[nJet]
+   Float_t         Jet_btagRobustParTAK4QG[14];   //[nJet]
    Float_t         Jet_chEmEF[14];   //[nJet]
    Float_t         Jet_chHEF[14];   //[nJet]
    Float_t         Jet_eta[14];   //[nJet]
@@ -447,7 +447,7 @@ public :
    Float_t         Muon_bsConstrainedPt[6];   //[nMuon]
    Float_t         Muon_bsConstrainedPtErr[6];   //[nMuon]
    // Float_t         Muon_mvaLowPt[6];   //[nMuon]
-   //Float_t          Muon_mvaTTH[6];   //[nMuon]
+   Float_t         Muon_mvaTTH[6];   //[nMuon]
    // Int_t           nPhoton;
    // Char_t          Photon_seediEtaOriX[5];   //[nPhoton]
    // UChar_t         Photon_cutBased[5];   //[nPhoton]
@@ -652,8 +652,8 @@ public :
    UChar_t         Electron_genPartFlav[4];   //[nElectron]
    Short_t         Electron_genPartIdx[4];   //[nElectron]
    UChar_t         FatJet_hadronFlavour[3];   //[nFatJet]
-   //UChar_t         FatJet_nBHadrons[3];   //[nFatJet]
-   //UChar_t         FatJet_nCHadrons[3];   //[nFatJet]
+   UChar_t         FatJet_nBHadrons[3];   //[nFatJet]
+   UChar_t         FatJet_nCHadrons[3];   //[nFatJet]
    // Short_t         FatJet_genJetAK8Idx[3];   //[nFatJet]
    // UChar_t         GenJetAK8_hadronFlavour[5];   //[nGenJetAK8]
    // Short_t         GenJetAK8_partonFlavour[5];   //[nGenJetAK8]
@@ -669,8 +669,8 @@ public :
    Short_t         Muon_genPartIdx[6];   //[nMuon]
    // UChar_t         Photon_genPartFlav[5];   //[nPhoton]
    // Short_t         Photon_genPartIdx[5];   //[nPhoton]
-   //Float_t         MET_fiducialGenPhi;
-   //Float_t         MET_fiducialGenPt;
+   Float_t         MET_fiducialGenPhi;
+   Float_t         MET_fiducialGenPt;
    UChar_t         SubJet_hadronFlavour[6];   //[nSubJet]
    UChar_t         SubJet_nBHadrons[6];   //[nSubJet]
    UChar_t         SubJet_nCHadrons[6];   //[nSubJet]
@@ -1996,7 +1996,7 @@ public :
    TBranch        *b_Electron_scEtOverPt;   //!
    TBranch        *b_Electron_sieie;   //!
    TBranch        *b_Electron_sip3d;   //!
-   //TBranch        *b_Electron_mvaTTH;   //!
+   TBranch        *b_Electron_mvaTTH;   //!
    TBranch        *b_nFatJet;   //!
    TBranch        *b_FatJet_jetId;   //!
    TBranch        *b_FatJet_nConstituents;   //!
@@ -2153,10 +2153,10 @@ public :
    TBranch        *b_Jet_btagPNetCvL;   //!
    TBranch        *b_Jet_btagPNetQvG;   //!
    TBranch        *b_Jet_btagPNetTauVJet;   //!
-   //TBranch        *b_Jet_btagRobustParTAK4B;   //!
-   //TBranch        *b_Jet_btagRobustParTAK4CvB;   //!
-   //TBranch        *b_Jet_btagRobustParTAK4CvL;   //!
-   //TBranch        *b_Jet_btagRobustParTAK4QG;   //!
+   TBranch        *b_Jet_btagRobustParTAK4B;   //!
+   TBranch        *b_Jet_btagRobustParTAK4CvB;   //!
+   TBranch        *b_Jet_btagRobustParTAK4CvL;   //!
+   TBranch        *b_Jet_btagRobustParTAK4QG;   //!
    TBranch        *b_Jet_chEmEF;   //!
    TBranch        *b_Jet_chHEF;   //!
    TBranch        *b_Jet_eta;   //!
@@ -2289,7 +2289,7 @@ public :
    TBranch        *b_Muon_bsConstrainedPt;   //!
    TBranch        *b_Muon_bsConstrainedPtErr;   //!
    // TBranch        *b_Muon_mvaLowPt;   //!
-   //TBranch        *b_Muon_mvaTTH;   //!
+   TBranch        *b_Muon_mvaTTH;   //!
    // TBranch        *b_nPhoton;   //!
    // TBranch        *b_Photon_seediEtaOriX;   //!
    // TBranch        *b_Photon_cutBased;   //!
@@ -2494,8 +2494,8 @@ public :
    TBranch        *b_Electron_genPartFlav;   //!
    TBranch        *b_Electron_genPartIdx;   //!
    TBranch        *b_FatJet_hadronFlavour;   //!
-   //TBranch        *b_FatJet_nBHadrons;   //!
-   //TBranch        *b_FatJet_nCHadrons;   //!
+   TBranch        *b_FatJet_nBHadrons;   //!
+   TBranch        *b_FatJet_nCHadrons;   //!
    // TBranch        *b_FatJet_genJetAK8Idx;   //!
    // TBranch        *b_GenJetAK8_hadronFlavour;   //!
    // TBranch        *b_GenJetAK8_partonFlavour;   //!
@@ -2511,8 +2511,8 @@ public :
    TBranch        *b_Muon_genPartIdx;   //!
    // TBranch        *b_Photon_genPartFlav;   //!
    // TBranch        *b_Photon_genPartIdx;   //!
-   //TBranch        *b_MET_fiducialGenPhi;   //!
-   //TBranch        *b_MET_fiducialGenPt;   //!
+   TBranch        *b_MET_fiducialGenPhi;   //!
+   TBranch        *b_MET_fiducialGenPt;   //!
    TBranch        *b_SubJet_hadronFlavour;   //!
    TBranch        *b_SubJet_nBHadrons;   //!
    TBranch        *b_SubJet_nCHadrons;   //!
@@ -3850,7 +3850,7 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Electron_scEtOverPt", Electron_scEtOverPt, &b_Electron_scEtOverPt);
    fChain->SetBranchAddress("Electron_sieie", Electron_sieie, &b_Electron_sieie);
    fChain->SetBranchAddress("Electron_sip3d", Electron_sip3d, &b_Electron_sip3d);
-   //fChain->SetBranchAddress("Electron_mvaTTH", Electron_mvaTTH, &b_Electron_mvaTTH);
+   fChain->SetBranchAddress("Electron_mvaTTH", Electron_mvaTTH, &b_Electron_mvaTTH);
    fChain->SetBranchAddress("nFatJet", &nFatJet, &b_nFatJet);
    fChain->SetBranchAddress("FatJet_jetId", FatJet_jetId, &b_FatJet_jetId);
    fChain->SetBranchAddress("FatJet_nConstituents", FatJet_nConstituents, &b_FatJet_nConstituents);
@@ -3947,10 +3947,10 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_btagPNetCvL", Jet_btagPNetCvL, &b_Jet_btagPNetCvL);
    fChain->SetBranchAddress("Jet_btagPNetQvG", Jet_btagPNetQvG, &b_Jet_btagPNetQvG);
    fChain->SetBranchAddress("Jet_btagPNetTauVJet", Jet_btagPNetTauVJet, &b_Jet_btagPNetTauVJet);
-   //fChain->SetBranchAddress("Jet_btagRobustParTAK4B", Jet_btagRobustParTAK4B, &b_Jet_btagRobustParTAK4B);
-   //fChain->SetBranchAddress("Jet_btagRobustParTAK4CvB", Jet_btagRobustParTAK4CvB, &b_Jet_btagRobustParTAK4CvB);
-   //fChain->SetBranchAddress("Jet_btagRobustParTAK4CvL", Jet_btagRobustParTAK4CvL, &b_Jet_btagRobustParTAK4CvL);
-   //fChain->SetBranchAddress("Jet_btagRobustParTAK4QG", Jet_btagRobustParTAK4QG, &b_Jet_btagRobustParTAK4QG);
+   fChain->SetBranchAddress("Jet_btagRobustParTAK4B", Jet_btagRobustParTAK4B, &b_Jet_btagRobustParTAK4B);
+   fChain->SetBranchAddress("Jet_btagRobustParTAK4CvB", Jet_btagRobustParTAK4CvB, &b_Jet_btagRobustParTAK4CvB);
+   fChain->SetBranchAddress("Jet_btagRobustParTAK4CvL", Jet_btagRobustParTAK4CvL, &b_Jet_btagRobustParTAK4CvL);
+   fChain->SetBranchAddress("Jet_btagRobustParTAK4QG", Jet_btagRobustParTAK4QG, &b_Jet_btagRobustParTAK4QG);
    fChain->SetBranchAddress("Jet_chEmEF", Jet_chEmEF, &b_Jet_chEmEF);
    fChain->SetBranchAddress("Jet_chHEF", Jet_chHEF, &b_Jet_chHEF);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
@@ -4061,7 +4061,7 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Muon_bsConstrainedPt", Muon_bsConstrainedPt, &b_Muon_bsConstrainedPt);
    fChain->SetBranchAddress("Muon_bsConstrainedPtErr", Muon_bsConstrainedPtErr, &b_Muon_bsConstrainedPtErr);
    // fChain->SetBranchAddress("Muon_mvaLowPt", Muon_mvaLowPt, &b_Muon_mvaLowPt);
-   //fChain->SetBranchAddress("Muon_mvaTTH", Muon_mvaTTH, &b_Muon_mvaTTH);
+   fChain->SetBranchAddress("Muon_mvaTTH", Muon_mvaTTH, &b_Muon_mvaTTH);
    // fChain->SetBranchAddress("nPhoton", &nPhoton, &b_nPhoton);
    // fChain->SetBranchAddress("Photon_seediEtaOriX", Photon_seediEtaOriX, &b_Photon_seediEtaOriX);
    // fChain->SetBranchAddress("Photon_cutBased", Photon_cutBased, &b_Photon_cutBased);
@@ -5467,8 +5467,8 @@ void MainEvent::InitSimulationVariables(TTree *tree){
    fChain->SetBranchAddress("Electron_genPartFlav", Electron_genPartFlav, &b_Electron_genPartFlav);
    fChain->SetBranchAddress("Electron_genPartIdx", Electron_genPartIdx, &b_Electron_genPartIdx);
    fChain->SetBranchAddress("FatJet_hadronFlavour", FatJet_hadronFlavour, &b_FatJet_hadronFlavour);
-   //fChain->SetBranchAddress("FatJet_nBHadrons", FatJet_nBHadrons, &b_FatJet_nBHadrons);
-   //fChain->SetBranchAddress("FatJet_nCHadrons", FatJet_nCHadrons, &b_FatJet_nCHadrons);
+   fChain->SetBranchAddress("FatJet_nBHadrons", FatJet_nBHadrons, &b_FatJet_nBHadrons);
+   fChain->SetBranchAddress("FatJet_nCHadrons", FatJet_nCHadrons, &b_FatJet_nCHadrons);
    // fChain->SetBranchAddress("FatJet_genJetAK8Idx", FatJet_genJetAK8Idx, &b_FatJet_genJetAK8Idx);
    // fChain->SetBranchAddress("GenJetAK8_hadronFlavour", GenJetAK8_hadronFlavour, &b_GenJetAK8_hadronFlavour);
    // fChain->SetBranchAddress("GenJetAK8_partonFlavour", GenJetAK8_partonFlavour, &b_GenJetAK8_partonFlavour);
@@ -5484,8 +5484,8 @@ void MainEvent::InitSimulationVariables(TTree *tree){
    fChain->SetBranchAddress("Muon_genPartIdx", Muon_genPartIdx, &b_Muon_genPartIdx);
    // fChain->SetBranchAddress("Photon_genPartFlav", Photon_genPartFlav, &b_Photon_genPartFlav);
    // fChain->SetBranchAddress("Photon_genPartIdx", Photon_genPartIdx, &b_Photon_genPartIdx);
-   //fChain->SetBranchAddress("MET_fiducialGenPhi", &MET_fiducialGenPhi, &b_MET_fiducialGenPhi);
-   //fChain->SetBranchAddress("MET_fiducialGenPt", &MET_fiducialGenPt, &b_MET_fiducialGenPt);
+   fChain->SetBranchAddress("MET_fiducialGenPhi", &MET_fiducialGenPhi, &b_MET_fiducialGenPhi);
+   fChain->SetBranchAddress("MET_fiducialGenPt", &MET_fiducialGenPt, &b_MET_fiducialGenPt);
    fChain->SetBranchAddress("SubJet_hadronFlavour", SubJet_hadronFlavour, &b_SubJet_hadronFlavour);
    fChain->SetBranchAddress("SubJet_nBHadrons", SubJet_nBHadrons, &b_SubJet_nBHadrons);
    fChain->SetBranchAddress("SubJet_nCHadrons", SubJet_nCHadrons, &b_SubJet_nCHadrons);

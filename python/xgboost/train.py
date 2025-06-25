@@ -50,8 +50,7 @@ luminosity = {
     "2023": 17.794,
     "2023BPix": 9.451,
     "2023Combined": 27.245,
-    # "Combined": 61.897,
-    "Combined": 170.905,
+    "Combined": 61.897,
 }
 
 subset_title = "B"+ background_subset + "_S" + signal_subset
@@ -60,30 +59,26 @@ test_name = channel_US +  "_" + era + "_" + subset_title
 plotDir = "../../plots/xgboost/" + channel_US + "/" + subset_title + "/"
 pwd = os.getcwd()
 data_directory = "../../root_io/skim/" + channel_US + "/"
-#if channel_US == "VBF": data_directory += "merged/"
+if channel_US == "VBF": data_directory += "merged/"
 
 
 # signal
-signal_file_name = data_directory + "signal_" + era + "_skim_" +\
+signal_file_name = data_directory + "signal_" + era + "_skim" +\
                    signal_subset + ".root"
 signal_file = root.TFile(signal_file_name)
 signal_tree = signal_file.Get("tree_output")
-signal_tree.Draw("diMuon_pt>>tmp1", "weight*(diMuon_mass>120 && diMuon_mass<130)")
-# signal_tree.Draw("diMuon_pt>>tmp1", "weight_no_lumi")
+signal_tree.Draw("diMuon_pt>>tmp1", "weight_no_lumi")
 signal_histogram = root.gDirectory.Get("tmp1")
-signal_events = signal_histogram.Integral()
-# signal_events = luminosity[era] * signal_histogram.Integral()
+signal_events = luminosity[era] * signal_histogram.Integral()
 
 # bkg
-bkg_file_name = data_directory + "background_" + era + "_skim_" +\
+bkg_file_name = data_directory + "background_" + era + "_skim" +\
                 background_subset + ".root"
 bkg_file = root.TFile(bkg_file_name)
 bkg_tree = bkg_file.Get("tree_output")
-bkg_tree.Draw("diMuon_pt>>tmp2", "weight*(diMuon_mass>120 && diMuon_mass<130)")
-#bkg_tree.Draw("diMuon_pt>>tmp2", "weight_no_lumi")
+bkg_tree.Draw("diMuon_pt>>tmp2", "weight_no_lumi")
 bkg_histogram = root.gDirectory.Get("tmp2")
-bkg_events = bkg_histogram.Integral()
-#bkg_events = luminosity[era] * bkg_histogram.Integral()
+bkg_events = luminosity[era] * bkg_histogram.Integral()
 
 print(
     "[INFO]: S = "
@@ -141,8 +136,7 @@ if channel_US == "VBF":
         ["HT", "HT", r"$H_{T}^{2}(soft)$"],
     ]
 # Add weight at the end!
-variables += [["diMuon_mass", "diMuon_mass", "diMuon_mass"]]
-variables += [["weight", "weight", "weight"]]
+variables += [["weight_no_lumi", "weight_no_lumi", "weight_no_lumi"]]
 
 print("number of variables", len(variables))
 
@@ -173,8 +167,7 @@ print("signal sample size: " + str(len(df_signal.values)))
 print("bkg sample size: " + str(len(df_bkg.values)))
 
 ###plot correlation
-#correlation_vars = variables[:-1] + [["diMuon_mass", "diMuon_mass", r"$M_{\mu\mu}$ [GeV]"]]
-correlation_vars = variables[:-2]
+correlation_vars = variables[:-1] + [["diMuon_mass", "diMuon_mass", r"$M_{\mu\mu}$ [GeV]"]]
 
 file_sig = root.TFile(signal_file_name)
 tree_sig = file_sig.Get("tree_output")
@@ -247,58 +240,55 @@ x_train_p, x_test_p, y_train, y_test = train_test_split(
     random_state=seed,
 )
 
-# x_train = x_train_p[:, :-1]
-# x_test = x_test_p[:, :-1]
-x_train = x_train_p[:, :-2]
-x_test = x_test_p[:, :-2]
+x_train = x_train_p[:, :-1]
+x_test = x_test_p[:, :-1]
 sample_weights_train = x_train_p[:, -1]
 sample_weights_test = x_test_p[:, -1]
 
 
-#for idx in range(len(sample_weights_train)):
-    #sample_weights_train[idx] = luminosity[era] * sample_weights_train[idx]
-#for idx in range(len(sample_weights_test)):
-    #sample_weights_test[idx] = luminosity[era] * sample_weights_test[idx]
+for idx in range(len(sample_weights_train)):
+    sample_weights_train[idx] = luminosity[era] * sample_weights_train[idx]
+for idx in range(len(sample_weights_test)):
+    sample_weights_test[idx] = luminosity[era] * sample_weights_test[idx]
 
 
 # Assuming x_train and y_train are pandas DataFrames or numpy arrays
-if isinstance(x_train, pd.DataFrame) or isinstance(x_train, pd.Series):
-    print("Checking x_train for NaN, inf, or -inf values:")
-    print(x_train.isin([np.nan, np.inf, -np.inf]).sum())
+# if isinstance(x_train, pd.DataFrame) or isinstance(x_train, pd.Series):
+# print("Checking x_train for NaN, inf, or -inf values:")
+# print(x_train.isin([np.nan, np.inf, -np.inf]).sum())
 
-if isinstance(y_train, pd.DataFrame) or isinstance(y_train, pd.Series):
-    print("Checking y_train for NaN, inf, or -inf values:")
-    print(y_train.isin([np.nan, np.inf, -np.inf]).sum())
+# if isinstance(y_train, pd.DataFrame) or isinstance(y_train, pd.Series):
+# print("Checking y_train for NaN, inf, or -inf values:")
+# print(y_train.isin([np.nan, np.inf, -np.inf]).sum())
 
-# If x_train and y_train are numpy arrays
-print("x_train has inf values:", np.isinf(x_train).any())
-print("x_train has NaN values:", np.isnan(x_train).any())
+# # If x_train and y_train are numpy arrays
+# print("x_train has inf values:", np.isinf(x_train).any())
+# print("x_train has NaN values:", np.isnan(x_train).any())
+# print("y_train has inf values:", np.isinf(y_train).any())
+# print("y_train has NaN values:", np.isnan(y_train).any())
 
 
- # Assuming x_train is a pandas DataFrame
-if isinstance(x_train, pd.DataFrame):
-# Check for inf or -inf in each column
-    inf_columns = x_train.columns.to_series()[np.isinf(x_train).any()]
-    print("Columns with inf or -inf values:", inf_columns.tolist())
+# # Assuming x_train is a pandas DataFrame
+# if isinstance(x_train, pd.DataFrame):
+# # Check for inf or -inf in each column
+# inf_columns = x_train.columns.to_series()[np.isinf(x_train).any()]
+# print("Columns with inf or -inf values:", inf_columns.tolist())
 
 # If x_train is a numpy array
-if isinstance(x_train, np.ndarray):
-    inf_columns = np.where(np.isinf(x_train).any(axis=0))[0]
+# if isinstance(x_train, np.ndarray):
+# inf_columns = np.where(np.isinf(x_train).any(axis=0))[0]
 
-print("Indices of columns with inf or -inf values:", inf_columns)
-if len(inf_columns) > 0:
-    print("variables with inf or -inf values:",[row[0] for row in variables][inf_columns[0]])
+# print("Indices of columns with inf or -inf values:", inf_columns)
+# print("variables with inf or -inf values:",[row[0] for row in variables][inf_columns[0]])
 
 # if isinstance(x_train, np.ndarray):
 # # Count the number of inf and -inf values in the whole array
-total_inf_count = np.isinf(x_train).sum()
-print("Total number of inf/-inf values in x_train:", total_inf_count)
+# total_inf_count = np.isinf(x_train).sum()
+# print("Total number of inf/-inf values in x_train:", total_inf_count)
 
-# Count per column (axis 0)
-inf_counts = np.isinf(x_train).sum(axis=0)
-print("inf/-inf position (by index):", np.isinf(x_train))
-x_train[np.isneginf(x_train)] = np.nan
-x_train[np.isinf(x_train)] = np.nan
+# # Count per column (axis 0)
+# inf_counts = np.isinf(x_train).sum(axis=0)
+# print("Number of inf/-inf values in each column (by index):")
 
 # fit model no training data
 model = xgb.XGBClassifier(
@@ -315,10 +305,7 @@ model.fit(x_train, y_train)  # , sample_weights_train)
 # print(model)
 # make predictions for test data
 y_pred = model.predict_proba(x_test)[:, 1]
-print("y_pred:" , y_pred)
-print("y_test:" , y_test)
 y_pred_train = model.predict_proba(x_train)[:, 1]
-print("y_pred_train:" , y_pred_train)
 predictions = [round(value) for value in y_pred]
 # evaluate predictions
 accuracy = accuracy_score(y_test, predictions)
@@ -328,9 +315,7 @@ AUC = roc_auc_score(y_test, y_pred)
 print("AUC: " + str(AUC))
 # get roc curve
 # roc = roc_curve(y_test, y_pred)
-diMuon_mass_test = x_test_p[:, -2]
-print("diMuon_mass: ", diMuon_mass_test[(diMuon_mass_test < 130) & (diMuon_mass_test > 120)])
-fpr, tpr, thr = roc_curve(y_test[(diMuon_mass_test < 130) & (diMuon_mass_test > 120)], y_pred[(diMuon_mass_test < 130) & (diMuon_mass_test > 120)], sample_weight=sample_weights_test[(diMuon_mass_test < 130) & (diMuon_mass_test > 120)])
+fpr, tpr, thr = roc_curve(y_test, y_pred, sample_weight=sample_weights_test)
 
 
 significance = []
@@ -590,8 +575,7 @@ model.get_booster().save_model("models/model_" + test_name + ".xgb")
 
 # plot feature importances
 
-model.get_booster().feature_names = [row[2] for row in variables[:-2]]
-#model.get_booster().feature_names = [row[2] for row in variables[:-1]]
+model.get_booster().feature_names = [row[2] for row in variables[:-1]]
 
 xgb.plot_importance(
     model, max_num_features=len(variables) - 1, xlabel="F score (weight)"
@@ -603,8 +587,7 @@ plt.savefig(
     plotDir + "training/myImportances_Fscore_" + test_name + ".png", bbox_inches="tight"
 )
 
-model.get_booster().feature_names = [row[1] for row in variables[:-2]]
-#model.get_booster().feature_names = [row[1] for row in variables[:-1]]
+model.get_booster().feature_names = [row[1] for row in variables[:-1]]
 
 # xgb.plot_tree( model.get_booster() )
 xgb.plot_tree(model)

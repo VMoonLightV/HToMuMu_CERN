@@ -90,10 +90,10 @@ class CreateTuple {
     TFile *output_file;        /**< Pointer to output TFile. */
 
     /** Read event variables */
-    float gen_weight, pileup_weight, pileup_weight_up, pileup_weight_down;
+    float gen_weight, pileup_weight;
     int n_SoftJet_pt2, n_SoftJet_pt5, n_SoftJet_pt10;
     float HT, HT_pt2, HT_pt5, HT_pt10;
-    /** Read DiMuon variables */
+    /**< Read DiMuon variables */
     float diMuon_mass, diMuon_bsConstrainedMass, diMuon_pt, diMuon_bsConstrainedPt, diMuon_phi, diMuon_eta;
 
     /** Read Muon variables */
@@ -114,7 +114,7 @@ class CreateTuple {
 
     /** New Event variables */
     double scale_factor; // luminosity * cross_section / gen_weight_sum
-    Double_t weight;
+    double weight;
     double weight_no_lumi;
     float rho;
     int pv;
@@ -123,12 +123,12 @@ class CreateTuple {
 
     /** New DiMuon variables*/
     float diMuon_rapidity;
-    Double_t diMuon_mass_write;
 
     /** New Muon variables*/
-    float mu1_pt_mass_ratio, mu2_pt_mass_ratio, mu1_bsConstrainedPt_mass_ratio,
-          mu2_bsConstrainedPt_mass_ratio, mu1_eta, mu2_eta, phi_CS, cos_theta_CS;
+    float mu1_pt_mass_ratio, mu2_pt_mass_ratio, mu1_bsConstrainedPt_mass_ratio, mu2_bsConstrainedPt_mass_ratio, mu1_eta, mu2_eta, phi_CS,
+        cos_theta_CS;
     float mu1_pt, mu2_pt, mu1_bsConstrainedPt, mu2_bsConstrainedPt, mu1_ptErr, mu2_ptErr, mu1_bsConstrainedPtErr, mu2_bsConstrainedPtErr;
+
     /** New Error variables*/
     float relative_diMuon_mass_error, relative_diMuon_bsConstrainedMass_error;
 
@@ -202,11 +202,8 @@ void CreateTuple::setBranchesAddressesOutput() {
 
     tree_output->Branch("gen_weight", &gen_weight, "gen_weight/f");
     tree_output->Branch("pileup_weight", &pileup_weight, "pileup_weight/f");
-    tree_output->Branch("pileup_weight_up", &pileup_weight_up, "pileup_weight_up/f");
-    tree_output->Branch("pileup_weight_down", &pileup_weight_down,
-                        "pileup_weight_down/f");
     tree_output->Branch("scale_factor", &scale_factor, "scale_factor/d");
-    tree_output->Branch("weight", &weight, "weight/D");
+    tree_output->Branch("weight", &weight, "weight/d");
     tree_output->Branch("weight_no_lumi", &weight_no_lumi, "weight_no_lumi/d");
     // tree_output->Branch("is_data", &is_data_int, "is_data/i");
     // tree_output->Branch("is_signal", &is_signal_int, "signal/i");
@@ -226,7 +223,7 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "is_VBF_category/i");
 
     // DiMuon variables
-    tree_output->Branch("diMuon_mass", &diMuon_mass_write, "diMuon_mass/D");
+    tree_output->Branch("diMuon_mass", &diMuon_mass, "diMuon_mass/f");
     tree_output->Branch("diMuon_bsConstrainedMass", &diMuon_bsConstrainedMass, "diMuon_bsConstrainedMass/f");
     tree_output->Branch("diMuon_pt", &diMuon_pt, "diMuon_pt/f");
     tree_output->Branch("diMuon_bsConstrainedPt", &diMuon_bsConstrainedPt, "diMuon_bsConstrainedPt/f");
@@ -289,8 +286,6 @@ void CreateTuple::setBranchesAddressesOutput() {
 void CreateTuple::setBranchesAddressesInput() {
 
     tree_input->SetBranchAddress("t_puWeight", &pileup_weight);
-    tree_input->SetBranchAddress("t_puWeightUp", &pileup_weight_up);
-    tree_input->SetBranchAddress("t_puWeightDown", &pileup_weight_down);
     tree_input->SetBranchAddress("t_genWeight", &gen_weight);
     tree_input->SetBranchAddress("t_Rho", &rho);
     tree_input->SetBranchAddress("t_PV_npvsGood", &pv);
@@ -357,16 +352,18 @@ void CreateTuple::fillOutputTree() {
     std::pair<float, float> angles_CS;
     for (int event_index = 0; event_index < total_entries; event_index++) {
         tree_input->GetEntry(event_index);
-        // if (diMuon_mass < 110 || diMuon_mass > 150)
-        if (diMuon_mass < 70 || diMuon_mass > 180)
+        if (diMuon_mass < 70 || diMuon_mass > 160){
             continue;
+        }
+        /*if(event_index > 100){
+            break;
+        }*/
 
         weight = GetEventWeight(gen_weight, pileup_weight, scale_factor);
         weight_no_lumi = weight /luminosity;
 
         // DiMuon variables
         diMuon_rapidity = (mu1_vector + mu2_vector).Rapidity();
-        diMuon_mass_write = static_cast<Double_t>(diMuon_mass);
 
         // Muon variables
         mu1_vector.SetPtEtaPhiM((*mu_pt)[mu1_index], (*mu_eta)[mu1_index],
@@ -377,7 +374,9 @@ void CreateTuple::fillOutputTree() {
                                 (*mu_phi)[mu1_index], MUON_MASS);
         mu2BSC_vector.SetPtEtaPhiM((*mu_bsConstrainedPt)[mu2_index], (*mu_eta)[mu2_index],
                                 (*mu_phi)[mu2_index], MUON_MASS);
+        angles_CS = CSAngles(mu1_vector, mu2_vector, (*mu_charge)[mu1_index]);
 
+        //new variables
         mu1_pt = (*mu_pt)[mu1_index];
         mu2_pt = (*mu_pt)[mu2_index];
         mu1_bsConstrainedPt = (*mu_bsConstrainedPt)[mu1_index];
@@ -388,8 +387,7 @@ void CreateTuple::fillOutputTree() {
         mu2_bsConstrainedPtErr = (*mu_bsConstrainedPtErr)[mu2_index];
         relative_diMuon_mass_error = std::sqrt(std::pow(mu1_ptErr/mu1_pt, 2) + std::pow(mu2_ptErr/mu2_pt, 2));
         relative_diMuon_bsConstrainedMass_error = std::sqrt(std::pow(mu1_bsConstrainedPtErr/mu1_bsConstrainedPt, 2) + std::pow(mu2_bsConstrainedPtErr/mu2_bsConstrainedPt, 2));
-        
-        angles_CS = CSAngles(mu1_vector, mu2_vector, (*mu_charge)[mu1_index]);
+
 
         mu1_pt_mass_ratio = (*mu_pt)[mu1_index] / diMuon_mass;
         mu2_pt_mass_ratio = (*mu_pt)[mu2_index] / diMuon_mass;

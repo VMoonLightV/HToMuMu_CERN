@@ -60,7 +60,7 @@ for dataset_name in list_datasets:
     if not os.path.exists("/eos/uscms/" + INPUT_FILE):
         print("Merged file does not exist. Skipping!")
         continue
-
+    
     OUTPUT_DIR = EOS_BASE_DIR + "histos/"
     os.system("xrdfs root://cmseos.fnal.gov mkdir -p "+ OUTPUT_DIR)
     file_name = channel + "_" + era + "_histos.root"
@@ -69,7 +69,7 @@ for dataset_name in list_datasets:
     hadd_exists = os.path.exists("/eos/uscms/" + OUTPUT_DIR + file_name)
     # print("Exists?", hadd_exists)
     hadd_copy_exists = os.path.exists("/eos/uscms/" + OUTPUT_DIR + file_copy_name)
-
+    
     if hadd_exists:
         print("Histo file already exists.")
         if recreate_hadded_file:
@@ -92,7 +92,7 @@ for dataset_name in list_datasets:
         if len(os.listdir(JOB_DIR+"/log/")) != len(os.listdir(JOB_DIR+"/out/")):
             print("Previous job didn't finish well. Try running manually.")
             continue
-
+            
     # Create condor directories
     os.system("mkdir -p " + JOB_DIR)
     os.system("mkdir -p " + JOB_DIR + "/log/")

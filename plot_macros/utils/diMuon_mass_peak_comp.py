@@ -22,10 +22,9 @@ from .helper import (
     clean_null_values,
 )
 
-from .colors import(
-    signal_colors,
-    get_color_list,
-)
+y_axis_max_range = {
+    "diMuon_mass_full_range": 10e8,
+}
 
 signal_sources = [
     "ggH",
@@ -33,29 +32,29 @@ signal_sources = [
     "ttH",
 ]
 
-# signal_colors = {"ggH": "red", "VBF": "blue", "ttH": "lime"}
+signal_colors = {"ggH": "red", "VBF": "blue", "ttH": "lime"}
 
-# def get_color_list(number_of_histograms):
-    # colors = [
-        # "#3f90da",
-        # "#ffa90e",
-        # "#bd1f01",
-        # "#94a4a2",
-        # "#832db6",
-        # "#a96b59",
-        # "#e76300",
-        # "#b9ac70",
-        # "#717581",
-        # "#92dadd",
-    # ]
+def get_color_list(number_of_histograms):
+    colors = [
+        "#3f90da",
+        "#ffa90e",
+        "#bd1f01",
+        "#94a4a2",
+        "#832db6",
+        "#a96b59",
+        "#e76300",
+        "#b9ac70",
+        "#717581",
+        "#92dadd",
+    ]
 
-    # color_list = []
-    # for i in range(number_of_histograms):
-        # color_list.append(colors[i])
+    color_list = []
+    for i in range(number_of_histograms):
+        color_list.append(colors[i])
 
-    # return color_list
+    return color_list
 
-variables = ["diMuon_mass_full_range", "diMuon_bsConstrainedMass_full_range"]
+variables = ["diMuon_mass", "diMuon_bsConstrainedMass"]
 Z_range = [80,100]
 H_range = [115,135]
 Z_fit_range = [89,93]
@@ -74,12 +73,13 @@ def plot_diMuon_comp_and_fit(fit_range, mass_range, noBSC_hist, BSC_hist, partic
     if (particle == "H" and signal==None):
         print("Must provide a signal to plot")
 
-    bin_centers = (noBSC_hist[1][:-1] + noBSC_hist[1][1:]) / 2
-    minBin = np.where(noBSC_hist[1] == fit_range[0])[0][0]
-    maxBin = np.where(noBSC_hist[1] == fit_range[1])[0][0] + 1
+    #print(np.where(noBSC_hist[1] >= fit_range[0])[0][0])
+    #print(np.where(noBSC_hist[1] <= fit_range[1])[0][-1] + 1)
+    minBin = np.where(noBSC_hist[1] >= fit_range[0])[0][0]
+    maxBin = np.where(noBSC_hist[1] <= fit_range[1])[0][-1] + 1
 
-    popt, pcov = curve_fit(gaussian, bin_centers[minBin:maxBin], noBSC_hist[0][minBin:maxBin], p0=[np.max(noBSC_hist[0][minBin:maxBin]), masses[particle], 1])
-    poptBSC, pcovBSC = curve_fit(gaussian, bin_centers[minBin:maxBin], BSC_hist[0][minBin:maxBin], p0=[np.max(BSC_hist[0][minBin:maxBin]), masses[particle], 1])
+    popt, pcov = curve_fit(gaussian, noBSC_hist[1][minBin:maxBin], noBSC_hist[0][minBin:maxBin], p0=[np.max(noBSC_hist[0][minBin:maxBin]), masses[particle], 1])
+    poptBSC, pcovBSC = curve_fit(gaussian, BSC_hist[1][minBin:maxBin], BSC_hist[0][minBin:maxBin], p0=[np.max(BSC_hist[0][minBin:maxBin]), masses[particle], 1])
 
 
     perr = np.sqrt(np.diag(pcov))
@@ -93,8 +93,9 @@ def plot_diMuon_comp_and_fit(fit_range, mass_range, noBSC_hist, BSC_hist, partic
     fig, axs = get_canvas(True)
     if (particle=="Z"): ifMCorData = "Data"
     else: ifMCorData = signal + " MC"
-    hep.histplot(noBSC_hist, label = ifMCorData + " no BSC", ax=axs[0])
-    hep.histplot(BSC_hist, label = ifMCorData + " BSC", ax=axs[0])
+
+    hep.histplot(noBSC_hist[0], noBSC_hist[1], label = ifMCorData + " no BSC", ax=axs[0])
+    hep.histplot(BSC_hist[0], BSC_hist[1], label = ifMCorData + " BSC", ax=axs[0])
 
     hep.cms.label(
     data="True",
@@ -110,11 +111,11 @@ def plot_diMuon_comp_and_fit(fit_range, mass_range, noBSC_hist, BSC_hist, partic
     #axs[0].plot(bin_centers[minBin:maxBin], gaussian(bin_centers[minBin:maxBin], poptBSC[0], poptBSC[1], poptBSC[2]), 
     #    label='BSC $\mu$: {:.2f} $\sigma$: {:.2f} $\pm$ {:.2f}'.format(poptBSC[1],poptBSC[2], perrBSC[2]))
 
-    axs[0].plot(bin_centers[minBin:maxBin], gaussian(bin_centers[minBin:maxBin], popt[0], popt[1], popt[2]),
+    axs[0].plot(noBSC_hist[1][minBin:maxBin], gaussian(noBSC_hist[1][minBin:maxBin], popt[0], popt[1], popt[2]),
         label='noBSC $\sigma / \mu $: {:.6f} $\pm$ {:.6f}'.format(noBSC_res, noBSC_res_err))
-    axs[0].plot(bin_centers[minBin:maxBin], gaussian(bin_centers[minBin:maxBin], poptBSC[0], poptBSC[1], poptBSC[2]), 
+    axs[0].plot(noBSC_hist[1][minBin:maxBin], gaussian(noBSC_hist[1][minBin:maxBin], poptBSC[0], poptBSC[1], poptBSC[2]), 
         label='BSC $\sigma / \mu $: {:.6f} $\pm$ {:.6f}'.format(BSC_res, BSC_res_err))
-
+    
     axs[0].set_ylabel("Events")
     axs[0].set_ylim(0, 1.6 * np.max(noBSC_hist[0]))
     axs[0].set_xlim(mass_range[0], mass_range[1])
@@ -162,9 +163,16 @@ def draw_diMuon_mass_peak_comp(particle, era, use_puweight=True):
         fit_range = Z_fit_range
         histograms_list = []
         #labels = []
-        with ur.open("../root_io/histos/Data_" + era + "_histos.root") as data_file:
+        with ur.open("../root_io/tuples/Data_" + era + "_tuples.root:tree_output") as data_file:
+            branches = data_file.arrays(variables, library="np")
             for var in variables:
-                histograms_list.append(data_file[var].to_numpy())
+                histogram, bins = np.histogram(
+                branches[var],
+                bins=160,
+                range=Z_range,
+                )
+
+                histograms_list.append([histogram, bins])
                 #labels.append(particle + "_" + var + "_" + era)
         plot_diMuon_comp_and_fit(fit_range, mass_range, histograms_list[0], histograms_list[1], particle, era)
 
@@ -177,8 +185,15 @@ def draw_diMuon_mass_peak_comp(particle, era, use_puweight=True):
         for signal in signal_sources:
             histograms_list = []
             #labels = []
-            with ur.open("../root_io/histos/" + signal + "_" + era + "_histos.root") as data_file:
+            with ur.open("../root_io/tuples/" + signal + "_" + era + "_tuples.root:tree_output") as data_file:
+                branches = data_file.arrays(variables, library="np")
                 for var in variables:
-                    histograms_list.append(data_file[var].to_numpy())
+                    histogram, bins = np.histogram(
+                    branches[var],
+                    bins=160,
+                    range=H_range,
+                    )
+
+                    histograms_list.append([histogram, bins])
                     #labels.append(particle + "_" + signal + "_" + var + "_" + era)
             plot_diMuon_comp_and_fit(fit_range, mass_range, histograms_list[0], histograms_list[1], particle, era, signal)

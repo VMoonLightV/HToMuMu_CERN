@@ -1,14 +1,11 @@
-This code does the BDT training for the ggH and/or VBF Categorization.
+This code do the BDT training for the ggH Categorization.
 
-## First time only
+## First use
 
 Go to https://uscms.org/uscms_at_work/computing/setup/gpu.shtml and follow the EAF instructions.
 
-If you are not in Fermilab you will need to setup a vpn. Here are the instructions: https://uscms.org/uscms_at_work/physics/computing/setup/remote.shtml#VPN
+When you are in do 
 
-Once you have access to the cluster and the grid, go to https://analytics-hub.fnal.gov, create a server (you can request a 20GB workspace in CMS CERN, for instance).
-
-When you are in, do
 ```
 "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
 micromamba create -n xgboost_env xgboost python=3.10 krb5  curl cfitsio root tensorflow keras -c conda-forge
@@ -17,33 +14,23 @@ pip3 install uproot
 pip3 install matplotlib
 pip3 install graphviz
 pip3 install mplhep
+pip3 install gpustat
 
 ```
 
 ## How to run
 
-Pick your node https://analytics-hub.fnal.gov/hub/home and activate the environment
+Pick your node https://analytics-hub.fnal.gov/hub/home and activate the enviroment
 ```
 eval "$(micromamba shell hook --shell bash)"
 micromamba activate xgboost_env
 ```
-
 Go to the xgboost directory
+
 ```
 cd /your_path/HmmAnalysis/python/xgboost
 ```
-
-Run the training (Make sure you generated the skim tuples first)
+Run the training (Make your you generate the skim tuples first)
 ```
-python3 train.py era background_sources signal_sources
-```
-
-You can append the BDT variable to the tuples running
-```
-python3 append_xgboost_discriminator_to_tree.py higgs_channel era era_model data_set bkg_src signal_src
-```
-
-You can run everything with the following script
-```
-bash run_train.sh higgs_channel
+python3 train.py era
 ```

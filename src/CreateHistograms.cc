@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
 
     CreateHistograms create_histograms =
         CreateHistograms(input, output, era, channel, is_data, is_signal);
-
     create_histograms.defineHistograms();
     create_histograms.setBranchesAddresses();
     if (is_data) {

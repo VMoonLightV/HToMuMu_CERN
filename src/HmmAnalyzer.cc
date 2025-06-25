@@ -64,6 +64,11 @@ void HmmAnalyzer::EventLoop() {
     long nb = 0;
     for (long jentry = 0; jentry < nentries; jentry++) {
         long ientry = LoadTree(jentry);
+        
+        /*std::cout << "---------------------- Event: " << jentry << " ----------------------" << std::endl;
+        if(jentry > 100){
+            break;
+        }*/
         if (ientry < 0)
             break;
 
@@ -105,6 +110,7 @@ void HmmAnalyzer::EventLoop() {
              PV_npvsGood > 0);
 
         if (!run_muChecks) {
+            //std::cout << "Muon did not pass the checks" << std::endl;
             continue;
         }
 
@@ -119,6 +125,7 @@ void HmmAnalyzer::EventLoop() {
         // 0;
         bool two_valid_muons = false;
         bool trig_match = false;
+        //std::cout << "nMuon: " << nMuon << std::endl;
 
         for (int i = 0; i < nMuon; i++) {
             // TLorentzVector mu_raw;
@@ -147,17 +154,18 @@ void HmmAnalyzer::EventLoop() {
             CorrectPtRoch(_Roch_calib, false, mu_raw, ptErr_raw, pt_Roch, ptErr_Roch,
                           pt_Roch_sys_up, pt_Roch_sys_down, Muon_charge[i],
                           Muon_nTrackerLayers[i], gen_pt, is_data);
-            // std::cout <<"pt_Roch "<<pt_Roch<<std::endl;
+            //std::cout <<"pt_Roch "<<pt_Roch<< "Err " << ptErr_Roch << std::endl;
             mu_pt_Roch_corr.push_back(pt_Roch);
             mu_ptErr_Roch_corr.push_back(ptErr_Roch);
         }
 
         for (int muon_index_1 = 0; muon_index_1 < nMuon; muon_index_1++) {
             if (!(Muon_isGlobal[muon_index_1] &&
-                  mu_pt_Roch_corr[muon_index_1] > muon_pt_cut.at(yearst) &&
+                  mu_pt_Roch_corr[muon_index_1] > muon_pt_cut[yearst] &&
                   Muon_mediumId[muon_index_1] &&
                   fabs(Muon_eta[muon_index_1]) < 2.4 &&
                   Muon_pfRelIso04_all[muon_index_1] < 0.25)) {
+                //std::cout << "Muon didn't pass eta and pT cuts" << std::endl;
                 continue;
             }
 
@@ -191,7 +199,7 @@ void HmmAnalyzer::EventLoop() {
                        TrigObj_eta[trigger_index], TrigObj_phi[trigger_index]);
             if (dR_TrigObj < 0.1 && Muon_tightId[index_mu1] &&
                 Muon_pfRelIso04_all[index_mu1] < 0.15 &&
-                mu_pt_Roch_corr[index_mu1] > muon_pt_cut.at(yearst)) {
+                mu_pt_Roch_corr[index_mu1] > muon_pt_cut[yearst]) {
                 trig_match = true;
                 t_index_trigm_mu = 1;
                 break;
@@ -199,7 +207,7 @@ void HmmAnalyzer::EventLoop() {
             dR_TrigObj =
                 DeltaR(Muon_eta[index_mu2], Muon_phi[index_mu2],
                        TrigObj_eta[trigger_index], TrigObj_phi[trigger_index]);
-            if (mu_pt_Roch_corr[index_mu2] > muon_pt_cut.at(yearst) &&
+            if (mu_pt_Roch_corr[index_mu2] > muon_pt_cut[yearst] &&
                 Muon_tightId[index_mu2] &&
                 Muon_pfRelIso04_all[index_mu2] < 0.15 && dR_TrigObj < 0.1) {
                 trig_match = true;
@@ -209,6 +217,7 @@ void HmmAnalyzer::EventLoop() {
         } // end of triger match, end of loop over trigger objects
 
         if (!(two_valid_muons && trig_match)) {
+            //std::cout << "Non valid muons or trigger didn't match" << std::endl;
             continue;
         }
 
@@ -223,6 +232,7 @@ void HmmAnalyzer::EventLoop() {
             // if(fabs(Muon_eta[i])<2.4 && Muon_mediumId[i] &&
             // Muon_pfRelIso04_all[i] < 0.25){
             if (!(fabs(Muon_eta[i]) < 2.4 && Muon_mediumId[i])) {
+                //std::cout << "Mu eta or mediumID not passed" << std::endl;
                 continue;
             }
             if (i == index_mu1)
@@ -230,6 +240,11 @@ void HmmAnalyzer::EventLoop() {
             if (i == index_mu2)
                 t_index_mu2 = t_index;
 
+            //std::cout << "---------------------- Muon#: " << i << " ----------------------" << std::endl;
+            //std::cout << "pt: "<< Muon_pt[i] << " | Err: "<< Muon_ptErr[i] <<std::endl;
+            //std::cout << "BSCPt: "<< Muon_bsConstrainedPt[i]<<" | BSCPtErr: "<< Muon_bsConstrainedPtErr[i] <<std::endl;
+            //std::cout << "Roch_corr_pt: "<< mu_pt_Roch_corr[i] <<" | Err: "<< mu_ptErr_Roch_corr[i] <<std::endl;
+            //std::cout << "BSC correction: " << mu_pt_Roch_corr[i] - Muon_bsConstrainedPt[i] << std::endl;
             t_Mu_charge->push_back(Muon_charge[i]);
             t_Mu_pt->push_back(mu_pt_Roch_corr[i]);
             t_Mu_ptErr->push_back(mu_ptErr_Roch_corr[i]);
@@ -365,11 +380,11 @@ void HmmAnalyzer::EventLoop() {
             t_Jet_nElectrons->push_back(Jet_nElectrons[j]);
             t_Jet_nMuons->push_back(Jet_nMuons[j]);
             // t_Jet_puId->push_back(Jet_puId[j]);
-            if (Jet_btagPNetB[j] > btagLoose_cut.at(yearst)) {
+            if (Jet_btagPNetB[j] > btagLoose_cut[yearst]) {
                 t_nbJet_Loose++;
             }
 
-            if (!(Jet_btagPNetB[j] > btagMedium_cut.at(yearst))) {
+            if (!(Jet_btagPNetB[j] > btagMedium_cut[yearst])) {
                 continue; // medium WP
             } // end of b-tag
             t_nbJet++;

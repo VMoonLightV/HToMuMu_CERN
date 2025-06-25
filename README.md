@@ -22,23 +22,11 @@ For data
 ./bin/HmmAnalyzer runList.txt out.root data T 2016
 ```
 
-To run over all the data sets look at condor/README.md to run it in condor jobs
+## Run CreateHistograms 
 
-## Run CreateTuples
-
-This will create a root file with tuples with all the usefull variables and the correspodeting weights;
+This will create a root file with the histogrmas filled with the corresponding weights.
 
 For data/simulation
 ```
-./bin/CreateTuple analyzer_output.root output_directory era dataset T(data)/F(simulation) T(signal)/F(Bkg-data)
+./bin/HmmAnalyzer analyzer_output.root output_directory era channel T(data)/F(simulation)
 ```
-
-
-To run over all the data sets look at condor/README.md to run it in condor jobs.   
-If you want to run it over a small dataset look at scripts/README.md
-
-## BDT Training
-Look at python/xgboost/README.md
-
-## Plotting 
-All plotting codes are located at plot_macros/

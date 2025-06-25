@@ -1,21 +1,15 @@
 from utils.sim_vs_data import draw_data_and_simul_and_ratio
 import sys
 
-if len(sys.argv) == 2:
-    production_channel = sys.argv[1]
-    bdt_subset = "BFull_SNottH"
-    print("You selected " + production_channel + " channel")
+if len(sys.argv) > 2:
+    print("Use one argument: Category. Show only events from that category")
+    exit()
 
-else:
-    print("Producion channel was not selected. Using all the events")
-    production_channel = ""
-    bdt_subset = ""
+use_ggH = False if sys.argv[1] != "ggH" else True
+use_VBF = False if sys.argv[1] != "VBF" else True
 
-# use_ggH = False if sys.argv[1] != "ggH" else True
-# use_VBF = False if sys.argv[1] != "VBF" else True
-
-# if not use_ggH and not use_VBF:
-# print("Using no category selection as default.")
+if not use_ggH and not use_VBF:
+    print("Using no category selection as default.")
 
 # ordered from bottom to top in the plot, so order it from lower to bigger cross section
 background_sources = [
@@ -30,26 +24,14 @@ signal_sources = [
     "VBF",
     "ttH",
 ]
-bdt_selections = {
-    "ggH": {
-        # "BFull_SNottH": [0.0, 0.06461538461538464, 0.16153846153846155, 1.0],
-        "BFull_SNottH": [0.0, 0.052, 0.131, 1.0],
-    },
-    "VBF": {
-        "BFull_SNottH": [0.0, 0.38, 0.912, 0.977, 1.0],
-        "BNoDY50_SNottH": [0.0, 0.546, 0.935, 0.985, 1.0],
-    },
-    "": {"":""},
-}
 
 variables = [
     ## DiMuon variables
     "diMuon_mass",
-    # "diMuon_mass_full_range",
-     "diMuon_bsConstrainedMass",
-    # "diMuon_mass_Z",
-    # "diMuon_bsConstrainedMass_Z",
-    "diMuon_rapidity",
+    "diMuon_bsConstrainedMass",
+    "diMuon_mass_Z",
+    "diMuon_bsConstrainedMass_Z",
+    "diMuon_rapidity", 
     "diMuon_eta",
     "diMuon_pt",
     "diMuon_bsConstrainedPt",
@@ -97,54 +79,38 @@ variables = [
     "HT_pt10",
 ]
 
-eras = ["2022EE", "2023", "2023BPix","2024"]
-# eras = ["2022", "2022EE", "2023", "2023BPix","2024"]
+# variables = ["diMuon_mass", "diMuon_mass_Z", "diMuon_bsConstrainedMass", "diMuon_bsConstrainedMass_Z"]
+variables = [
+    "relative_diMuon_mass_error",
+    "relative_diMuon_bsConstrainedMass_error",
+    "mu1_pt",
+    "mu2_pt",
+    "mu1_ptErr",
+    "mu2_ptErr",
+    "mu1_bsConstrainedPt",
+    "mu2_bsConstrainedPt",
+    "mu1_bsConstrainedPtErr",
+    "mu2_bsConstrainedPtErr",
+]
+
+# eras = ["2022"]
+eras = ["2022", "2022EE", "2023", "2023BPix","2024"]
 # eras = ["2022", "2022EE"]
-# eras = ["2023", "2023BPix"]
-#eras = ["2023BPix"]
-#eras = ["2024"]
-#eras = ["Combined"]
+# eras = ["2023"]#, "2023BPix"]
+# eras = ["2024"]
 
 for era in eras:
-    # for variable in variables:
-        # draw_data_and_simul_and_ratio(
-            # variable,
-            # era,
-            # background_sources,
-            # signal_sources,
-            # True,
-            # production_channel,
-            # bdt_selections[production_channel][bdt_subset],
-            # bdt_subset,
-        # )
-    draw_data_and_simul_and_ratio(
-            "diMuon_mass",
-            era,
-            background_sources,
-            signal_sources,
-            True,
-            production_channel,
-            bdt_selections[production_channel][bdt_subset],
-            bdt_subset,
-            True,
-        )
-    draw_data_and_simul_and_ratio(
-            "diMuon_bsConstrainedMass",
-            era,
-            background_sources,
-            signal_sources,
-            True,
-            production_channel,
-            bdt_selections[production_channel][bdt_subset],
-            bdt_subset,
-            True,
-        )
+    for variable in variables:
+        draw_data_and_simul_and_ratio(variable, era, background_sources,
+                                      signal_sources,
+                                      use_ggH_category=use_ggH,
+                                      use_VBF_category=use_VBF)
 
     # draw_data_and_simul_and_ratio("PV", era, background_sources, signal_sources)
     # draw_data_and_simul_and_ratio("rho", era, background_sources, signal_sources)
     # draw_data_and_simul_and_ratio(
-        # "PV", era, background_sources, signal_sources, use_puweight=False
+    #     "PV", era, background_sources, signal_sources, use_puweight=False
     # )
     # draw_data_and_simul_and_ratio(
-       # "rho", era, background_sources, signal_sources, use_puweight=False
+    #     "rho", era, background_sources, signal_sources, use_puweight=False
     # )

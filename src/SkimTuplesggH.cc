@@ -57,7 +57,6 @@ int main(int argc, char *argv[]) {
                               "min_delta_eta_diMuon_jet",
                               "min_delta_phi_diMuon_jet",
                               "weight_no_lumi",
-                              "weight",
                               "is_ggH_category"})
         tree_input->SetBranchStatus(ggh_branches, 1);
 
@@ -67,8 +66,7 @@ int main(int argc, char *argv[]) {
                       "RECREATE");
     TTree *tree_output = tree_input->CloneTree(0); // Clone the structure only
 
-    tree_output = tree_input->CopyTree("(is_ggH_category == 1) && (diMuon_mass > 115. && diMuon_mass < 135.)");
-
+    tree_output = tree_input->CopyTree("is_ggH_category == 1");
     // Write the selected tree to the output file
 
     output_file.cd();

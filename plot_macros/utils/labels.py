@@ -98,16 +98,15 @@ n_bins = {
     ## DiMuon variables
     "diMuon_rapidity": 50,
     "diMuon_pt": 80,
+    "diMuon_mass": 80,
     "diMuon_bsConstrainedPt": 80,
     "diMuon_bsConstrainedMass":80,
-    #"diMuon_mass_Z": 80,
-    #"diMuon_bsConstrainedMass_full_range": 200,
-    "diMuon_mass": 80,
-    # "diMuon_mass_full_range": 200,
+    "diMuon_mass_Z": 80,
+    "diMuon_bsConstrainedMass_full_range": 200,
     "diMuon_phi": 80,
     "diMuon_eta": 50,
-    "relative_diMuon_mass_error": 60,
-    "relative_diMuon_bsConstrainedMass_error": 60,
+    "relative_diMuon_mass_error": 40,
+    "relative_diMuon_bsConstrainedMass_error": 40,
     ## Muon variables
     "mu1_pt_mass_ratio": 50,
     "mu2_pt_mass_ratio": 50,
@@ -117,14 +116,14 @@ n_bins = {
     "mu2_eta": 50,
     "phi_CS": 50,
     "cos_theta_CS": 50,
-    "mu1_pt": 60,
-    "mu2_pt": 60,
-    "mu1_ptErr": 80,
-    "mu2_ptErr": 80,
-    "mu1_bsConstrainedPt": 60,
-    "mu2_bsConstrainedPt": 60,
-    "mu1_bsConstrainedPtErr": 80,
-    "mu2_bsConstrainedPtErr": 80,
+    "mu1_pt": 40,
+    "mu2_pt": 40,
+    "mu1_ptErr": 60,
+    "mu2_ptErr": 60,
+    "mu1_bsConstrainedPt": 40,
+    "mu2_bsConstrainedPt": 40,
+    "mu1_bsConstrainedPtErr": 60,
+    "mu2_bsConstrainedPtErr": 60,
     ## Jet variables
     "n_jet": 8,
     "leading_jet_pt": 50,
@@ -186,10 +185,9 @@ x_range = {
     "diMuon_phi": (-3.1415, 3.1415),
     "diMuon_eta": (-10, 10),
     "diMuon_rapidity": (-2.5, 2.5),
-    #"diMuon_mass_Z": (85, 100),
-    "relative_diMuon_mass_error": (0,1.1),
-    "relative_diMuon_bsConstrainedMass_error": (0,1.1),
-    # "diMuon_mass_full_range": (50, 150),
+    "diMuon_mass_Z": (85, 100),
+    "relative_diMuon_mass_error": (0,0.3),
+    "relative_diMuon_bsConstrainedMass_error": (0,0.3),
     ## Muon variables
     "mu1_pt_mass_ratio": (0.19, 1.6),
     "mu2_pt_mass_ratio": (0.19, 1.6),
@@ -199,14 +197,14 @@ x_range = {
     "mu2_eta": (-2.4, 2.4),
     "phi_CS": (-3.1415, 3.1415),
     "cos_theta_CS": (-1, 1),
-    "mu1_pt": (0,1000),
-    "mu2_pt": (0,500),
-    "mu1_ptErr": (0,100),
-    "mu2_ptErr": (0,35),
-    "mu1_bsConstrainedPt": (0,1000),
-    "mu2_bsConstrainedPt": (0,500),
-    "mu1_bsConstrainedPtErr": (0,100),
-    "mu2_bsConstrainedPtErr": (0,35),
+    "mu1_pt": (0,800),
+    "mu2_pt": (0,350),
+    "mu1_ptErr": (0,60),
+    "mu2_ptErr": (0,20),
+    "mu1_bsConstrainedPt": (0,800),
+    "mu2_bsConstrainedPt": (0,350),
+    "mu1_bsConstrainedPtErr": (0,60),
+    "mu2_bsConstrainedPtErr": (0,20),
     ## Jet variables
     "n_jet": (0, 8),
     "leading_jet_pt": (25, 400),
@@ -246,14 +244,15 @@ x_range = {
     "BDT_VBF": (0, 1),
 }
 
-# y_labels = {
-    # "diMuon_mass": r"events",
-    # "diMuon_mass_full_range": r"events",
-    # "diMuon_rapidity": r"events",
-    # "diMuon_pt": r"events",
-    # "diMuon_phi": r"events",
-    # "diMuon_eta": r"events",
-# }
+y_labels = {
+    "diMuon_mass": r"events",
+    "diMuon_bsConstrainedMass": r"events",
+    "diMuon_rapidity": r"events",
+    "diMuon_pt": r"events",
+    "diMuon_bsConstrainedPt": r"events",
+    "diMuon_phi": r"events",
+    "diMuon_eta": r"events",
+}
 
 background_labels = {
     ## DY
@@ -294,10 +293,9 @@ luminosity = {
     "2022Combined": "34.65",
     "2023": "17.79",
     "2023BPix": "9.45",
-    "2023Combined": "27.24",
     "2024": "109.08",
-    # "Combined": "61.89",
-    "Combined": "170.97",
+    "2023Combined": "27.24",
+    "Combined": "61.89",
 }
 
 variables_type = {
@@ -320,7 +318,6 @@ variables_type = {
         "diMuon_mass",
         "diMuon_bsConstrainedPt",
         "diMuon_bsConstrainedMass",
-        "diMuon_mass_full_range",
         "diMuon_phi",
         "diMuon_eta",
         "relative_diMuon_mass_error",
@@ -372,8 +369,8 @@ variables_type = {
         "min_delta_eta_diMuon_jet",
         "min_delta_phi_diMuon_jet",
     ],
-    ## BDT
-    "BDT_channel": [
+    ## BDT_ggh
+    "ggH_category": [
         "BDT_ggH",
         "BDT_VBF",
     ],

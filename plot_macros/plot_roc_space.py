@@ -11,41 +11,31 @@ if len(sys.argv) < 3:
     exit()
 channel_US = sys.argv[1]
 era_input = sys.argv[2]
-comparation_input = sys.argv[3]
 
 colors = ["blue", "red", "lime", "black", "orange"]
-#if "--only" in sys.argv:
-#    sys.argv.remove("--only")
-eras = [era_input]
-
-if comparation_input == "mass_range":
-    comparation_list = ["_M-115-135", "_M-110-150", "_M-100-180"]
+if "--only" in sys.argv:
+    sys.argv.remove("--only")
+    eras = [era_input]
+elif era_input == "2022":
+    eras = ["2022", "2022EE", "2022Combined"]
+elif era_input == "2023":
+    eras = ["2023", "2023BPix", "2023Combined"]
+elif era_input == "Combined":
+    eras = ["2022Combined", "2023Combined", "Combined"]
+elif era_input == "All":
+    eras = ["2022", "2022EE", "2023","2023BPix","Combined"]
 else:
-    comparation_list = [""]
     print("Set era to be one of the available sets:")
     print(" > 2022, 2023, Combined, All")
     exit()
 
-#elif era_input == "2022":
-#    eras = ["2022", "2022EE", "2022Combined"]
-#elif era_input == "2023":
-#    eras = ["2023", "2023BPix", "2023Combined"]
-#elif era_input == "Combined":
-#    eras = ["Combined"]
-#elif era_input == "All":
-#    eras = ["2022", "2022EE", "2023","2023BPix","Combined"]
-#else:
-#    print("Set era to be one of the available sets:")
-#    print(" > 2022, 2023, Combined, All")
-#    exit()
-
-if len(sys.argv) == 4:
+if len(sys.argv) == 3:
     background_subset = "Full"
     signal_subset = "NottH"
     print("Using default subsets:", background_subset, signal_subset)
-elif len(sys.argv) == 6:
-    background_subset = sys.argv[4]
-    signal_subset = sys.argv[5]
+elif len(sys.argv) == 5:
+    background_subset = sys.argv[3]
+    signal_subset = sys.argv[4]
 else:
     print("Include subset of background AND signal only.")
     exit()
@@ -56,46 +46,37 @@ print("Background subset: ", background_subset)
 print("Signal subset: ", signal_subset)
 
 subset_title = "B" + background_subset + "_S" + signal_subset
-comparation_list.append("_runII")
 
 fig, ax = get_canvas()
-for comparation, colors in zip(comparation_list, colors):
-    print("Plotting: ", comparation)
+for era, colors in zip(eras, colors):
     fpr_list = []
     tpr_list = []
-    file_path = "../python/xgboost/roc/" + channel_US +  "_" + era_input + "_" +\
-                subset_title + "_roc" + comparation + ".txt"
+    file_path = "../python/xgboost/roc/" + channel_US +  "_" + era + "_" +\
+                subset_title + "_roc.txt"
     with open(file_path, "r") as file:
         for line in file:
-            if comparation == "_runII":
-                parts = line.strip().split(", ")
-                fpr = float(parts[1])
-                tpr = float(parts[0]) 
-            else: 
-                parts = line.strip().split(",")
-                fpr = float(parts[1].split("=")[1].strip())
-                tpr = float(parts[2].split("=")[1].strip())
+            parts = line.strip().split(",")
+            fpr = float(parts[1].split("=")[1].strip())
+            tpr = float(parts[2].split("=")[1].strip())
             fpr_list.append(fpr)
             tpr_list.append(tpr)
 
-    ax.plot(tpr_list, fpr_list, label=comparation.replace("_", ""))
+    ax.plot(tpr_list, fpr_list, label=era)
 
 # Show x-axis ticks every 0.1 units
 plt.xticks(np.arange(0, 1.1, 0.1))
 ax.set_ylabel(r"$\epsilon_{bkg}$")
 ax.set_xlabel(r"$\epsilon_{sig}$")
 ax.set_ylim(0.0001, 1)
-ax.set_xlim(0.001, 1)
-#ax.set_xlim(0, 1)
+ax.set_xlim(0, 1)
 ax.legend(frameon=False, loc="lower right")
 hep.cms.label(data="False", label=channel_US + ", " + subset_title,
               year=era_input, com="13.6", ax=ax)
 ax.set_yscale("log")
-ax.set_xscale("log")
 ax.grid()
 
 file_name = "roc_space_" + channel_US + "_" + era_input
-#if len(eras) == 1:
-#    file_name += "ONLY"
-save_figure(fig, "../plots/roc/" + channel_US + "_category/",
-            file_name + "_" + subset_title + "_" + comparation_input)
+if len(eras) == 1:
+    file_name += "ONLY"
+save_figure(fig, "../plots/" + channel_US + "_category/roc/",
+            file_name + "_" + subset_title)

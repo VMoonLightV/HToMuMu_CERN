@@ -90,7 +90,7 @@ datasets_info = {
     "Muon1_2024C": ["T", 2, "2024", "Data",
                        "/Muon1/Run2024C-PromptReco-v1/NANOAOD"],
     "Muon1_2024D": ["T", 2, "2024", "Data",
-                       "/Muon1/Run2024D-PromptReco-v1/NANOAOD"],
+                       "/Muon1/Run2024-PromptReco-v1/NANOAOD"],
     "Muon1_2024E_v1": ["T", 2, "2024", "Data",
                        "/Muon1/Run2024E-PromptReco-v1/NANOAOD"],
     "Muon1_2024E_v2": ["T", 2, "2024", "Data",
@@ -471,13 +471,17 @@ datasets_info = {
             "/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
     "TTtoLNu2Q_Summer24": ["F", 2, "2024", "MC_background",
             "/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
-
+    
     #"TWminusto2L2Nu_Summer24": ["F", 2, "20234", "MC_background",
     #        ""],
     #"TWminusto4Q_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
     #"TWminustoLNu2Q_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
+    "TbarWplusto2L2Nu_Summer24": ["F", 2, "2024", "MC_background",
+            "/TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
+    "TbarWplusto4Q_Summer24": ["F", 2, "2024", "MC_background",
+            "/TbarWplusto4Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
     #"TbarQtoLNu-t-channel_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
     #"TQbartoLNu-t-channel_Summer24": ["F", 2, "2024", "MC_background",
@@ -516,6 +520,7 @@ datasets_info = {
     #        ""],
     #"WWW_4F_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
+
     ####################################################################################################
     # 2022 Simulations Signal
     ####################################################################################################
@@ -577,9 +582,10 @@ datasets_info = {
             "/WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV_powheg-minlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
     "ZH_Summer23BPix": ["F", 2, "2023BPix", "MC_signal",
             "/ZH_Hto2Mu_ZtoAll_M-125_TuneCP5_13p6TeV_powheg-minlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
-
+        
     ####################################################################################################
     # 2024 Simulations Signal
     ####################################################################################################
     #All missing currently
+
 }
