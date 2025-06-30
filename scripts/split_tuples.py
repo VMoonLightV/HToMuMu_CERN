@@ -7,11 +7,13 @@ import numpy as np
 data_type = "signal"
 channel = "ggH"
 
-out_path = "../../../split_tuples/" + channel + "/"
+out_path = "./root_io/tuples/split_tuples/" + channel + "/"
 input_path = "./root_io/tuples/BDT_score/" + channel + "/BFull_SNottH/"
 path = "./"
 os.makedirs(out_path, exist_ok=True)
-bdt_cuts = {"ggH" : [0.0, 0.058, 0.138, 1.0], "VBF": [0.0, 0.058, 0.138, 1.0]}
+#bdt_cuts = {"ggH" : [0.0, 0.058, 0.138, 1.0], "VBF": [0.0, 0.518, 0.943, 0.992, 1.0]}
+#bdt_cuts = {"ggH" : [0.0, 0.099, 0.238, 1.0], "VBF": [0.0, 0.518, 0.943, 0.992, 1.0]}
+bdt_cuts = {"ggH" : [0.0, 0.18615384615384592, 0.42307692307692246, 1.0], "VBF": [0.0, 0.3448846153846141, 0.7038461538461517, 0.938461538461536, 1.0]}
 branching_ratio = 2.176e-4
 print("[Info]: branching ratio =", branching_ratio)
 
@@ -52,6 +54,8 @@ with uproot.recreate(out_path + output_file_name) as file_output:
             (branches["BDT_" + channel] > bdt_cuts[channel][category])
             & (branches["BDT_" + channel] < bdt_cuts[channel][category + 1])
             & (branches["is_" + channel + "_category"] == 1)
+            & (branches["diMuon_mass"] < 180)
+            & (branches["diMuon_mass"] > 100)
         )
 
 
@@ -76,10 +80,13 @@ with uproot.recreate(out_path + output_file_name) as file_output:
         
         print("Final events: ", len(selected_events["diMuon_mass"]))
         
+        cat_name= channel + "cat" + str(len(bdt_cuts[channel]) - category -1)
+        print("cat name:", cat_name)
         if data_type == "data":
-            tree_name = "%s_%s_%s"%("Data","13TeV","cat" + str(len(bdt_cuts[channel]) - category))
+            tree_name = "%s_%s_%s"%("Data","13TeV",cat_name)
         elif data_type == "signal":
-            tree_name = "%s_%s_%s_%s"%(channel.lower(),"125","13TeV","cat" + str(category))
+            tree_name = "%s_%s_%s_%s"%(channel.lower(),"125","13TeV",cat_name)
+            
 
         
 
