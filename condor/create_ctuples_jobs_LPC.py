@@ -13,6 +13,7 @@ from listDatasets_Run3 import datasets_info
 skip_dataset = [
     "DoubleMuon_2022A",
     "DoubleMuon_2022B",
+    "DoubleMuon_2022C",
     "Muon0_2023B",
     "Muon1_2023B",
 ]
