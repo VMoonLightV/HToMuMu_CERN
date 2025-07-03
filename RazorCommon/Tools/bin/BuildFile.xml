@@ -1,0 +1,9 @@
+<use   name="rootcore"/>
+<use   name="FWCore/FWLite"/>
+<use   name="DataFormats/FWLite"/>
+<use   name="DataFormats/Luminosity"/>
+<use   name="FWCore/PythonParameterSet"/>
+<use   name="CommonTools/Utils"/>
+<environment>
+  <bin   file="FWLiteGoodLumi.cc"></bin>
+</environment>
