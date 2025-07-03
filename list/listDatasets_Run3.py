@@ -15,6 +15,8 @@ datasets_info = {
                    "/Muon/Run2022C-22Sep2023-v1/NANOAOD"],
     "Muon_2022D": ["T", 2, "2022", "Data",
                    "/Muon/Run2022D-22Sep2023-v1/NANOAOD"],
+    "SingleMuon_2022C": ["T", 2, "2022", "Data",
+                   "/SingleMuon/Run2022C-22Sep2023-v1/NANOAOD"],
     ####################################################################################################
     # 2022EE  Datasets
     ####################################################################################################
@@ -105,6 +107,22 @@ datasets_info = {
                        "/Muon1/Run2024I-PromptReco-v1/NANOAOD"],
     "Muon1_2024I_v2": ["T", 2, "2024", "Data",
                        "/Muon1/Run2024I-PromptReco-v2/NANOAOD"],
+    ####################################################################################################
+    # 2025  Datasets
+    ####################################################################################################
+    "Muon0_2025B": ["T", 2, "2025", "Data",
+                       "/Muon0/Run2025B-PromptReco-v1/NANOAOD"],
+    "Muon0_2025C_v1": ["T", 2, "2025", "Data",
+                       "/Muon0/Run2025C-PromptReco-v1/NANOAOD"],
+    "Muon0_2025C_v2": ["T", 2, "2025", "Data",
+                       "/Muon0/Run2025C-PromptReco-v2/NANOAOD"],
+
+    "Muon1_2025B": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025B-PromptReco-v1/NANOAOD"],
+    "Muon1_2025C_v1": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025C-PromptReco-v1/NANOAOD"],
+    "Muon1_2025C_v2": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025C-PromptReco-v2/NANOAOD"],
     
     ####################################################################################################
     # 2022 Simulations Backgrounds
