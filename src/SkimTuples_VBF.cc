@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
         "weight",
         //"is_ggH_category",
         "is_VBF_category",
+	"relative_diMuon_mass_error",
     };
     for (auto VBF_branch : branches)
         tree_input->SetBranchStatus(VBF_branch, 1);
