@@ -100,7 +100,6 @@ n_bins = {
     "diMuon_pt": 80,
     "diMuon_bsConstrainedPt": 80,
     "diMuon_bsConstrainedMass":80,
-    #"diMuon_mass_Z": 80,
     #"diMuon_bsConstrainedMass_full_range": 200,
     "diMuon_mass": 80,
     # "diMuon_mass_full_range": 200,
@@ -160,8 +159,8 @@ n_bins = {
     "HT_pt5": 20,
     "HT_pt10": 20,
     ## BDT_ggh
-    "BDT_ggH": 50,
-    "BDT_VBF": 50,
+    "BDT_ggH": 100,
+    "BDT_VBF": 100,
 }
 
 """
@@ -221,12 +220,12 @@ x_range = {
     "diJet_eta": (-10, 10),
     "diJet_phi": (-3.1415, 3.1415),
     "diJet_mass": (0, 500),
-    "diJet_mass_VBF": (400, 900),
+    "diJet_mass_VBF": (200, 900),
     "diJet_mass_mo": (0, 800),
     "diJet_DeltaEta": (-12, 12),
     "delta_eta_diJet": (0, 8.0),
     "delta_eta_diJet_ggH": (0, 5.5),
-    "delta_eta_diJet_VBF": (2.5, 8.0),
+    "delta_eta_diJet_VBF": (2.0, 8.0),
     "delta_phi_diJet": (0, 3.14),
     "z_zeppenfeld": (-7, 7),
     "z_zeppenfeld_VBF": (-5, 5),
