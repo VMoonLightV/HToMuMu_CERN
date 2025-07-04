@@ -123,7 +123,6 @@ class CreateTuple {
 
     /** New DiMuon variables*/
     float diMuon_rapidity;
-    Double_t diMuon_mass_write;
 
     /** New Muon variables*/
     float mu1_pt_mass_ratio, mu2_pt_mass_ratio, mu1_bsConstrainedPt_mass_ratio,
@@ -226,7 +225,7 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "is_VBF_category/i");
 
     // DiMuon variables
-    tree_output->Branch("diMuon_mass", &diMuon_mass_write, "diMuon_mass/D");
+    tree_output->Branch("diMuon_mass", &diMuon_mass, "diMuon_mass/f");
     tree_output->Branch("diMuon_bsConstrainedMass", &diMuon_bsConstrainedMass, "diMuon_bsConstrainedMass/f");
     tree_output->Branch("diMuon_pt", &diMuon_pt, "diMuon_pt/f");
     tree_output->Branch("diMuon_bsConstrainedPt", &diMuon_bsConstrainedPt, "diMuon_bsConstrainedPt/f");
@@ -366,7 +365,6 @@ void CreateTuple::fillOutputTree() {
 
         // DiMuon variables
         diMuon_rapidity = (mu1_vector + mu2_vector).Rapidity();
-        diMuon_mass_write = static_cast<Double_t>(diMuon_mass);
 
         // Muon variables
         mu1_vector.SetPtEtaPhiM((*mu_pt)[mu1_index], (*mu_eta)[mu1_index],
