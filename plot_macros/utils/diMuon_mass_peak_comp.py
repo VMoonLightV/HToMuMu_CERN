@@ -94,8 +94,8 @@ def plot_diMuon_comp_and_fit(fit_range, mass_range, noBSC_hist, BSC_hist, partic
     if (particle=="Z"): ifMCorData = "Data"
     else: ifMCorData = signal + " MC"
 
-    hep.histplot(noBSC_hist[0], noBSC_hist[1], label = ifMCorData + " no BSC", ax=axs[0])
-    hep.histplot(BSC_hist[0], BSC_hist[1], label = ifMCorData + " BSC", ax=axs[0])
+    hep.histplot(noBSC_hist[0], noBSC_hist[1], label = ifMCorData + " no BSC " + "sigma: {:.6f}, mu: {:.6f}".format(popt[2], popt[1]), ax=axs[0])
+    hep.histplot(BSC_hist[0], BSC_hist[1], label = ifMCorData + " BSC " + "sigma: {:.6f}, mu: {:.6f}".format(poptBSC[2], poptBSC[1]), ax=axs[0])
 
     hep.cms.label(
     data="True",
@@ -163,7 +163,7 @@ def draw_diMuon_mass_peak_comp(particle, era, use_puweight=True):
         fit_range = Z_fit_range
         histograms_list = []
         #labels = []
-        with ur.open("../root_io/tuples/Data_" + era + "_tuples.root:tree_output") as data_file:
+        with ur.open("/eos/home-y/yulou/Fnal-hmm/hmm-tuples/Data_" + era + "_tuples.root:tree_output") as data_file:
             branches = data_file.arrays(variables, library="np")
             for var in variables:
                 histogram, bins = np.histogram(
@@ -185,7 +185,7 @@ def draw_diMuon_mass_peak_comp(particle, era, use_puweight=True):
         for signal in signal_sources:
             histograms_list = []
             #labels = []
-            with ur.open("../root_io/tuples/" + signal + "_" + era + "_tuples.root:tree_output") as data_file:
+            with ur.open("/eos/home-y/yulou/Fnal-hmm/hmm-tuples/" + signal + "_" + era + "_tuples.root:tree_output") as data_file:
                 branches = data_file.arrays(variables, library="np")
                 for var in variables:
                     histogram, bins = np.histogram(
@@ -197,3 +197,7 @@ def draw_diMuon_mass_peak_comp(particle, era, use_puweight=True):
                     histograms_list.append([histogram, bins])
                     #labels.append(particle + "_" + signal + "_" + var + "_" + era)
             plot_diMuon_comp_and_fit(fit_range, mass_range, histograms_list[0], histograms_list[1], particle, era, signal)
+
+
+
+

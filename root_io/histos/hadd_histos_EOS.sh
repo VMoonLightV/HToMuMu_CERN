@@ -1,4 +1,4 @@
-EOS_PATH="/eos/uscms/store/group/lpchmumu/$USER/analyzer_HiggsMuMu/histos/"
+EOS_PATH="/eos/cms/store/group/phys_higgs/cmshmm/sixie/analyzer_HiggsMuMu/06262025/histos/"
 
 ##############  2022  ##############
 #hadd -f Data_2022_histos.root ${EOS_PATH}DoubleMuon_2022C_2022_histos.root ${EOS_PATH}Muon_2022C_2022_histos.root ${EOS_PATH}Muon_2022D_2022_histos.root

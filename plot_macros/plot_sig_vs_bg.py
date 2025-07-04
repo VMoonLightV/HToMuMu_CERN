@@ -30,20 +30,23 @@ variables = [
     "min_delta_eta_diMuon_jet",
     "min_delta_phi_diMuon_jet",
     ## VBF required
-    "pt_balance",
-    "pt_centrality",
-    "n_SoftJet_pt2",
-    "n_SoftJet_pt5",
-    "n_SoftJet_pt10",
-    "HT",
-    "HT_pt2",
-    "HT_pt5",
-    "HT_pt10",
-]
+    ]
+if channel_US =="VBF":
+  variables += [
+      "pt_balance",
+      "pt_centrality",
+      "n_SoftJet_pt2",
+      "n_SoftJet_pt5",
+      "n_SoftJet_pt10",
+      "HT",
+      "HT_pt2",
+      "HT_pt5",
+      "HT_pt10",
+  ]
 
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
-# eras = ["2022", "2022EE", "2023", "2023BPix"]
+#eras = ["2022", "2022EE", "2023", "2023BPix"]
 eras = ["2022Combined", "2023Combined", "Combined"]
 background_subset = ["Full", "NoDY50"]
 # background_subset = ["NoDY50"]

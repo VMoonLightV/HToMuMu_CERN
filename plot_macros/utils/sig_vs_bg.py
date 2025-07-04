@@ -15,13 +15,13 @@ from .helper import (
 def draw_sig_and_bg_from_tuple(variable, era, category="", bsubset="", ssubset=""):
     plt.style.use(hep.style.CMS)
 
-    files_path = "../root_io/skim/" + category + "/"
-    if category == "VBF": files_path += "merged/"
+    files_path = "/eos/home-y/yulou/Fnal-hmm/hmm-skims/" + category + "/"
+    #if category == "VBF": files_path += "merged/"
 
-    background_path = files_path + "background_" + era + "_skim" + bsubset + ".root"
+    background_path = files_path + "background_" + era + "_skim_" + bsubset + ".root"
     with ur.open(background_path + ":tree_output") as file:
         background_branches = file.arrays([variable, "weight_no_lumi"], library="np")
-    signal_path = files_path + "signal_" + era + "_skim" + ssubset + ".root"
+    signal_path = files_path + "signal_" + era + "_skim_" + ssubset + ".root"
     with ur.open(signal_path + ":tree_output") as file:
         signal_branches = file.arrays([variable, "weight_no_lumi"], library="np")
 

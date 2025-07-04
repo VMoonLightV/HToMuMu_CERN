@@ -130,7 +130,7 @@ def get_histograms_from_tuple(
 
     for source in sources:
         with ur.open(
-            "../root_io/tuples/" + source + "_" + era + "_tuples.root:tree_output"
+            "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/" + source + "_" + era + "_tuples.root:tree_output"
         ) as file:
             branches = file.arrays(variables, library="np")
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
@@ -229,7 +229,7 @@ def draw_data_and_simul_and_ratio(
         variable_bin += "_VBF"
 
     with ur.open(
-        "../root_io/tuples/Data_" + era + "_tuples.root:tree_output"
+        "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/Data_" + era + "_tuples.root:tree_output"
     ) as data_file:
         branches = data_file.arrays(variables, library="np")
         if "bsConstrained" in variable:
