@@ -71,7 +71,7 @@ def get_histograms_from_tuple(
 
     for source in sources:
         file_name = source + "_" + era + "_tuples.root:tree_output"
-        if bdt_subset != "":
+        if bdt_subset != "" and len(bdt_cuts) != 0:
             file_name = source + "_" + era + "_" + bdt_subset + ".root:tree_output"
 
         with ur.open(tuple_path + file_name) as file:
