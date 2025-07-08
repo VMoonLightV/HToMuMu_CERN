@@ -132,7 +132,7 @@ class CreateTuple {
     float relative_diMuon_mass_error, relative_diMuon_bsConstrainedMass_error;
 
     /** New jets variables*/
-    float leading_jet_pt, leading_jet_eta, subleading_jet_pt;
+    float leading_jet_pt, leading_jet_eta, subleading_jet_pt, subleading_jet_eta;
 
     /** New DiJets variables*/
     float delta_eta_diJet, delta_phi_diJet, z_zeppenfeld, pt_balance,
@@ -267,6 +267,8 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "leading_jet_eta/f");
     tree_output->Branch("subleading_jet_pt", &subleading_jet_pt,
                         "subleading_jet_pt/f");
+    tree_output->Branch("subleading_jet_eta", &subleading_jet_eta,
+                        "subleading_jet_eta/f");
     //
     // diJet variables
     tree_output->Branch("diJet_mass", &diJet_mass, "diJet_mass/f");
@@ -357,7 +359,7 @@ void CreateTuple::fillOutputTree() {
     for (int event_index = 0; event_index < total_entries; event_index++) {
         tree_input->GetEntry(event_index);
         // if (diMuon_mass < 110 || diMuon_mass > 150)
-        if (diMuon_mass < 70 || diMuon_mass > 180)
+        if (diMuon_mass < 100 || diMuon_mass > 180)
             continue;
 
         weight = GetEventWeight(gen_weight, pileup_weight, scale_factor);
@@ -403,6 +405,7 @@ void CreateTuple::fillOutputTree() {
             leading_jet_eta = 0;
             diJet_mass = 0;
             subleading_jet_pt = 0;
+            subleading_jet_eta = 0;
             delta_eta_diJet = 0;
             delta_phi_diJet = -1;
             z_zeppenfeld = 0;
@@ -415,6 +418,7 @@ void CreateTuple::fillOutputTree() {
             leading_jet_eta = jet_eta->at(0);
             diJet_mass = 0;
             subleading_jet_pt = 0;
+            subleading_jet_eta = 0;
             delta_eta_diJet = 0;
             delta_phi_diJet = -1;
             z_zeppenfeld = 0;
@@ -425,8 +429,8 @@ void CreateTuple::fillOutputTree() {
         } else {
             leading_jet_pt = jet_pt->at(0);
             leading_jet_eta = jet_eta->at(0);
-            // diJet_mass;
             subleading_jet_pt = jet_pt->at(1);
+            subleading_jet_eta = jet_eta->at(1);
             delta_eta_diJet = DeltaEta(jet_eta->at(0), jet_eta->at(1));
             delta_phi_diJet = DeltaPhi(jet_phi->at(0), jet_phi->at(1));
             z_zeppenfeld = GetZZeppenfeldVariable(diMuon_rapidity, jet_pt,
