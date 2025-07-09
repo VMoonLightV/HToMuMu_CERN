@@ -262,6 +262,8 @@ void CreateTuple::setBranchesAddressesOutput() {
 
     // Jet variables
     tree_output->Branch("n_jet", &n_jet, "n_jet/i");
+    tree_output->Branch("n_bjet", &n_bjet, "n_bjet/i");
+    tree_output->Branch("n_bjet_Loose", &n_bjet_Loose, "n_bjet_Loose/i");
     tree_output->Branch("leading_jet_pt", &leading_jet_pt, "leading_jet_pt/f");
     tree_output->Branch("leading_jet_eta", &leading_jet_eta,
                         "leading_jet_eta/f");
@@ -444,8 +446,8 @@ void CreateTuple::fillOutputTree() {
                 TMath::Min(DeltaEta(diMuon_eta, jet_eta->at(0)),
                            DeltaEta(diMuon_eta, jet_eta->at(1)));
             min_delta_phi_diMuon_jet =
-                TMath::Min(TMath::Abs(DeltaPhi(diMuon_eta, jet_eta->at(0))),
-                           TMath::Abs(DeltaPhi(diMuon_eta, jet_eta->at(1))));
+                TMath::Min(TMath::Abs(DeltaPhi(diMuon_phi, jet_phi->at(0))),
+                           TMath::Abs(DeltaPhi(diMuon_phi, jet_phi->at(1))));
         }
 
         // Choose category
