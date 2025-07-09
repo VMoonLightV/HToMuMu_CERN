@@ -123,7 +123,6 @@ class CreateTuple {
 
     /** New DiMuon variables*/
     float diMuon_rapidity;
-    Double_t diMuon_mass_write;
 
     /** New Muon variables*/
     float mu1_pt_mass_ratio, mu2_pt_mass_ratio, mu1_bsConstrainedPt_mass_ratio,
@@ -133,7 +132,7 @@ class CreateTuple {
     float relative_diMuon_mass_error, relative_diMuon_bsConstrainedMass_error;
 
     /** New jets variables*/
-    float leading_jet_pt, leading_jet_eta, subleading_jet_pt;
+    float leading_jet_pt, leading_jet_eta, subleading_jet_pt, subleading_jet_eta;
 
     /** New DiJets variables*/
     float delta_eta_diJet, delta_phi_diJet, z_zeppenfeld, pt_balance,
@@ -226,7 +225,7 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "is_VBF_category/i");
 
     // DiMuon variables
-    tree_output->Branch("diMuon_mass", &diMuon_mass_write, "diMuon_mass/D");
+    tree_output->Branch("diMuon_mass", &diMuon_mass, "diMuon_mass/f");
     tree_output->Branch("diMuon_bsConstrainedMass", &diMuon_bsConstrainedMass, "diMuon_bsConstrainedMass/f");
     tree_output->Branch("diMuon_pt", &diMuon_pt, "diMuon_pt/f");
     tree_output->Branch("diMuon_bsConstrainedPt", &diMuon_bsConstrainedPt, "diMuon_bsConstrainedPt/f");
@@ -263,11 +262,15 @@ void CreateTuple::setBranchesAddressesOutput() {
 
     // Jet variables
     tree_output->Branch("n_jet", &n_jet, "n_jet/i");
+    tree_output->Branch("n_bjet", &n_bjet, "n_bjet/i");
+    tree_output->Branch("n_bjet_Loose", &n_bjet_Loose, "n_bjet_Loose/i");
     tree_output->Branch("leading_jet_pt", &leading_jet_pt, "leading_jet_pt/f");
     tree_output->Branch("leading_jet_eta", &leading_jet_eta,
                         "leading_jet_eta/f");
     tree_output->Branch("subleading_jet_pt", &subleading_jet_pt,
                         "subleading_jet_pt/f");
+    tree_output->Branch("subleading_jet_eta", &subleading_jet_eta,
+                        "subleading_jet_eta/f");
     //
     // diJet variables
     tree_output->Branch("diJet_mass", &diJet_mass, "diJet_mass/f");
@@ -358,7 +361,7 @@ void CreateTuple::fillOutputTree() {
     for (int event_index = 0; event_index < total_entries; event_index++) {
         tree_input->GetEntry(event_index);
         // if (diMuon_mass < 110 || diMuon_mass > 150)
-        if (diMuon_mass < 70 || diMuon_mass > 180)
+        if (diMuon_mass < 100 || diMuon_mass > 180)
             continue;
 
         weight = GetEventWeight(gen_weight, pileup_weight, scale_factor);
@@ -366,7 +369,6 @@ void CreateTuple::fillOutputTree() {
 
         // DiMuon variables
         diMuon_rapidity = (mu1_vector + mu2_vector).Rapidity();
-        diMuon_mass_write = static_cast<Double_t>(diMuon_mass);
 
         // Muon variables
         mu1_vector.SetPtEtaPhiM((*mu_pt)[mu1_index], (*mu_eta)[mu1_index],
@@ -405,6 +407,7 @@ void CreateTuple::fillOutputTree() {
             leading_jet_eta = 0;
             diJet_mass = 0;
             subleading_jet_pt = 0;
+            subleading_jet_eta = 0;
             delta_eta_diJet = 0;
             delta_phi_diJet = -1;
             z_zeppenfeld = 0;
@@ -417,6 +420,7 @@ void CreateTuple::fillOutputTree() {
             leading_jet_eta = jet_eta->at(0);
             diJet_mass = 0;
             subleading_jet_pt = 0;
+            subleading_jet_eta = 0;
             delta_eta_diJet = 0;
             delta_phi_diJet = -1;
             z_zeppenfeld = 0;
@@ -427,8 +431,8 @@ void CreateTuple::fillOutputTree() {
         } else {
             leading_jet_pt = jet_pt->at(0);
             leading_jet_eta = jet_eta->at(0);
-            // diJet_mass;
             subleading_jet_pt = jet_pt->at(1);
+            subleading_jet_eta = jet_eta->at(1);
             delta_eta_diJet = DeltaEta(jet_eta->at(0), jet_eta->at(1));
             delta_phi_diJet = DeltaPhi(jet_phi->at(0), jet_phi->at(1));
             z_zeppenfeld = GetZZeppenfeldVariable(diMuon_rapidity, jet_pt,
@@ -442,8 +446,8 @@ void CreateTuple::fillOutputTree() {
                 TMath::Min(DeltaEta(diMuon_eta, jet_eta->at(0)),
                            DeltaEta(diMuon_eta, jet_eta->at(1)));
             min_delta_phi_diMuon_jet =
-                TMath::Min(TMath::Abs(DeltaPhi(diMuon_eta, jet_eta->at(0))),
-                           TMath::Abs(DeltaPhi(diMuon_eta, jet_eta->at(1))));
+                TMath::Min(TMath::Abs(DeltaPhi(diMuon_phi, jet_phi->at(0))),
+                           TMath::Abs(DeltaPhi(diMuon_phi, jet_phi->at(1))));
         }
 
         // Choose category

@@ -58,7 +58,8 @@ int main(int argc, char *argv[]) {
                               "min_delta_phi_diMuon_jet",
                               "weight_no_lumi",
                               "weight",
-                              "is_ggH_category"})
+                              "is_ggH_category",
+			      "relative_diMuon_mass_error"})
         tree_input->SetBranchStatus(ggh_branches, 1);
 
     gROOT->cd();

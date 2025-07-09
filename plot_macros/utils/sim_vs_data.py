@@ -56,11 +56,8 @@ def get_histograms_from_tuple(
     # so in the case we re escale the luminosity
     era_reweight = 1
     if lumi_rescale:
+        print("Re scaling lumi")
         era_reweight = 109.08 / 9.45
-        if production_channel == "ggH":
-            era_reweight = 50112710/5438017
-        elif production_channel == "VBF":
-            era_reweight = 127867/28980
         era = "2023BPix"
 
     variable_bin = variables[0]
@@ -69,24 +66,18 @@ def get_histograms_from_tuple(
         variable_bin += "_" + production_channel
 
     tuple_path = "../root_io/tuples/"
-    if bdt_subset != "":
-        # tuple_path += "BDT_score/" + bdt_subset + "/"
+    if bdt_subset != "" and len(bdt_cuts) != 0:
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
 
     for source in sources:
         file_name = source + "_" + era + "_tuples.root:tree_output"
-        if bdt_subset != "":
+        if bdt_subset != "" and len(bdt_cuts) != 0:
             file_name = source + "_" + era + "_" + bdt_subset + ".root:tree_output"
 
         with ur.open(tuple_path + file_name) as file:
             branches = file.arrays(variables, library="np")
 
             bool_list = np.ones(len(branches[variables[0]]), dtype=bool)
-
-            # if variables[0] != "diMuon_mass" and is_background:
-                # bool_list = (bool_list) & (
-                    # ((branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120)) & (branches["diMuon_mass"] < 150) & (branches["diMuon_mass"] > 110)
-                # )
 
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
                 bool_list = (bool_list) & (branches["diMuon_bsConstrainedMass"] > 130) | (
@@ -98,7 +89,7 @@ def get_histograms_from_tuple(
                     )
 
 
-            elif (variables[0] != "diMuon_mass" and ("bsConstrained" not in variables[0]) and is_background):
+            elif variables[0] != "diMuon_mass" and ("bsConstrained" not in variables[0]) and is_background:
                 bool_list = (bool_list) & (
                     ((branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120))
                 )
@@ -135,11 +126,8 @@ def get_histograms_from_tuple(
 
             histogram, bins = np.histogram(
                 branches[variables[0]],
-                #bins=n_bins[variable_bin],
                 bins=number_of_bins,
-                # range=x_range[variable_bin],
                 range=x_range_histos,
-                # weights=branches["weight"],
                 weights=(
                     branches["weight"] * era_reweight
                     # branches["weight"] * (branches["pileup_weight_down"] / branches["pileup_weight"])
@@ -149,8 +137,6 @@ def get_histograms_from_tuple(
             )
             histograms_list.append(histogram)
             bins_list.append(bins)
-            # histograms_list[source] = histogram
-            # bins_list[source] = bins
     return histograms_list, bins_list
 
 
@@ -164,8 +150,7 @@ def get_data_histograms_from_tuple(
 ):
     tuple_path = "../root_io/tuples/"
     file_name = "Data_" + era + "_tuples.root:tree_output"
-    if bdt_subset != "":
-        # tuple_path += "BDT_score/" + bdt_subset + "/"
+    if bdt_subset != "" and len(bdt_cuts) != 0:
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
         file_name = "Data_" + era + "_" + bdt_subset + ".root:tree_output"
 
@@ -176,7 +161,7 @@ def get_data_histograms_from_tuple(
         if variable_bin + "_" + production_channel in x_range:
             variable_bin += "_" + production_channel
 
-        # bool_list = (branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120)
+
         if "bsConstrained" in variables[0]:
             bool_list = ((branches["diMuon_bsConstrainedMass"] > 130) | (branches["diMuon_bsConstrainedMass"] < 120))
             if not Z_study:
@@ -218,8 +203,6 @@ def get_data_histograms_from_tuple(
         
         data_histogram, data_bins = np.histogram(
             branches[variables[0]],
-            # bins=n_bins[variable_bin],
-            # range=x_range[variable_bin],
             bins=number_of_bins,
             range=x_range_histos,
         )
@@ -241,7 +224,7 @@ def draw_data_and_simul_and_ratio(
     plt.style.use(hep.style.CMS)
 
     print("*" * len("****** PLOTTING " + variable + " *****"))
-    print("****** PLOTTING " + variable + " *****")
+    print("****** PLOTTING " + variable + " ERA " + era + " *****")
     print("*" * len("****** PLOTTING " + variable + " *****"))
 
     variables = [variable, "weight"] 
@@ -252,6 +235,7 @@ def draw_data_and_simul_and_ratio(
     # if variable != "diMuon_mass":
     if production_channel != "":
         variables.append("is_" + production_channel + "_category")
+    if len(bdt_cuts) != 0:
         variables.append("BDT_" + production_channel)
 
     data_histogram, data_bins = get_data_histograms_from_tuple(
@@ -263,17 +247,12 @@ def draw_data_and_simul_and_ratio(
         Z_study=Z_study,
     )
 
-    # if variable == "diMuon_mass":
     if variable == "diMuon_mass" or variable == "diMuon_bsConstrainedMass":
         data_histogram[data_histogram == 0] = -100.0
 
-    simulation_era = era
-    ##if era == "2024":
-    ##    simulation_era = "2023BPix"
-
     bkg_histograms_list, bkg_bins_list = get_histograms_from_tuple(
         background_sources,
-        simulation_era,
+        era,
         variables,
         True,
         use_puweight,
@@ -283,9 +262,10 @@ def draw_data_and_simul_and_ratio(
         era == "2024",
         Z_study=Z_study
     )
+
     signal_histograms_list, signal_bins_list = get_histograms_from_tuple(
         signal_sources,
-        simulation_era,
+        era,
         variables,
         False,
         use_puweight,
@@ -335,7 +315,7 @@ def draw_data_and_simul_and_ratio(
     if not use_puweight:
         label = "No PU weight"
     if len(bdt_cuts) > 1:
-        label = "Cat" + str(4 - len(bdt_cuts))
+        label = "Cat" + str(len(bdt_cuts) - 1)
     hep.cms.label(
         data="True",
         label=label,
@@ -392,7 +372,7 @@ def draw_data_and_simul_and_ratio(
         output_directory = (
             "../plots/ratio/" + production_channel + "_category/" + era + "/"
         )
-        output_directory = "../plots/ratio/ggH_category/bdt_selections/" + era + "/"
+        output_directory = "../plots/ratio/" + production_channel + "_category/bdt_selections/" + era + "/"
     if len(bdt_cuts) > 1:
         output_name += label
 
