@@ -1,4 +1,4 @@
-from utils.sim_vs_data_njet import draw_data_and_simul_and_ratio
+from utils.sim_vs_data_njet_Zpt import draw_data_and_simul_and_ratio
 import sys
 
 '''
