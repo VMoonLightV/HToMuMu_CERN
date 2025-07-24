@@ -36,8 +36,8 @@ class LeptonEfficiencyCorrector {
     float getSFErr(int pdgid, float pt, float eta);
     const std::vector<float> & run();
 
-    
-    static void initializeCorrections(const std::string& year_num);
+    //read run3 muon efficiency json files
+    void initializeCorrections(const std::string& year_num);
     float runner(const unique_ptr<correction::CorrectionSet>& cset,
             const string& key,
             const map<string, correction::Variable::Type>& example

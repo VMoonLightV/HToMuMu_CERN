@@ -297,12 +297,8 @@ void HmmAnalyzer::EventLoop() {
                 continue;
             }
 
-            // if (year == "2016") {
-            
-            //t_Mu_EffSF_TRIG->push_back(Mu_eff_SF_TRIG.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
-            //t_Mu_EffSFErr_TRIG->push_back(Mu_eff_SF_TRIG.getSFErr(13, Muon_pt[i], Muon_eta[i]));
-            //!!! maybe need to be moved to somewhere else
-            
+
+            //read run3 muon efficiency json files
 
             t_Mu_EffSF_TRIG->push_back(corrector.give_eff("Muon_eff_SF_TRIG", Muon_pt[i], Muon_eta[i]));
             t_Mu_EffSFErr_TRIG->push_back(corrector.give_eff("Muon_eff_SFerr_TRIG", Muon_pt[i], Muon_eta[i]));
@@ -314,11 +310,16 @@ void HmmAnalyzer::EventLoop() {
             t_Mu_EffSF_ISO->push_back(corrector.give_eff("Muon_eff_SF_ISO", Muon_pt[i], Muon_eta[i]));
             t_Mu_EffSF_ISO_stat->push_back(corrector.give_eff("Muon_eff_SF_ISO_stat", Muon_pt[i], Muon_eta[i]));
             t_Mu_EffSF_ISO_syst->push_back(corrector.give_eff("Muon_eff_SF_ISO_syst", Muon_pt[i], Muon_eta[i]));
+
+
+            // if (year == "2016") {
+
+            //t_Mu_EffSF_TRIG->push_back(Mu_eff_SF_TRIG.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            //t_Mu_EffSFErr_TRIG->push_back(Mu_eff_SF_TRIG.getSFErr(13, Muon_pt[i], Muon_eta[i]));
         
             /*t_Mu_EffSF_ID->push_back(Mu_eff_SF_ID.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
             t_Mu_EffSF_ID_stat->push_back(Mu_eff_SF_ID_stat.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
             t_Mu_EffSF_ID_syst->push_back(Mu_eff_SF_ID_syst.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
-            
             
             t_Mu_EffSF_ISO->push_back(Mu_eff_SF_ISO.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
             t_Mu_EffSF_ISO_stat->push_back(Mu_eff_SF_ISO_stat.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));

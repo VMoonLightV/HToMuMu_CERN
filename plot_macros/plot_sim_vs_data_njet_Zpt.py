@@ -100,7 +100,8 @@ eras = ["2022", "2022EE", "2023", "2023BPix"]#,"2024"]
 #region = "SR_Zpt_reweighting"
 #region = "ZCR" 
 #region = "SR_Zpt_normalization_reweighting" 
-region = "ZCR_normalization" 
+#region = "ZCR_normalization" 
+region = sys.argv[1]
 
 if "ZCR" in region: variables += ["diMuon_mass_Z"]
 if "SR" in region : variables += ["diMuon_mass"]

@@ -201,7 +201,7 @@ def polyfit(df, output_name):
     poly_function = np.poly1d(coefficients)
 
     coeff_df = pd.DataFrame({
-        'power': range(8, -1, -1),
+        'power': range(order, -1, -1),
         'coefficient': coefficients
     })
     coeff_df.to_csv(output_name, index=False)
@@ -310,6 +310,7 @@ def draw_data_and_simul_and_ratio(
         signal_sources, simulation_era, variables, False, use_puweight,
         use_ggH_category, use_VBF_category, njet, region, era == "2024", isZRange, 
     )
+    
 
 
     fig, axs = get_canvas(True)
@@ -395,11 +396,6 @@ def draw_data_and_simul_and_ratio(
             
             csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, sum_data/sum_MC])
 
-    
-
-            
-
-
     hep.histplot(
         ratio_hist,
         data_bins,
@@ -418,7 +414,9 @@ def draw_data_and_simul_and_ratio(
     axs[1].set_xlim(data_bins[0], data_bins[-1])
     axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable])
     
-    if ("ZCR_nor" in region) & (variable == "diMuon_pt"):
+    if ("ZCR_normalization" in region) & (variable == "diMuon_pt"):
+      axs[1].set_ylim(0.0, 2.0)
+      
       iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/" 
       os.makedirs(iter_dir, exist_ok=True)
             
@@ -452,7 +450,7 @@ def draw_data_and_simul_and_ratio(
               label=f'{order}-th Polynomial Fit')
   
       axs[1].legend(loc='best')
-    
+  
 
     output_directory = f"../plots/ratio/njet/{njet}jet_{region}/" + era + "/"
     if not use_puweight:

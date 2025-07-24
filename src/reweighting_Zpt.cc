@@ -69,9 +69,9 @@ int main(int argc, char *argv[]) {
             throw std::runtime_error("need 9 coffis, read: " + std::to_string(coefficients.size()));
         }
         
-        std::cout << "\nnominal order (high to low):" << std::endl;
+        //std::cout << "\nnominal order (high to low):" << std::endl;
         for (int i = 0; i < 9; i++) {
-            std::cout << "order " << 8-i << ": " << coefficients[i] << std::endl;
+            //std::cout << "order " << 8-i << ": " << coefficients[i] << std::endl;
         }
         
     } catch (const std::exception& e) {
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("weight", &weight);
     tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
-    TString output_file_path = output + njet +"jet/SR_Zpt_normalization_reweighting/" + channel + "_" + era + "_skim.root";
+    TString output_file_path = output + njet +"jet/SR_Zpt_normalization_reweighting_0-250pt/" + channel + "_" + era + "_skim.root";
 
     TString output_dir = gSystem->DirName(output_file_path);
 
@@ -124,9 +124,13 @@ int main(int argc, char *argv[]) {
         tree_input->GetEntry(i);  
         
         double f_pt = Polynomial(coefficients, dimuon_pt);
+
+        if (f_pt < 0.1) {
+            std::cout << "\n strange F(pt): " << f_pt << ", with dimuon_pt:" << dimuon_pt << std::endl;
+        }
         
         if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
-            if (fabs(f_pt) < 1e-10) {
+            /*if (fabs(f_pt) < 1e-10) {
                 if (zero_division_warnings < MAX_WARNINGS) {
                     std::cerr << "warning: at event " << i << " dimuon_pt = " << dimuon_pt
                             << ", f(pt) ≈ 0 (" << f_pt << ")weight set as 0" << std::endl;
@@ -135,7 +139,12 @@ int main(int argc, char *argv[]) {
                 weight = 0;
             } else {
                 weight = weight * f_pt;
+            }*/
+            if ((dimuon_pt) < 250.0) {
+                weight = weight * f_pt;
             }
+
+
         }
         tree_output->Fill();
         

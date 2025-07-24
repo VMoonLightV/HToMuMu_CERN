@@ -114,7 +114,8 @@ const std::vector<float> &LeptonEfficiencyCorrector::run() {
 }
 */
 
-//read run3 muon efficiencies json file and give values
+
+//read run3 muon efficiency json files
 
 using namespace std;
 namespace fs = filesystem;
