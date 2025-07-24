@@ -6,23 +6,44 @@
 #include <vector>
 #include <TH2.h>
 #include <TFile.h>
+#include <memory>    
+#include <map> 
 
 #include "WeightCalculatorFromHistogram.h"
+#include "correction.h"
+
+using namespace std;
+namespace fs = filesystem;
+
+
+extern std::unique_ptr<correction::CorrectionSet> cset_L;
+extern std::unique_ptr<correction::CorrectionSet> cset_M;
+extern std::unique_ptr<correction::CorrectionSet> cset_H;
+
 
 class LeptonEfficiencyCorrector {
- public:
+  public:
 
-  LeptonEfficiencyCorrector() {effmaps_.clear();}
-  //LeptonEfficiencyCorrector(std::vector<std::string> files, std::vector<std::string> histos);
-  ~LeptonEfficiencyCorrector() {}
+    LeptonEfficiencyCorrector() {effmaps_.clear();}
+    //LeptonEfficiencyCorrector(std::vector<std::string> files, std::vector<std::string> histos);
+    ~LeptonEfficiencyCorrector() {}
 
-  void init(std::vector<std::string> files, std::vector<std::string> histos);
-  void setLeptons(int nLep, int *lepPdgId, float *lepPt, float *lepEta);
+    void init(std::vector<std::string> files, std::vector<std::string> histos);
+    void setLeptons(int nLep, int *lepPdgId, float *lepPt, float *lepEta);
 
-  float getSF(int pdgid, float pt, float eta);
-  float getSFAve(int pdgid, float pt, float eta, float weight); 
-  float getSFErr(int pdgid, float pt, float eta);
-  const std::vector<float> & run();
+    float getSF(int pdgid, float pt, float eta);
+    float getSFAve(int pdgid, float pt, float eta, float weight); 
+    float getSFErr(int pdgid, float pt, float eta);
+    const std::vector<float> & run();
+
+    
+    static void initializeCorrections(const std::string& year_num);
+    float runner(const unique_ptr<correction::CorrectionSet>& cset,
+            const string& key,
+            const map<string, correction::Variable::Type>& example
+          );
+    float give_eff(const string& type, float muon_pt, float muon_eta);
+  
 
 private:
   std::vector<TH2F*> effmaps_;

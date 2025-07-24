@@ -7,6 +7,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cassert>
+#include <filesystem>
+#include <string>
+
+#include "correction.h"
+#include "../lib/LeptonEfficiencyCorrector.h"
 
 #ifdef MAKECINT
 #pragma link C++ class vector < float> + ;
@@ -21,7 +27,7 @@
 int main(int argc, char *argv[]) {
 
     if (argc != 6) {
-        std::cerr << "Please give 4 arguments " << "runList " << " "
+        std::cerr << "Please give 5 arguments " << "runList " << " "
                   << "outputFileName" << " " << "dataset"
                   << "data type and year" << std::endl;
         return -1;
@@ -32,21 +38,33 @@ int main(int argc, char *argv[]) {
     // const char *is_data = argv[4];
     const bool is_data_input = *argv[4] == 'T';
     TString year_num = argv[5];
+
+    //read run3 muon efficiency json files
+    LeptonEfficiencyCorrector corrector;
+    corrector.initializeCorrections(year_num.Data());
+
     HmmAnalyzer Hmm(inputFileList, outFileName, data, is_data_input, year_num);
     std::cout << "Running on: " << std::endl;
     std::cout << "  Dataset: " << data << " year " << year_num << std::endl;
     std::cout << "  Era:  " << year_num << std::endl;
     std::cout << std::boolalpha;
     std::cout << "  Is data? " << is_data_input << std::endl;
+
+
     Hmm.EventLoop();
 
     return 0;
 }
 
+
 void HmmAnalyzer::EventLoop() {
 
     if (fChain == 0)
         return;
+    
+    //read run3 muon efficiency json files
+    LeptonEfficiencyCorrector corrector;
+    
 
     // btag SF
     BTagCalibration calib("deepcsv", "./data/btagSF/DeepCSV_94XSF_V3_B_F.csv");
@@ -62,6 +80,7 @@ void HmmAnalyzer::EventLoop() {
     // long nentries = 6;
     long nbytes = 0;
     long nb = 0;
+    
     for (long jentry = 0; jentry < nentries; jentry++) {
         long ientry = LoadTree(jentry);
         
@@ -279,22 +298,32 @@ void HmmAnalyzer::EventLoop() {
             }
 
             // if (year == "2016") {
-            t_Mu_EffSF_TRIG->push_back(
-                Mu_eff_SF_TRIG.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
-            t_Mu_EffSFErr_TRIG->push_back(
-                Mu_eff_SF_TRIG.getSFErr(13, Muon_pt[i], Muon_eta[i]));
-            t_Mu_EffSF_ID->push_back(
-                Mu_eff_SF_ID.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
-            t_Mu_EffSF_ID_stat->push_back(Mu_eff_SF_ID_stat.getSFAve(
-                11, Muon_pt[i], Muon_eta[i], 0.5548));
-            t_Mu_EffSF_ID_syst->push_back(Mu_eff_SF_ID_syst.getSFAve(
-                11, Muon_pt[i], Muon_eta[i], 0.5548));
-            t_Mu_EffSF_ISO->push_back(
-                Mu_eff_SF_ISO.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
-            t_Mu_EffSF_ISO_stat->push_back(Mu_eff_SF_ISO_stat.getSFAve(
-                11, Muon_pt[i], Muon_eta[i], 0.5548));
-            t_Mu_EffSF_ISO_syst->push_back(Mu_eff_SF_ISO_syst.getSFAve(
-                11, Muon_pt[i], Muon_eta[i], 0.5548));
+            
+            //t_Mu_EffSF_TRIG->push_back(Mu_eff_SF_TRIG.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            //t_Mu_EffSFErr_TRIG->push_back(Mu_eff_SF_TRIG.getSFErr(13, Muon_pt[i], Muon_eta[i]));
+            //!!! maybe need to be moved to somewhere else
+            
+
+            t_Mu_EffSF_TRIG->push_back(corrector.give_eff("Muon_eff_SF_TRIG", Muon_pt[i], Muon_eta[i]));
+            t_Mu_EffSFErr_TRIG->push_back(corrector.give_eff("Muon_eff_SFerr_TRIG", Muon_pt[i], Muon_eta[i]));
+
+            t_Mu_EffSF_ID->push_back(corrector.give_eff("Muon_eff_SF_ID", Muon_pt[i], Muon_eta[i]));
+            t_Mu_EffSF_ID_stat->push_back(corrector.give_eff("Muon_eff_SF_ID_stat", Muon_pt[i], Muon_eta[i]));
+            t_Mu_EffSF_ID_syst->push_back(corrector.give_eff("Muon_eff_SF_ID_syst", Muon_pt[i], Muon_eta[i]));
+
+            t_Mu_EffSF_ISO->push_back(corrector.give_eff("Muon_eff_SF_ISO", Muon_pt[i], Muon_eta[i]));
+            t_Mu_EffSF_ISO_stat->push_back(corrector.give_eff("Muon_eff_SF_ISO_stat", Muon_pt[i], Muon_eta[i]));
+            t_Mu_EffSF_ISO_syst->push_back(corrector.give_eff("Muon_eff_SF_ISO_syst", Muon_pt[i], Muon_eta[i]));
+        
+            /*t_Mu_EffSF_ID->push_back(Mu_eff_SF_ID.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            t_Mu_EffSF_ID_stat->push_back(Mu_eff_SF_ID_stat.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            t_Mu_EffSF_ID_syst->push_back(Mu_eff_SF_ID_syst.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            
+            
+            t_Mu_EffSF_ISO->push_back(Mu_eff_SF_ISO.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            t_Mu_EffSF_ISO_stat->push_back(Mu_eff_SF_ISO_stat.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            t_Mu_EffSF_ISO_syst->push_back(Mu_eff_SF_ISO_syst.getSFAve(11, Muon_pt[i], Muon_eta[i], 0.5548));
+            */
             //}
         }
 

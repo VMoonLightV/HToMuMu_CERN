@@ -2,6 +2,9 @@ import uproot as ur
 import mplhep as hep
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import os
+import csv
 
 from .labels import (
     x_labels,
@@ -18,6 +21,9 @@ from .helper import (
     get_output_directory,
     clean_null_values,
 )
+
+# polynominal fit for ZCR_normalization
+order = 8
 
 signal_colors = {"ggH": "red", "VBF": "blue", "ttH": "lime"}
 
@@ -102,7 +108,7 @@ def get_background_label_list(background_sources):
 
 def get_histograms_from_tuple(
     sources, era, variables, is_background, use_puweight,
-    use_ggH_category, use_VBF_category,  lumi_rescale=False, isZRange=False,
+    use_ggH_category, use_VBF_category, njet, region, lumi_rescale=False, isZRange=False,
 ):
     if not use_puweight:
         variables.append("pileup_weight")
@@ -130,7 +136,7 @@ def get_histograms_from_tuple(
 
     for source in sources:
         with ur.open(
-            "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/" + source + "_" + era + "_tuples.root:tree_output"
+            f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/" + source + "_" + era + "_skim.root:tree_output"
         ) as file:
             branches = file.arrays(variables, library="np")
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
@@ -184,15 +190,39 @@ def get_histograms_from_tuple(
     return histograms_list, bins_list
 
 
+
+def polyfit(df, output_name):
+
+    x = df['BinCenter'].values
+    y = df['RatioValue'].values
+
+    coefficients = np.polyfit(x, y, order)
+
+    poly_function = np.poly1d(coefficients)
+
+    coeff_df = pd.DataFrame({
+        'power': range(8, -1, -1),
+        'coefficient': coefficients
+    })
+    coeff_df.to_csv(output_name, index=False)
+
+    print(f"\nploynominal in {output_name}: ")
+    print(poly_function)
+    
+    return coeff_df
+
 def draw_data_and_simul_and_ratio(
     variable,
     era,
     background_sources,
     signal_sources,
+    njet,
+    region,
     use_puweight=True,
     use_ggH_category=False,
     use_VBF_category=False,
-):
+    
+    ):
     plt.style.use(hep.style.CMS)
 
     print("*" * len("****** PLOTTING " + variable + " *****"))
@@ -229,7 +259,7 @@ def draw_data_and_simul_and_ratio(
         variable_bin += "_VBF"
 
     with ur.open(
-        "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/Data_" + era + "_tuples.root:tree_output"
+        f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/Data_" + era + "_skim.root:tree_output"
     ) as data_file:
         branches = data_file.arrays(variables, library="np")
         if "bsConstrained" in variable:
@@ -258,6 +288,8 @@ def draw_data_and_simul_and_ratio(
             bins=n_bins[variable_bin],
             range=x_range[variable_bin],
         )
+        
+        sum_data = len(branches[variable])
 
     if variable == "diMuon_mass" or variable == "diMuon_bsConstrainedMass":
         data_histogram[data_histogram == 0] = -100.0
@@ -266,15 +298,17 @@ def draw_data_and_simul_and_ratio(
     simulation_era = era
     #if era == "2024":
         #simulation_era = "2023BPix"
+    
+    num_jet=njet
 
     print(variables)
     bkg_histograms_list, bkg_bins_list = get_histograms_from_tuple(
         background_sources, simulation_era, variables, True, use_puweight,
-        use_ggH_category, use_VBF_category, era == "2024", isZRange,
+        use_ggH_category, use_VBF_category, njet, region, era == "2024", isZRange, 
     )
     signal_histograms_list, signal_bins_list = get_histograms_from_tuple(
         signal_sources, simulation_era, variables, False, use_puweight,
-        use_ggH_category, use_VBF_category, era == "2024", isZRange,
+        use_ggH_category, use_VBF_category, njet, region, era == "2024", isZRange, 
     )
 
 
@@ -343,8 +377,28 @@ def draw_data_and_simul_and_ratio(
             tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist
 
     ratio_hist, ratio_error = get_histograms_ratio(data_histogram, tot_bg_numpy_hist)
+    sum_MC = sum([hist.sum() for hist in tot_bg_numpy_hist])
     
-    #normalization could be calculated here
+    if "R" in region:
+        print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
+        #if  variable != "n_jet":
+        #    with open(f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.txt", "a") as f:
+        #      f.write(f"{era} {njet}jet ZCR data/MC num_events ({variable}): {sum_data} / {sum_MC} = {sum_data/sum_MC}" + "\n")
+        
+        csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.csv"
+        write_header = not os.path.exists(csv_path)
+        with open(csv_path, 'a', newline='') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            
+            if write_header:
+                csv_writer.writerow(["Era", "Njet", "Variable", "Region", "Data_Events", "MC_Events", "Ratio"])
+            
+            csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, sum_data/sum_MC])
+
+    
+
+            
+
 
     hep.histplot(
         ratio_hist,
@@ -362,9 +416,45 @@ def draw_data_and_simul_and_ratio(
         axs[1].set_ylabel("Data/MC", loc="center")
     axs[1].set_ylim(0.5, 1.5)
     axs[1].set_xlim(data_bins[0], data_bins[-1])
-    axs[1].set_xlabel(x_labels[variable])
+    axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable])
+    
+    if ("ZCR_nor" in region) & (variable == "diMuon_pt"):
+      iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/" 
+      os.makedirs(iter_dir, exist_ok=True)
+            
+      num_bins = len(ratio_hist)
+      min_val, max_val= x_range[variable]
+      range_val = max_val - min_val
+      bin_width = range_val/num_bins
+      bin_edges = np.linspace(0, range_val, num_bins + 1)
+      bin_centers = bin_edges[:-1] + bin_width / 2
+            
+      df = pd.DataFrame({
+                'BinCenter': bin_centers,
+                'RatioValue': ratio_hist,
+                'RatioError': ratio_error  
+                })
+                
+      df.to_csv(f'{iter_dir}/{era}_ratio_table.csv', index=False)
+      
+      # draw fit curve
+      output_file= f"{iter_dir}/polynomial_{era}_coefficients.csv"
+            
+      coeff_df = polyfit(df, output_file)
+      coefficients = coeff_df['coefficient'].values
+      x_fit = np.linspace(data_bins[0], data_bins[-1], 500)
+      y_fit = np.polyval(coefficients, x_fit)
+  
+      axs[1].plot(x_fit, y_fit, 
+              color='blue', 
+              linewidth=2,
+              linestyle='-',
+              label=f'{order}-th Polynomial Fit')
+  
+      axs[1].legend(loc='best')
+    
 
-    output_directory = "../plots/ratio/" + era + "/"
+    output_directory = f"../plots/ratio/njet/{njet}jet_{region}/" + era + "/"
     if not use_puweight:
         output_directory = "../plots/ratio/" + era + "/no_puWeight/"
     if use_ggH_category:

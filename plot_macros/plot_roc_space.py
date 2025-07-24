@@ -51,7 +51,7 @@ fig, ax = get_canvas()
 for era, colors in zip(eras, colors):
     fpr_list = []
     tpr_list = []
-    file_path = "../python/xgboost/roc/" + channel_US +  "_" + era + "_" +\
+    file_path = "/eos/home-y/yulou/Fnal-hmm/python/xgboost/roc/" + channel_US +  "_" + era + "_" +\
                 subset_title + "_roc.txt"
     with open(file_path, "r") as file:
         for line in file:

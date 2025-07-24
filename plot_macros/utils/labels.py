@@ -185,7 +185,8 @@ x_range = {
     "diMuon_phi": (-3.1415, 3.1415),
     "diMuon_eta": (-10, 10),
     "diMuon_rapidity": (-2.5, 2.5),
-    "diMuon_mass_Z": (85, 100),
+    #"diMuon_mass_Z": (85, 100), ##################!!! I use ZCR (70-110GeV) instead
+    "diMuon_mass_Z": (70, 110),
     "relative_diMuon_mass_error": (0,0.3),
     "relative_diMuon_bsConstrainedMass_error": (0,0.3),
     ## Muon variables

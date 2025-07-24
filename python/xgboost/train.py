@@ -58,12 +58,12 @@ subset_title = "B"+ background_subset + "_S" + signal_subset
 test_name = channel_US +  "_" + era + "_" + subset_title
 plotDir = "../../plots/xgboost/" + channel_US + "/" + subset_title + "/"
 pwd = os.getcwd()
-data_directory = "../../root_io/skim/" + channel_US + "/"
-if channel_US == "VBF": data_directory += "merged/"
+data_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-skims/" + channel_US + "/"
+#!!!if channel_US == "VBF": data_directory += "merged/"
 
 
 # signal
-signal_file_name = data_directory + "signal_" + era + "_skim" +\
+signal_file_name = data_directory + "signal_" + era + "_skim_" +\
                    signal_subset + ".root"
 signal_file = root.TFile(signal_file_name)
 signal_tree = signal_file.Get("tree_output")

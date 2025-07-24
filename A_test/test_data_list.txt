@@ -1,4 +1,1 @@
-root://cmsxrootd.fnal.gov//store/data/Run2022C/Muon/NANOAOD/22Sep2023-v1/30000/8c3c411a-6cac-4dae-b120-c038f36bd9fd.root
-root://cmsxrootd.fnal.gov//store/data/Run2022C/Muon/NANOAOD/22Sep2023-v1/30000/7b72eecf-8b67-4eb6-99ea-bb4ef70d45a3.root
-root://cmsxrootd.fnal.gov//store/data/Run2022C/Muon/NANOAOD/22Sep2023-v1/30000/47efafe6-1953-4ffe-9303-690fe292afaf.root
-root://cmsxrootd.fnal.gov//store/data/Run2022C/Muon/NANOAOD/22Sep2023-v1/30000/0e6c1b0f-336d-4cb6-b820-441ef76ed6e8.root
+/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/A_test/test_data_sample_2023.root

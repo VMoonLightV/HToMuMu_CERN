@@ -68,7 +68,9 @@ class HmmAnalyzer : public MainEvent {
                        const int _charge, const int _trk_layers,
                        const float _GEN_pt, const bool _isData);
     void EventLoop();
-    // declare any specific function required
+
+    //read run3 muon efficiency json file
+
 
     void clearTreeVectors();
     void BookTreeBranches();
@@ -101,6 +103,8 @@ class HmmAnalyzer : public MainEvent {
     LeptonEfficiencyCorrector Mu_eff_SF_ISO;
     LeptonEfficiencyCorrector Mu_eff_SF_ISO_stat;
     LeptonEfficiencyCorrector Mu_eff_SF_ISO_syst;
+
+    
 
     TFile *oFile;
     // TFile *ohistFile;
@@ -310,6 +314,7 @@ class HmmAnalyzer : public MainEvent {
     std::vector<float> *t_GenJet_mass;
     std::vector<float> *t_GenJet_phi;
     std::vector<float> *t_GenJet_pt;
+
 };
 
 #endif
@@ -358,6 +363,11 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     btagMedium_cut["2023"] = 0.1917;
     btagMedium_cut["2023BPix"] = 0.1919;
 
+    if (!is_data) {
+        getPileupHistograms();
+    }
+
+    /*
     // muon eff SFs
     muon_effSF_TRIG_files.clear();
     muon_effSF_ID_files.clear();
@@ -367,6 +377,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     histo_names_ISO.clear();
     // if (year == "2016") {
 
+    
     std::string Mu_ID_file1 =
         //"./data/leptonSF/" + yearst + "/RunBCDEF_SF_ID.root";
         // std::string Mu_Iso_file1 =
@@ -409,7 +420,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     histo_names_TRIG.push_back(Mu_Trg_name);
     histo_names_ID.push_back(Mu_ID_name);
     histo_names_ISO.push_back(Mu_Iso_name);
-
+                            
     //} else if (year == "2017") {
     // std::string Mu_Trg_file =
     //"./data/leptonSF/" + yearst +
@@ -449,11 +460,10 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     Mu_eff_SF_TRIG.init(muon_effSF_TRIG_files, histo_names_TRIG);
     Mu_eff_SF_ID.init(muon_effSF_ID_files, histo_names_ID);
     Mu_eff_SF_ISO.init(muon_effSF_ISO_files, histo_names_ISO);
+                            */
 
-    if (!is_data) {
-        getPileupHistograms();
-    }
 
+    /*
     std::string Mu_ID_name_stat = "NUM_MediumID_DEN_genTracks_eta_pt_stat";
     std::string Mu_ID_name_syst = "NUM_MediumID_DEN_genTracks_eta_pt_syst";
     std::string Mu_Iso_name_stat = "NUM_LooseRelIso_DEN_MediumID_eta_pt_stat";
@@ -485,7 +495,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     Mu_eff_SF_ID_syst.init(muon_effSF_ID_files, histo_names_ID_syst);
     Mu_eff_SF_ISO_stat.init(muon_effSF_ISO_files, histo_names_ISO_stat);
     Mu_eff_SF_ISO_syst.init(muon_effSF_ISO_files, histo_names_ISO_syst);
-
+    */
     TChain *tree = new TChain("Events");
 
     if (!FillChain(tree, inputFileList)) {

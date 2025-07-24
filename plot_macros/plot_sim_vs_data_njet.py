@@ -1,15 +1,17 @@
-from utils.sim_vs_data import draw_data_and_simul_and_ratio
+from utils.sim_vs_data_njet import draw_data_and_simul_and_ratio
 import sys
 
+'''
 if len(sys.argv) > 2:
     print("Use one argument: Category. Show only events from that category")
     exit()
+'''
+use_ggH = False #if sys.argv[1] != "ggH" else True
+use_VBF = False #if sys.argv[1] != "VBF" else True
 
-use_ggH = False if sys.argv[1] != "ggH" else True
-use_VBF = False if sys.argv[1] != "VBF" else True
-
-if not use_ggH and not use_VBF:
-    print("Using no category selection as default.")
+#njet = sys.argv[1]
+#if not use_ggH and not use_VBF:
+#    print("Using no category selection as default.")
 
 # ordered from bottom to top in the plot, so order it from lower to bigger cross section
 background_sources = [
@@ -81,35 +83,37 @@ variables = [
 
 # variables = ["diMuon_mass", "diMuon_mass_Z", "diMuon_bsConstrainedMass", "diMuon_bsConstrainedMass_Z"]
 variables = [
-    "relative_diMuon_mass_error",
-    "relative_diMuon_bsConstrainedMass_error",
-    "mu1_pt",
-    "mu2_pt",
-    "mu1_ptErr",
-    "mu2_ptErr",
-    "mu1_bsConstrainedPt",
-    "mu2_bsConstrainedPt",
-    "mu1_bsConstrainedPtErr",
-    "mu2_bsConstrainedPtErr",
-    
-    "diMuon_rapidity", 
-    "diMuon_eta",
+
     "diMuon_pt",
+    #"diMuon_rapidity",
+    #"diMuon_mass",    
+    #"diMuon_mass_Z",    
     "n_jet",
 ]
 
 # eras = ["2022"]
-eras = ["2022", "2022EE", "2023", "2023BPix","2024"]
+eras = ["2022", "2022EE", "2023", "2023BPix"]#,"2024"]
 # eras = ["2022", "2022EE"]
 # eras = ["2023"]#, "2023BPix"]
 # eras = ["2024"]
+#region = "SR" 
+#region = "SR_Zpt_reweighting"
+#region = "ZCR" 
+#region = "SR_Zpt_normalization_reweighting" 
+region = "ZCR_normalization" 
 
-for era in eras:
-    for variable in variables:
-        draw_data_and_simul_and_ratio(variable, era, background_sources,
-                                      signal_sources,
-                                      use_ggH_category=use_ggH,
-                                      use_VBF_category=use_VBF)
+if "ZCR" in region: variables += ["diMuon_mass_Z"]
+if "SR" in region : variables += ["diMuon_mass"]
+    
+for njet in [0,1,2]:
+    for era in eras:
+        for variable in variables:
+            draw_data_and_simul_and_ratio(variable, era, background_sources,
+                                          signal_sources,
+                                          njet, region,
+                                          use_ggH_category=use_ggH,
+                                          use_VBF_category=use_VBF,
+                                          )
 
     # draw_data_and_simul_and_ratio("PV", era, background_sources, signal_sources)
     # draw_data_and_simul_and_ratio("rho", era, background_sources, signal_sources)
