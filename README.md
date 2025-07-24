@@ -6,8 +6,8 @@ This code is based in the Run2 Analysis https://github.com/irenedutta23/HmmAna
 cmsrel CMSSW_14_0_14
 cd CMSSW_14_0_14/src
 cmsenv
-git clone git@github.com:MatBarria/HmmAnalysis.git
-cd HmmAnalysis
+git clone git@github.com:LPC-HH/HToMuMu.git
+cd HToMuMu
 make -j4
 ```
 
