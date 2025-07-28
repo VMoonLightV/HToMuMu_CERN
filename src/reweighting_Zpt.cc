@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("weight", &weight);
     tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
-    TString output_file_path = output + njet +"jet/SR_Zpt_normalization_reweighting_0-250pt/" + channel + "_" + era + "_skim.root";
+    TString output_file_path = output + njet +"jet/ZCR_self_reweighting_0-250pt/" + channel + "_" + era + "_skim.root";
 
     TString output_dir = gSystem->DirName(output_file_path);
 
@@ -129,7 +129,8 @@ int main(int argc, char *argv[]) {
             std::cout << "\n strange F(pt): " << f_pt << ", with dimuon_pt:" << dimuon_pt << std::endl;
         }
         
-        if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
+        //if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
+        if (channel == "DY") {
             /*if (fabs(f_pt) < 1e-10) {
                 if (zero_division_warnings < MAX_WARNINGS) {
                     std::cerr << "warning: at event " << i << " dimuon_pt = " << dimuon_pt

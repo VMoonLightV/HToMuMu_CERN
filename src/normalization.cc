@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     for (Long64_t i = 0; i < n_entries; i++) {
         tree_input->GetEntry(i);  
             
-        if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
+        if (channel == "DY")  {
             //std::cout << "\n start normalization for MC bkg" << std::endl;
             weight = weight * ratio;
                 

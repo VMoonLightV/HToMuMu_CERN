@@ -120,9 +120,7 @@ const std::vector<float> &LeptonEfficiencyCorrector::run() {
 using namespace std;
 namespace fs = filesystem;
 
-unique_ptr<correction::CorrectionSet> cset_L;
-unique_ptr<correction::CorrectionSet> cset_M;
-unique_ptr<correction::CorrectionSet> cset_H;
+unique_ptr<correction::CorrectionSet> cset;
 
 void LeptonEfficiencyCorrector::initializeCorrections(const std::string& year_num) {
     std::string basePath = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/data/leptonSF/";
@@ -143,9 +141,7 @@ void LeptonEfficiencyCorrector::initializeCorrections(const std::string& year_nu
         return correction::CorrectionSet::from_file(path);
     };
 
-    cset_L = loadCorrectionSet(basePath + "muon_JPsi.json.gz");
-    cset_M = loadCorrectionSet(basePath + "muon_Z.json.gz");
-    cset_H = loadCorrectionSet(basePath + "muon_HighPt.json.gz");
+    cset = loadCorrectionSet(basePath + "muon_Z.json.gz");
 
     std::cout << "Muon efficiency corrections initialized" << std::endl;
 }
@@ -166,46 +162,24 @@ float LeptonEfficiencyCorrector::runner(const unique_ptr<correction::CorrectionS
 float LeptonEfficiencyCorrector::give_eff(const string& type, float muon_pt, float muon_eta) {
 
     //"We recommend you to use the latest version of high-pT muon ID for the full Run-2 and Run-3 analyses"
-    //Currently, we are use different Muon EFF for different muon pt.
-    //SF type and pt range below, no EFF is provided for TRIG and ISO in low pt range
-    static const map<string, map<string, pair<string, string>>> type_config = {
-        {"TRIG", {
-            {"low",  {"", "nominal"}},      
-            {"medium",  {"NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium", "nominal"}},
-            {"high", {"NUM_HLT_DEN_MediumIDLooseRelIsoProbes", "nominal"}}
-        }},
-        {"ID", {
-            {"low",  {"NUM_MediumID_DEN_TrackerMuons", "nominal"}},
-            {"medium",  {"NUM_MediumID_DEN_TrackerMuons", "nominal"}},
-            {"high", {"NUM_MediumID_DEN_GlobalMuonProbes", "nominal"}}  
-        }},
-        {"ISO", {
-            {"low",  {"", "nominal"}},      
-            {"medium",  {"NUM_LoosePFIso_DEN_MediumID", "nominal"}},
-            {"high", {"NUM_probe_LooseRelTkIso_DEN_MediumIDProbes", "nominal"}}
-        }}
+    //We only use medium pt json file, it covers muon_pt starting from 15.0 GeV.
+    static const map<string, pair<string, string>> type_config = {
+        {"TRIG", {"NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium", "nominal"},},
+        {"ID", {"NUM_MediumID_DEN_TrackerMuons", "nominal"},},
+        {"ISO", {"NUM_LoosePFIso_DEN_MediumID", "nominal"},}
     };
 
     std::string category;
     if (type.find("TRIG") != std::string::npos)       category = "TRIG";
     else if (type.find("ID") != std::string::npos)    category = "ID";
     else if (type.find("ISO") != std::string::npos)   category = "ISO";
-    else return 0.0f; 
+    else throw std::runtime_error("No valid type: " + type);
 
-    std::string pt_range;
-    // even the low pt require the pt > 3.0, but I think we don't need low muon pt EFFSF, just put it here now.
-    if (muon_pt < 3.0)      return ((type.find("SFerr") != std::string::npos)
+    // medium pt trigger eff start from 26.0 GeV 
+    if (muon_pt < 26.0)      return ((type.find("SFerr") != std::string::npos)
                                     ||(type.find("_s") != std::string::npos)) ? 0.0f : 1.0f;
-    else if (muon_pt < 30)  pt_range = "low";
-    else if (muon_pt < 200) pt_range = "medium";
-    else                    pt_range = "high";
 
-    if (pt_range == "low" && (category != "TRIG" || category != "ISO")) {
-        return ((type.find("SFerr") != std::string::npos)
-                    ||(type.find("_s") != std::string::npos)) ? 0.0f : 1.0f;
-    }
-
-    const auto& config = type_config.at(category).at(pt_range);
+    const auto& config = type_config.at(category);
     const std::string& final_key = config.first;
     std::string scale_type = config.second; 
 
@@ -221,25 +195,16 @@ float LeptonEfficiencyCorrector::give_eff(const string& type, float muon_pt, flo
 
         float stat = 0.0;
         float syst = 0.0;
-        scale_type = "stat";
-        params = {{"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", scale_type}};
-        if (pt_range == "low")       stat = runner(cset_L, final_key, params);
-        else if (pt_range == "medium") stat = runner(cset_M, final_key, params);
-        else                    stat = runner(cset_H, final_key, params);
-
-        scale_type = "syst";
-        params = {{"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", scale_type}};
-        if (pt_range == "low")       syst = runner(cset_L, final_key, params);
-        else if (pt_range == "medium") syst = runner(cset_M, final_key, params);
-        else                    syst = runner(cset_H, final_key, params);
+        
+        params = {{"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", "stat"}};
+        stat = runner(cset, final_key, params);
+        params = {{"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", "syst"}};
+        syst = runner(cset, final_key, params);
 
         float result = std::sqrt(stat * stat + syst * syst);
-
         return  result;
     } 
-
-    if (pt_range == "low")       return runner(cset_L, final_key, params);
-    else if (pt_range == "medium") return runner(cset_M, final_key, params);
-    else                    return runner(cset_H, final_key, params);
+    
+    return runner(cset, final_key, params);
 }
 

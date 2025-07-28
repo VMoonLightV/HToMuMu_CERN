@@ -204,7 +204,7 @@ def polyfit(df, output_name):
         'power': range(order, -1, -1),
         'coefficient': coefficients
     })
-    coeff_df.to_csv(output_name, index=False)
+    coeff_df.to_csv(output_name, index=False, mode='w')
 
     print(f"\nploynominal in {output_name}: ")
     print(poly_function)
@@ -373,12 +373,21 @@ def draw_data_and_simul_and_ratio(
     tot_bg_numpy_hist = np.array([])
     for i, bg_hist in enumerate(bkg_histograms_list):
         if i == 0:
-            tot_bg_numpy_hist = bg_hist
+            tot_bg_numpy_hist = bg_hist            
         else:
             tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist
+            
+        if i ==3:
+            DY_count = bg_hist.sum()
+            
+    print(DY_count)
+            
 
     ratio_hist, ratio_error = get_histograms_ratio(data_histogram, tot_bg_numpy_hist)
+    
+    #print(tot_bg_numpy_hist)
     sum_MC = sum([hist.sum() for hist in tot_bg_numpy_hist])
+    print(sum_MC)
     
     if "R" in region:
         print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
@@ -392,9 +401,9 @@ def draw_data_and_simul_and_ratio(
             csv_writer = csv.writer(csvfile)
             
             if write_header:
-                csv_writer.writerow(["Era", "Njet", "Variable", "Region", "Data_Events", "MC_Events", "Ratio"])
+                csv_writer.writerow(["Era", "Njet", "Variable", "Region", "Data_Events", "MC_Events", "DY_count", "Ratio"])
             
-            csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, sum_data/sum_MC])
+            csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC])
 
     hep.histplot(
         ratio_hist,
@@ -433,7 +442,7 @@ def draw_data_and_simul_and_ratio(
                 'RatioError': ratio_error  
                 })
                 
-      df.to_csv(f'{iter_dir}/{era}_ratio_table.csv', index=False)
+      df.to_csv(f'{iter_dir}/{era}_ratio_table.csv', index=False, mode='w')
       
       # draw fit curve
       output_file= f"{iter_dir}/polynomial_{era}_coefficients.csv"

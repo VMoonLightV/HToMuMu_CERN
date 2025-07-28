@@ -15,10 +15,7 @@
 using namespace std;
 namespace fs = filesystem;
 
-
-extern std::unique_ptr<correction::CorrectionSet> cset_L;
-extern std::unique_ptr<correction::CorrectionSet> cset_M;
-extern std::unique_ptr<correction::CorrectionSet> cset_H;
+extern std::unique_ptr<correction::CorrectionSet> cset;
 
 
 class LeptonEfficiencyCorrector {
