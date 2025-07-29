@@ -1,5 +1,110 @@
 #include "../lib/LeptonEfficiencyCorrector.h"
+#include "correction.h"
 
+#include <algorithm>
+#include <stdexcept>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+#include <filesystem>
+#include <cmath>
+
+using namespace std;
+namespace fs = filesystem;
+
+unique_ptr<correction::CorrectionSet> cset;
+
+void LeptonEfficiencyCorrector::initializeCorrections(const std::string& year_num) {
+    std::string basePath = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/data/leptonSF/";
+    
+    const std::vector<std::string> valid_eras = {"2022", "2022EE", "2023", "2023BPix"};
+    
+    if (std::find(valid_eras.begin(), valid_eras.end(), year_num) != valid_eras.end()) {
+        basePath += year_num + "/";
+    } else {
+        throw std::runtime_error("Unsupported era: " + year_num);
+    }    
+
+    auto loadCorrectionSet = [](const std::string& path) -> std::unique_ptr<correction::CorrectionSet> {
+        std::cout << "Loading JSON file: " << path << std::endl;
+        if (!std::filesystem::exists(path)) {
+            throw std::runtime_error("File not found: " + path);
+        }
+        return correction::CorrectionSet::from_file(path);
+    };
+
+    cset = loadCorrectionSet(basePath + "muon_Z.json.gz");
+
+    std::cout << "Muon efficiency corrections initialized" << std::endl;
+}
+
+float LeptonEfficiencyCorrector::runner(const unique_ptr<correction::CorrectionSet>& cset,
+          const string& key,
+          const map<string, correction::Variable::Type>& example)
+{
+    correction::Correction::Ref sf = cset->at(key);
+    vector<correction::Variable::Type> inputs;
+    for (const correction::Variable& input: sf->inputs())
+        inputs.push_back(example.at(input.name()));
+    float result = sf->evaluate(inputs);
+
+    return result;
+}
+
+float LeptonEfficiencyCorrector::give_eff(const string& type, float muon_pt, float muon_eta) {
+
+    //"We recommend you to use the latest version of high-pT muon ID for the full Run-2 and Run-3 analyses"
+    //We only use medium pt json file, it covers muon_pt starting from 15.0 GeV.
+    //you can change to the efficiencies you want here
+    static const map<string, pair<string, string>> type_config = {
+        {"TRIG", {"NUM_IsoMu24_DEN_CutBasedIdMedium_and_PFIsoMedium", "nominal"},},
+        {"ID", {"NUM_MediumID_DEN_TrackerMuons", "nominal"},},
+        {"ISO", {"NUM_LoosePFIso_DEN_MediumID", "nominal"},}
+    };
+
+    std::string category;
+    if (type.find("TRIG") != std::string::npos)       category = "TRIG";
+    else if (type.find("ID") != std::string::npos)    category = "ID";
+    else if (type.find("ISO") != std::string::npos)   category = "ISO";
+    else throw std::runtime_error("No valid type: " + type);
+
+    // medium pt trigger eff start from 26.0 GeV 
+    if (muon_pt < 26.0)      return ((type.find("SFerr") != std::string::npos)
+                                    ||(type.find("_s") != std::string::npos)) ? 0.0f : 1.0f;
+
+    const auto& config = type_config.at(category);
+    const std::string& final_key = config.first;
+    std::string scale_type = config.second; 
+
+    if (type.find("stat") != std::string::npos)       scale_type = "stat";
+    else if (type.find("syst") != std::string::npos)  scale_type = "syst";
+
+    std::map<std::string, correction::Variable::Type> params = {
+        {"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", scale_type}
+    };
+
+    //only for Muon_eff_SFerr_TRIG = sqrt(stat^2 + syst^2)
+    if (type.find("eff_SFerr_TRIG") != std::string::npos) {
+
+        float stat = 0.0;
+        float syst = 0.0;
+        
+        params = {{"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", "stat"}};
+        stat = runner(cset, final_key, params);
+        params = {{"pt", muon_pt}, {"eta", muon_eta}, {"scale_factors", "syst"}};
+        syst = runner(cset, final_key, params);
+
+        float result = std::sqrt(stat * stat + syst * syst);
+        return  result;
+    } 
+    
+    return runner(cset, final_key, params);
+}
+
+
+/*
 void LeptonEfficiencyCorrector::init(std::vector<std::string> files,
                                      std::vector<std::string> histos) {
     effmaps_.clear();
@@ -98,3 +203,4 @@ const std::vector<float> &LeptonEfficiencyCorrector::run() {
     }
     return ret_;
 }
+*/

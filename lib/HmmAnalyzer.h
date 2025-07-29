@@ -68,26 +68,18 @@ class HmmAnalyzer : public MainEvent {
                        const int _charge, const int _trk_layers,
                        const float _GEN_pt, const bool _isData);
     void EventLoop();
-    // declare any specific function required
+
+    //read run3 muon efficiency json file
+
 
     void clearTreeVectors();
     void BookTreeBranches();
     bool is_data;
     TString year;
     std::string yearst;
-    std::map<std::string, float> muon_pt_cut = {{"2022", 26.0}, {"2022EE", 26.0},
-                                                {"2023", 26.0}, {"2023BPix", 26.0},
-                                                {"2024", 26.0}};
-    // Define b-tagging scores
-    // b-tag particleNet LOOSE score selection
-    std::map<std::string, float> btagLoose_cut = {{"2022", 0.047}, {"2022EE", 0.0499},
-                                                {"2023", 0.0358}, {"2023BPix", 0.0359},
-                                                {"2024", 0.0359}}; // 2024 values NEED to be checked.
-                                                                   // other values probaly too
-    std::map<std::string, float> btagMedium_cut = {{"2022", 0.245}, {"2022EE", 0.2605},
-                                                {"2023", 0.1917}, {"2023BPix", 0.1917},
-                                                {"2024", 0.1917}}; // 2024 values NEED to be checked.
-                                                                   // other values probaly too
+    std::map<std::string, float> muon_pt_cut;
+    std::map<std::string, float> btagLoose_cut;
+    std::map<std::string, float> btagMedium_cut;
 
     TH1D *h_sumOfgw = new TH1D("h_sumOfgenWeight", "h_sumOfgenWeight", 1, 0, 1);
     TH1D *h_sumOfgpw =
@@ -104,6 +96,8 @@ class HmmAnalyzer : public MainEvent {
     std::vector<std::string> histo_names_TRIG, histo_names_ID,
         histo_names_ID_stat, histo_names_ID_syst, histo_names_ISO,
         histo_names_ISO_stat, histo_names_ISO_syst;
+    
+    /*
     LeptonEfficiencyCorrector Mu_eff_SF_TRIG;
     LeptonEfficiencyCorrector Mu_eff_SF_ID;
     LeptonEfficiencyCorrector Mu_eff_SF_ID_stat;
@@ -111,6 +105,8 @@ class HmmAnalyzer : public MainEvent {
     LeptonEfficiencyCorrector Mu_eff_SF_ISO;
     LeptonEfficiencyCorrector Mu_eff_SF_ISO_stat;
     LeptonEfficiencyCorrector Mu_eff_SF_ISO_syst;
+    */
+    
 
     TFile *oFile;
     // TFile *ohistFile;
@@ -320,6 +316,7 @@ class HmmAnalyzer : public MainEvent {
     std::vector<float> *t_GenJet_mass;
     std::vector<float> *t_GenJet_phi;
     std::vector<float> *t_GenJet_pt;
+
 };
 
 #endif
@@ -342,9 +339,37 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     h_pileup->SetBinContent(1, 0.0);
     h_pileup_nTrue->SetBinContent(1, 0.0);
 
+    // muon pT selection
+    muon_pt_cut["2016"] = 26.0;
+    // muon_pt_cut["2017"] = 29.0;
+    // muon_pt_cut["2018"] = 26.0;
+    muon_pt_cut["2022"] = 26.0;
+    muon_pt_cut["2022EE"] = 26.0;
+    muon_pt_cut["2023"] = 26.0;
+    muon_pt_cut["2023BPix"] = 26.0;
 
+    // Define b-tagging scores
+    // b-tag particleNet LOOSE score selection
+    btagLoose_cut["2022"] = 0.047;
+    btagLoose_cut["2022EE"] = 0.0499;
+    btagLoose_cut["2023"] = 0.0358;
+    btagLoose_cut["2023BPix"] = 0.0359;
 
+    // b-tag deepFlav MEDIUM score selection
+    btagMedium_cut["2016"] = 0.6321;
+    // btagMedium_cut["2017"] = 0.4941;
+    // btagMedium_cut["2018"] = 0.4184;
+    // b-tag particleNet MEDIUM score selection
+    btagMedium_cut["2022"] = 0.245;
+    btagMedium_cut["2022EE"] = 0.2605;
+    btagMedium_cut["2023"] = 0.1917;
+    btagMedium_cut["2023BPix"] = 0.1919;
 
+    if (!is_data) {
+        getPileupHistograms();
+    }
+
+    /*
     // muon eff SFs
     muon_effSF_TRIG_files.clear();
     muon_effSF_ID_files.clear();
@@ -354,6 +379,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     histo_names_ISO.clear();
     // if (year == "2016") {
 
+    
     std::string Mu_ID_file1 =
         //"./data/leptonSF/" + yearst + "/RunBCDEF_SF_ID.root";
         // std::string Mu_Iso_file1 =
@@ -396,7 +422,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     histo_names_TRIG.push_back(Mu_Trg_name);
     histo_names_ID.push_back(Mu_ID_name);
     histo_names_ISO.push_back(Mu_Iso_name);
-
+                            
     //} else if (year == "2017") {
     // std::string Mu_Trg_file =
     //"./data/leptonSF/" + yearst +
@@ -436,11 +462,10 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     Mu_eff_SF_TRIG.init(muon_effSF_TRIG_files, histo_names_TRIG);
     Mu_eff_SF_ID.init(muon_effSF_ID_files, histo_names_ID);
     Mu_eff_SF_ISO.init(muon_effSF_ISO_files, histo_names_ISO);
+                            */
 
-    if (!is_data) {
-        getPileupHistograms();
-    }
 
+    /*
     std::string Mu_ID_name_stat = "NUM_MediumID_DEN_genTracks_eta_pt_stat";
     std::string Mu_ID_name_syst = "NUM_MediumID_DEN_genTracks_eta_pt_syst";
     std::string Mu_Iso_name_stat = "NUM_LooseRelIso_DEN_MediumID_eta_pt_stat";
@@ -472,7 +497,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     Mu_eff_SF_ID_syst.init(muon_effSF_ID_files, histo_names_ID_syst);
     Mu_eff_SF_ISO_stat.init(muon_effSF_ISO_files, histo_names_ISO_stat);
     Mu_eff_SF_ISO_syst.init(muon_effSF_ISO_files, histo_names_ISO_syst);
-
+    */
     TChain *tree = new TChain("Events");
 
     if (!FillChain(tree, inputFileList)) {
