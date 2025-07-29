@@ -106,8 +106,9 @@ region = sys.argv[1]
 if "ZCR" in region: variables += ["diMuon_mass_Z"]
 if "SR" in region : variables += ["diMuon_mass"]
     
-for njet in [0,1,2]:
-    for era in eras:
+njet = 1
+###for njet in [0,1,2]:
+for era in eras:
         for variable in variables:
             draw_data_and_simul_and_ratio(variable, era, background_sources,
                                           signal_sources,

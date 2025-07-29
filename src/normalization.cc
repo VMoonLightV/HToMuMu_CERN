@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
     TString output_file_path = output + njet +"jet/ZCR_normalization/" + channel + "_" + era + "_skim.root";
+    //TString output_file_path = output + "nobin_jet/ZCR_normalization/" + channel + "_" + era + "_skim.root";
     TFile output_file(output_file_path, "RECREATE");
     
     TTree* tree_output = tree_input->CloneTree(0);

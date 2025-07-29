@@ -10,18 +10,53 @@
 #include <sstream>
 #include <TSystem.h>
 #include <TError.h>
+#include <algorithm>
 
 // g++ -o ./bin/reweighting_Zpt src/reweighting_Zpt.cc $(root-config --cflags --libs)
 
 
 
-double Polynomial(const std::vector<double>& coefficients, double x) {
-    double result = 0.0;
+float Polynomial(const std::vector<float>& coefficients, float x) {
+    float result = 0.0;
     for (size_t i = 0; i < coefficients.size(); i++) {
         result = result * x + coefficients[i];
     }
     return result;
 }
+
+struct PolynomialSegment {
+    double range_L;
+    double range_R;
+    int power;
+    double coefficient;
+};
+
+float PiecewisePolynomial(const std::vector<PolynomialSegment>& segments, float x) {
+    auto seg = std::find_if(segments.begin(), segments.end(), [x](const auto& s) {
+        
+        return x >= s.range_L && x <= s.range_R; 
+    });
+
+    if (seg == segments.end()) {
+        return std::numeric_limits<float>::quiet_NaN(); 
+    }
+    std::vector<float> coeffs;
+    for (const auto& s : segments) {
+        if (s.range_L == seg->range_L && s.range_R == seg->range_R) {
+            if (coeffs.size() <= static_cast<size_t>(s.power)) {
+                coeffs.resize(s.power + 1, 0.0);
+            }
+            coeffs[s.power] = s.coefficient;
+        }
+    }
+    float result = 0.0;
+    for (size_t i = 0; i < coeffs.size(); i++) {
+        result = result * x + coeffs[i];
+    }
+    return result;
+}
+
+
 
 int main(int argc, char *argv[]) {
     if (argc != 7) {
@@ -36,11 +71,11 @@ int main(int argc, char *argv[]) {
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
     TString njet(argv[6]);
-    TString coeff_csv = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/plots/ratio/njet/"+ njet +"jet_ratio_table_dimuon_pt_ZCR_normalization/polynomial_"+ era +"_coefficients.csv";
+    TString coeff_csv = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/plots/ratio/njet/"+ njet +"jet_ratio_table_dimuon_pt_ZCR_normalization_piecewise_8-th/polynomial_"+ era +"_coefficients.csv";
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
     std::cout << "coffi_csv: " << coeff_csv << std::endl;
-    
+    /*
     std::vector<double> coefficients;
     try {
         std::ifstream csv_file(coeff_csv.Data());
@@ -78,6 +113,38 @@ int main(int argc, char *argv[]) {
         std::cerr << "wrong read: " << e.what() << std::endl;
         return -1;
     }
+        */
+
+    std::vector<PolynomialSegment> segments; // 替换原有的coefficients
+
+    std::ifstream csv_file(coeff_csv.Data());
+    if (!csv_file.is_open()) {
+            throw std::runtime_error("can't open coffi_csv file: " + coeff_csv);
+    }
+        
+    std::string line;
+    std::getline(csv_file, line);
+    while (std::getline(csv_file, line)) {
+        std::istringstream iss(line);
+        std::string rangeL_str, rangeR_str, power_str, coeff_str;
+        
+        // 按列解析：区间左、右、幂次、系数
+        std::getline(iss, rangeL_str, ',');
+        std::getline(iss, rangeR_str, ',');
+        std::getline(iss, power_str, ','); 
+        std::getline(iss, coeff_str);
+        try {
+                PolynomialSegment seg{
+                    std::stod(rangeL_str),
+                    std::stod(rangeR_str),
+                    std::stoi(power_str),
+                    std::stod(coeff_str)
+                };
+                segments.push_back(seg);
+        
+        } catch (...) {}
+        
+    }
 
     TFile inputFile(input_name, "READ");
     if (inputFile.IsZombie()) {
@@ -98,7 +165,7 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("weight", &weight);
     tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
-    TString output_file_path = output + njet +"jet/ZCR_self_reweighting_0-250pt/" + channel + "_" + era + "_skim.root";
+    TString output_file_path = output + njet +"jet/Zpt_self_normalization_reweighting_8-th/" + channel + "_" + era + "_skim.root";
 
     TString output_dir = gSystem->DirName(output_file_path);
 
@@ -123,12 +190,6 @@ int main(int argc, char *argv[]) {
     for (Long64_t i = 0; i < n_entries; i++) {
         tree_input->GetEntry(i);  
         
-        double f_pt = Polynomial(coefficients, dimuon_pt);
-
-        if (f_pt < 0.1) {
-            std::cout << "\n strange F(pt): " << f_pt << ", with dimuon_pt:" << dimuon_pt << std::endl;
-        }
-        
         //if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
         if (channel == "DY") {
             /*if (fabs(f_pt) < 1e-10) {
@@ -142,7 +203,12 @@ int main(int argc, char *argv[]) {
                 weight = weight * f_pt;
             }*/
             if ((dimuon_pt) < 250.0) {
+                float f_pt = PiecewisePolynomial(segments, dimuon_pt);
                 weight = weight * f_pt;
+                if (i<10) {std::cout << f_pt << " in pt: " << dimuon_pt << std::endl;}
+                if (f_pt < 0.1) {
+                    std::cout << "\n strange F(pt): " << f_pt << ", with dimuon_pt:" << dimuon_pt << std::endl;
+                }
             }
 
 

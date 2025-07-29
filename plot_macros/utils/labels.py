@@ -178,7 +178,8 @@ x_range = {
     "PV": (0, 70),
     "rho": (0, 70),
     ## DiMuon variables
-    "diMuon_pt": (0, 250),
+    ##"diMuon_pt": (0, 250), ### only for dimuon_pt reweighting now!!!
+    "diMuon_pt": (0, 200),
     "diMuon_mass": (110, 150),
     "diMuon_bsConstrainedPt": (0, 250),
     "diMuon_bsConstrainedMass": (110, 150),
