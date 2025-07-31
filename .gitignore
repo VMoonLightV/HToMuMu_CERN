@@ -4,6 +4,7 @@
 plots/
 *.root
 *.pdf
+*.csv
 rootFiles/
 testPlots/
 ZPeakCompTest.ipynb
