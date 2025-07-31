@@ -108,6 +108,7 @@ if "SR" in region : variables += ["diMuon_mass"]
     
 njet = 1
 ###for njet in [0,1,2]:
+njet = "nobin_"
 for era in eras:
         for variable in variables:
             draw_data_and_simul_and_ratio(variable, era, background_sources,

@@ -23,7 +23,7 @@ from .helper import (
 )
 
 # polynominal fit for ZCR_normalization
-order = 8
+order = 6
 
 signal_colors = {"ggH": "red", "VBF": "blue", "ttH": "lime"}
 
@@ -137,7 +137,7 @@ def get_histograms_from_tuple(
     for source in sources:
         with ur.open(
             ###f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/" + source + "_" + era + "_skim.root:tree_output"
-            f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/" + source + "_" + era + "_tuples.root:tree_output"
+            f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/" + source + "_" + era + "_skim.root:tree_output"
         ) as file:
             branches = file.arrays(variables, library="np")
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
@@ -172,10 +172,13 @@ def get_histograms_from_tuple(
             if(isZRange):
                 variable_bin = "diMuon_mass_Z"
 
+            base_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
+            if (variables[0] == "diMuon_pt"): base_bins[-1] = 10000
+
             histogram, bins = np.histogram(
                 branches[variables[0]],
-                bins=n_bins[variable_bin],
-                range=x_range[variable_bin],
+                bins=base_bins,
+                
                 # weights=branches["weight"],
                 weights=(
                     branches["weight"]*era_reweight
@@ -183,6 +186,7 @@ def get_histograms_from_tuple(
                     else branches["weight"]/ branches["pileup_weight"]
                 ),
             )
+
             histograms_list.append(histogram)
             bins_list.append(bins)
             # histograms_list[source] = histogram
@@ -219,8 +223,8 @@ def piecewise_polyfit(df, min_x, max_x, output_name):
     y = df['RatioValue'].values
     
     #min_x, max_x = np.min(x), np.max(x)
-    boundaries = [0,50,100,250,500,1000]
-    orders = [order,3,3,3,3]
+    boundaries = [0,100,250,600]
+    orders = [order,3,3,3]
 
     all_coeffs = []
     poly_functions = []
@@ -329,7 +333,7 @@ def draw_data_and_simul_and_ratio(
 
     with ur.open(
         ###f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/Data_" + era + "_skim.root:tree_output"
-        f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/Data_" + era + "_tuples.root:tree_output"
+        f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/Data_" + era + "_skim.root:tree_output"
     ) as data_file:
         branches = data_file.arrays(variables, library="np")
         if "bsConstrained" in variable:
@@ -353,10 +357,14 @@ def draw_data_and_simul_and_ratio(
             for var in variables:
                 branches[var] = branches[var][bool_list]
 
+
+        print(x_range[variable_bin], n_bins[variable_bin])
+        base_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
+        if (variable == "diMuon_pt"): base_bins[-1] = 10000
+
         data_histogram, data_bins = np.histogram(
             branches[variable],
-            bins=n_bins[variable_bin],
-            range=x_range[variable_bin],
+            bins=base_bins
         )
         
         sum_data = len(branches[variable])
@@ -383,6 +391,7 @@ def draw_data_and_simul_and_ratio(
     
 
 
+
     fig, axs = get_canvas(True)
 
     hep.histplot(
@@ -396,6 +405,7 @@ def draw_data_and_simul_and_ratio(
         color=get_color_list(len(background_sources)),
     )
 
+    if (variable == "diMuon_pt"): data_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
     hep.histplot(
         data_histogram,
         data_bins,
@@ -434,6 +444,7 @@ def draw_data_and_simul_and_ratio(
     # axs[0].set_ylim(0.1, y_axis_max_range[variable])
     axs[0].set_ylim(0.1, 1000 * np.max(data_histogram))
     axs[0].set_xlim(data_bins[0], data_bins[-1])
+    if (variable == "diMuon_pt"): axs[0].set_xlim(x_range[variable][0], x_range[variable][1])
     axs[0].set_yscale("log")
     axs[0].legend(frameon=False, loc="upper right", ncols=2)
     axs[0].tick_params(axis="x", which="both", bottom=True, top=True, labelbottom=False)
@@ -476,6 +487,24 @@ def draw_data_and_simul_and_ratio(
             
             csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC])
     '''
+    if "ZCR" in region:
+        print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
+        
+        csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}_inclusive.csv"
+        write_header = not os.path.exists(csv_path)
+        with open(csv_path, 'a', newline='') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            
+            if write_header:
+                csv_writer.writerow(["Era","Njet",  "Variable", "Region", "Data_Events", "MC_Events", "DY_count", "Ratio", 
+                                     "no_DY_bkg", "Right_DY", "DY_factor"])
+            
+            csv_writer.writerow([era,njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
+                                 sum_MC - DY_count, sum_data - sum_MC + DY_count, (sum_data - sum_MC + DY_count)/DY_count])
+    
+
+
+
     hep.histplot(
         ratio_hist,
         data_bins,
@@ -492,6 +521,7 @@ def draw_data_and_simul_and_ratio(
         axs[1].set_ylabel("Data/MC", loc="center")
     axs[1].set_ylim(0.5, 1.5)
     axs[1].set_xlim(data_bins[0], data_bins[-1])
+    if (variable == "diMuon_pt"): axs[1].set_xlim(x_range[variable][0], x_range[variable][1])
     ###axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable])
     axs[1].set_xlabel(f"nobin_jet {region} "+x_labels[variable])
     
@@ -543,7 +573,8 @@ def draw_data_and_simul_and_ratio(
   
 
     ###output_directory = f"../plots/ratio/njet/{njet}jet_{region}_piecewise_{order}-th/" + era + "/"
-    output_directory = f"../plots/ratio/njet/nobin_jet_{region}_piecewise_{order}-th/" + era + "/"
+    output_directory = f"../plots/ratio/njet/{njet}jet_{region}/" + era + "/"
+    if ("ZCR_normalization" in region or "SR" in region): output_directory = f"../plots/ratio/njet/{njet}jet_{region}_piecewise_{order}-th/" + era + "/"
     if not use_puweight:
         output_directory = "../plots/ratio/" + era + "/no_puWeight/"
     if use_ggH_category:

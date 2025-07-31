@@ -14,8 +14,6 @@
 
 // g++ -o ./bin/reweighting_Zpt src/reweighting_Zpt.cc $(root-config --cflags --libs)
 
-
-
 float Polynomial(const std::vector<float>& coefficients, float x) {
     float result = 0.0;
     for (size_t i = 0; i < coefficients.size(); i++) {
@@ -70,52 +68,14 @@ int main(int argc, char *argv[]) {
     TString era(argv[3]);
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
-    TString njet(argv[6]);
-    TString coeff_csv = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/plots/ratio/njet/"+ njet +"jet_ratio_table_dimuon_pt_ZCR_normalization_piecewise_8-th/polynomial_"+ era +"_coefficients.csv";
+    //TString njet(argv[6]);
+    //TString coeff_csv = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/plots/ratio/njet/"+ njet +"jet_ratio_table_dimuon_pt_ZCR_normalization_piecewise_8-th/polynomial_"+ era +"_coefficients.csv";
+    TString coeff_csv(argv[6]);
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
     std::cout << "coffi_csv: " << coeff_csv << std::endl;
-    /*
-    std::vector<double> coefficients;
-    try {
-        std::ifstream csv_file(coeff_csv.Data());
-        if (!csv_file.is_open()) {
-            throw std::runtime_error("can't open coffi_csv file: " + coeff_csv);
-        }
-        
-        std::string line;
-        std::getline(csv_file, line);
-        
-        while (std::getline(csv_file, line)) {
-            std::istringstream iss(line);
-            std::string order_str, coeff_str;
-            
-            if (std::getline(iss, order_str, ',') && std::getline(iss, coeff_str)) {
-                try {
-                    double coeff_value = std::stod(coeff_str);
-                    coefficients.push_back(coeff_value);
-                } catch (const std::exception& e) {
-                    std::cerr << "wrong transfrorm " << e.what() << " line: " << line << std::endl;
-                }
-            }
-        }
-        
-        if (coefficients.size() != 9) {
-            throw std::runtime_error("need 9 coffis, read: " + std::to_string(coefficients.size()));
-        }
-        
-        //std::cout << "\nnominal order (high to low):" << std::endl;
-        for (int i = 0; i < 9; i++) {
-            //std::cout << "order " << 8-i << ": " << coefficients[i] << std::endl;
-        }
-        
-    } catch (const std::exception& e) {
-        std::cerr << "wrong read: " << e.what() << std::endl;
-        return -1;
-    }
-        */
 
-    std::vector<PolynomialSegment> segments; // 替换原有的coefficients
+    std::vector<PolynomialSegment> segments; 
 
     std::ifstream csv_file(coeff_csv.Data());
     if (!csv_file.is_open()) {
@@ -128,7 +88,6 @@ int main(int argc, char *argv[]) {
         std::istringstream iss(line);
         std::string rangeL_str, rangeR_str, power_str, coeff_str;
         
-        // 按列解析：区间左、右、幂次、系数
         std::getline(iss, rangeL_str, ',');
         std::getline(iss, rangeR_str, ',');
         std::getline(iss, power_str, ','); 
@@ -165,7 +124,8 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("weight", &weight);
     tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
-    TString output_file_path = output + njet +"jet/Zpt_self_normalization_reweighting_8-th/" + channel + "_" + era + "_skim.root";
+    TString output_file_path = output + channel + "_" + era + "_skim.root";
+    //TString output_file_path = output + "SR_normalization_reweighting_6-th/" + channel + "_" + era + "_skim.root";
 
     TString output_dir = gSystem->DirName(output_file_path);
 
@@ -192,17 +152,8 @@ int main(int argc, char *argv[]) {
         
         //if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
         if (channel == "DY") {
-            /*if (fabs(f_pt) < 1e-10) {
-                if (zero_division_warnings < MAX_WARNINGS) {
-                    std::cerr << "warning: at event " << i << " dimuon_pt = " << dimuon_pt
-                            << ", f(pt) ≈ 0 (" << f_pt << ")weight set as 0" << std::endl;
-                    zero_division_warnings++;
-                }
-                weight = 0;
-            } else {
-                weight = weight * f_pt;
-            }*/
-            if ((dimuon_pt) < 250.0) {
+
+            if ((dimuon_pt) < 600.0) {
                 float f_pt = PiecewisePolynomial(segments, dimuon_pt);
                 weight = weight * f_pt;
                 if (i<10) {std::cout << f_pt << " in pt: " << dimuon_pt << std::endl;}

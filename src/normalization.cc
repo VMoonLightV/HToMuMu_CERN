@@ -13,7 +13,7 @@
 
 
 int main(int argc, char *argv[]) {
-    if (argc != 8) {
+    if (argc != 7) {
         std::cerr << "Please give 8 arguments: input, output, channel, era, is_data, njet, zone, coffi_csv"
                   << std::endl;
         return -1;
@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
     TString era(argv[3]);
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
-    TString njet(argv[6]);
-    double ratio = atof(argv[7]);
+    //TString njet(argv[6]);
+    double ratio = atof(argv[6]);
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
     std::cout << "ratio: " << ratio << std::endl;
@@ -47,9 +47,8 @@ int main(int argc, char *argv[]) {
     double weight = 0;
     float dimuon_pt = 0;
     tree_input->SetBranchAddress("weight", &weight);
-    tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
-    TString output_file_path = output + njet +"jet/ZCR_normalization/" + channel + "_" + era + "_skim.root";
+    TString output_file_path = output + channel + "_" + era + "_skim.root";
     //TString output_file_path = output + "nobin_jet/ZCR_normalization/" + channel + "_" + era + "_skim.root";
     TFile output_file(output_file_path, "RECREATE");
     
@@ -62,13 +61,13 @@ int main(int argc, char *argv[]) {
     
     std::cout << "\n start processing " << n_entries << " events..." << std::endl;
     
-
+    if (channel == "DY")  {std::cout << "\n start normalization for DY" << std::endl;}
     
     for (Long64_t i = 0; i < n_entries; i++) {
         tree_input->GetEntry(i);  
             
         if (channel == "DY")  {
-            //std::cout << "\n start normalization for MC bkg" << std::endl;
+            //std::cout << "\n start normalization for DY" << std::endl;
             weight = weight * ratio;
                 
         }
