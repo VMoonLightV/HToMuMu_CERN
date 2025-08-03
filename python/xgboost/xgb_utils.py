@@ -32,13 +32,18 @@ luminosity = {
 }
 
 
-def copy_and_skim_tree(tuple_path, tuple_name, BDT_path, BDT_name, channel_US):
+def copy_and_skim_tree(tuple_path, tuple_name, BDT_path, BDT_name, channel_US, use_bsConstrain):
 
     original_file = root.TFile.Open(tuple_path + tuple_name)
     original_tree = original_file.Get("tree_output")
-    cuts = (
-        "diMuon_mass > 100 && diMuon_mass < 180 && is_" + channel_US + "_category == 1"
-    )
+    if use_bsConstrain:
+        cuts = (
+            "diMuon_bsConstrainedMass > 100 && diMuon_bsConstrainedMass < 180 && is_" + channel_US + "_category == 1"
+        )
+    else:
+        cuts = (
+            "diMuon_mass > 100 && diMuon_mass < 180 && is_" + channel_US + "_category == 1"
+        )
     skim_file = root.TFile.Open(BDT_path + BDT_name, "RECREATE")
     skim_tree = original_tree.CopyTree(cuts)
     skim_tree.Write("tree_output")
@@ -57,6 +62,7 @@ def append_BDT_score(
     mean_map,
     std_map,
     do_standardization,
+    use_bsConstrain,
     use_skim=False,
 ):
 
@@ -82,7 +88,7 @@ def append_BDT_score(
     file_name = BDT_path + BDT_name
     print(f"[INFO] Creating BDT file: {file_name}")
 
-    copy_and_skim_tree(tuple_path, tuple_name, BDT_path, BDT_name, channel_US)
+    copy_and_skim_tree(tuple_path, tuple_name, BDT_path, BDT_name, channel_US, use_bsConstrain)
 
     with uproot.open(file_name) as file:
         df = pd.DataFrame(
@@ -93,6 +99,9 @@ def append_BDT_score(
     tree = file.Get("tree_output")
 
     model_file = f"./models/model_{channel_US}_{model_era}_{subset_title}.pkl"
+    if use_bsConstrain:
+        model_file = f"./models/model_{channel_US}_{model_era}_{subset_title}_bsC.pkl"
+        
 
     x_test = df.values
     if do_standardization:
@@ -148,12 +157,9 @@ def append_BDT_score(
     tree.GetCurrentFile().Write()
     tree.GetCurrentFile().Close()
 
-def get_variables(channel_US):
+def get_variables(channel_US, use_bsConstrain):
     channel_vars = [
         ["diMuon_rapidity", "diMuon_rapidity", r"$y_{\mu\mu}$"],
-        ["diMuon_pt", "diMuon_pt", r"$p_T^{\mu\mu}$ [GeV]"],
-        ["mu1_pt_mass_ratio", "mu1_pt_mass_ratio", r"$p_T^{\mu 1}/m_{\mu\mu}$"],
-        ["mu2_pt_mass_ratio", "mu2_pt_mass_ratio", r"$p_T^{\mu 2}/m_{\mu\mu}$"],
         ["mu1_eta", "mu1_eta", r"$\eta_{\mu 1}$"],
         ["mu2_eta", "mu2_eta", r"$\eta_{\mu 2}$"],
         ["phi_CS", "phi_CS", r"$\phi_{CS}$"],
@@ -178,6 +184,26 @@ def get_variables(channel_US):
             r"min$|\Delta\phi_{\mu\mu,j}|$ [rad]",
         ],
     ]
+    if use_bsConstrain:
+        channel_vars += [
+            ["diMuon_bsConstrainedPt", "diMuon_bsConstrainedPt", r"$p_T^{\mu\mu}$ [GeV] (bsC)"],
+            [
+                "mu1_bsConstrainedPt_mass_ratio", 
+                "mu1_bsConstrainedPt_mass_ratio", 
+                r"$p_T^{\mu 1}/m_{\mu\mu} (bsC)$"
+            ],
+            [
+                "mu2_bsConstrainedPt_mass_ratio", 
+                "mu2_bsConstrainedPt_mass_ratio", 
+                r"$p_T^{\mu 2}/m_{\mu\mu} (bsC)$"
+            ],
+        ]
+    else: 
+        channel_vars += [
+            ["diMuon_pt", "diMuon_pt", r"$p_T^{\mu\mu}$ [GeV]"],
+            ["mu1_pt_mass_ratio", "mu1_pt_mass_ratio", r"$p_T^{\mu 1}/m_{\mu\mu}$"],
+            ["mu2_pt_mass_ratio", "mu2_pt_mass_ratio", r"$p_T^{\mu 2}/m_{\mu\mu}$"],
+        ]
     if channel_US == "VBF":
         channel_vars += [
             # VBF sspecific vchannel_vars
@@ -188,9 +214,27 @@ def get_variables(channel_US):
         ]
 
     # DO NOT CHANGE THE ORDER OF THIS VARIABLES
-    channel_vars += [["diMuon_mass", "diMuon_mass", "diMuon_mass"],
-                     ["relative_diMuon_mass_error", "relative_diMuon_mass_error", "relative_diMuon_mass_error"],
-                     ["weight", "weight", "weight"]]
+    if use_bsConstrain:
+        channel_vars += [
+                        [
+                            "diMuon_bsConstrainedMass",
+                            "diMuon_bsConstrainedMass", 
+                            "diMuon_bsConstrainedMass"
+                        ],
+                        [
+                            "relative_diMuon_bsConstrainedMass_error", 
+                            "relative_diMuon_bsConstrainedMass_error", 
+                            "relative_diMuon_bsConstrainedMass_error"
+                        ],
+                        ["weight", "weight", "weight"]]
+    else: 
+        channel_vars += [["diMuon_mass", "diMuon_mass", "diMuon_mass"],
+                        [
+                            "relative_diMuon_mass_error",
+                            "relative_diMuon_mass_error",
+                            "relative_diMuon_mass_error"
+                        ],
+                        ["weight", "weight", "weight"]]
     return channel_vars
 
 def plot_discriminator(
@@ -448,8 +492,10 @@ def plot_xgb_tree(model, variables, test_name, plot_path):
     plt.savefig(f"{plot_path}training/myTree_{test_name}.png")
 
 
-def save_model(model, test_name):
+def save_model(model, test_name, use_bsConstrain):
     # Pickle dictionary using protocol 0.
+    if use_bsConstrain:
+        test_name = f"{test_name}_bsC"
     output = open("models/model_" + test_name + ".pkl", "wb")
     pickle.dump(model, output)
     output.close()

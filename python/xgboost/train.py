@@ -34,6 +34,7 @@ DO_STANDARDIZATION = True
 USE_WEIGHT = False
 USE_WEIGHT_MASS_RES = True
 APPEND_VARIABLES = True
+USE_BSCONSTRAIN = False 
 SEED = 7
 TEST_SIZE = 0.4
 SAMPLE_SIZE = 1.0
@@ -52,7 +53,7 @@ for subdir in ["training", "results", "scores", "variables"]:
 os.makedirs("models", exist_ok=True)
 os.makedirs("roc", exist_ok=True)
 
-variables = xgb_utils.get_variables(channel_US)
+variables = xgb_utils.get_variables(channel_US, USE_BSCONSTRAIN)
 print("number of variables", len(variables) - 3)
 
 ##Getting ROOT files into pandas
@@ -67,14 +68,18 @@ with uproot.open(bkg_file_name) as file:
     )
 print("[INFO]: Data frames created successfully")
 
+if USE_BSCONSTRAIN:
+    mass_var_name = "diMuon_bsConstrainedMass"
+else:
+    mass_var_name = "diMuon_mass"
 
 bkg_events = df_bkg["weight"][
-    (df_bkg["diMuon_mass"] > SIGNAL_REGION[0])
-    & (df_bkg["diMuon_mass"] < SIGNAL_REGION[1])
+    (df_bkg[mass_var_name] > SIGNAL_REGION[0])
+    & (df_bkg[mass_var_name] < SIGNAL_REGION[1])
 ].sum()
 signal_events = df_signal["weight"][
-    (df_signal["diMuon_mass"] > SIGNAL_REGION[0])
-    & (df_signal["diMuon_mass"] < SIGNAL_REGION[1])
+    (df_signal[mass_var_name] > SIGNAL_REGION[0])
+    & (df_signal[mass_var_name] < SIGNAL_REGION[1])
 ].sum()
 
 ####  weight Normalization
@@ -91,6 +96,12 @@ print(f"[INFO]: Bkg sample size: {len(df_bkg.values)}")
 
 x = np.concatenate([df_bkg.values, df_signal.values])
 y = np.concatenate([np.zeros(len(df_bkg)), np.ones(len(df_signal))])
+
+### Apply dimuon mass cut
+print("len y pred cut:", len(y))
+y = y[(x[:, -3] > 115) & (x[:, -3] < 135)]
+x = x[(x[:, -3] > 115) & (x[:, -3] < 135)]
+print("len y post cut:", len(y))
 
 if DRAW_CORRELATIONS:
     xgb_utils.draw_correlation_matrix(
@@ -263,7 +274,7 @@ xgb_utils.plot_discriminator(
     scale="linear",
 )
 xgb_utils.draw_roc_curve(fpr, tpr, test_name, plot_path, era, AUC)
-xgb_utils.save_model(model, test_name)
+xgb_utils.save_model(model, test_name, USE_BSCONSTRAIN)
 xgb_utils.plot_feature_importances(model, variables, test_name, plot_path)
 xgb_utils.plot_xgb_tree(model, variables, test_name, plot_path)
 
@@ -285,6 +296,7 @@ for file_type in tuples:
         mean_map,
         std_map,
         DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
     )
     xgb_utils.append_BDT_score(
         file_type,
@@ -297,6 +309,7 @@ for file_type in tuples:
         mean_map,
         std_map,
         DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
     )
 xgb_utils.append_BDT_score(
     "Data",
@@ -309,17 +322,6 @@ xgb_utils.append_BDT_score(
     mean_map,
     std_map,
     DO_STANDARDIZATION,
-)
-xgb_utils.append_BDT_score(
-    "DY",
-    channel_US,
-    "2024",
-    "Combined",
-    signal_subset,
-    background_subset,
-    variables[:-3],
-    mean_map,
-    std_map,
-    DO_STANDARDIZATION,
+    USE_BSCONSTRAIN,
 )
 
