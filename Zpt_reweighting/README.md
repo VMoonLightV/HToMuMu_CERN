@@ -44,6 +44,6 @@ python3 "plot_sim_vs_data_njet_Zpt.py" bin(or nobin) ZCR_normalization
     * weight = weight * Func_cor(dimuon_pt)
 
 ```
-python3 "reweighting_Zpt.py" bin SR(or ZCR_normalization)
+python3 "reweighting_Zpt.py" bin SR_reweighting(or ZCR_self_reweighting)
 ```
 
