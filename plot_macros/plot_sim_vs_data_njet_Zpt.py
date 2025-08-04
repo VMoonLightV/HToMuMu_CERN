@@ -1,4 +1,6 @@
-from utils.sim_vs_data_njet_Zpt import draw_data_and_simul_and_ratio
+#from utils.sim_vs_data_njet_Zpt import draw_data_and_simul_and_ratio
+
+from utils.Count_effs import draw_data_and_simul_and_ratio
 import sys
 
 base_input_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"

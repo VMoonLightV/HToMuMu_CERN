@@ -452,15 +452,22 @@ def draw_data_and_simul_and_ratio(
         print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
         
         csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.csv"
-        write_header = not os.path.exists(csv_path)
-        with open(csv_path, 'a', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile)
-            
-            if write_header:
+
+        if (era=="2022" and (njet=="0" or njet=="nobin_") and variable == "diMuon_pt"):
+            with open(csv_path, 'w', newline='') as csvfile:
+                print("open: ", csv_path)
+                csv_writer = csv.writer(csvfile)
+
                 csv_writer.writerow(["Era","Njet",  "Variable", "Region", "Data_Events", "MC_Events", "DY_count", "Ratio", 
                                      "no_DY_bkg", "Right_DY", "DY_factor"])
             
-            csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
+                csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
+                                 sum_MC - DY_count, sum_data - sum_MC + DY_count, (sum_data - sum_MC + DY_count)/DY_count])
+        
+        else: 
+            with open(csv_path, 'a', newline='') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
                                  sum_MC - DY_count, sum_data - sum_MC + DY_count, (sum_data - sum_MC + DY_count)/DY_count])
 
     hep.histplot(
