@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <TSystem.h>
+#include <TError.h>
 
 // g++ -o ./bin/normalization src/normalization.cc $(root-config --cflags --libs)
 
@@ -24,7 +26,7 @@ int main(int argc, char *argv[]) {
     TString era(argv[3]);
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
-    //TString njet(argv[6]);
+    TString njet(argv[6]);
     double ratio = atof(argv[6]);
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
@@ -49,7 +51,17 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("weight", &weight);
 
     TString output_file_path = output + channel + "_" + era + "_skim.root";
-    //TString output_file_path = output + "nobin_jet/ZCR_normalization/" + channel + "_" + era + "_skim.root";
+    TString output_dir = gSystem->DirName(output_file_path);
+
+    if (gSystem->AccessPathName(output_dir, kWritePermission))
+    {
+
+        if (gSystem->mkdir(output_dir, kTRUE) != 0)
+        {
+            Error("", "Failed to create directory: %s", output_dir.Data());
+            return 1;
+        }
+    }
     TFile output_file(output_file_path, "RECREATE");
     
     TTree* tree_output = tree_input->CloneTree(0);

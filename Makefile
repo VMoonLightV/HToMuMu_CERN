@@ -5,9 +5,9 @@ LIB := ./lib
 
 # C++ compiler flags.
 CXX   := g++ -g -Wall 
-FLAGS := -std=c++17 $(shell root-config --cflags) $(correction config --cflags --ldflags) -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/boost/1.80.0-4e27c6908892e3529bfbcf4445a96fe6/include
+FLAGS := -std=c++17 $(shell root-config --cflags) $(shell correction config --cflags --ldflags) -I/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/boost/1.80.0-4e27c6908892e3529bfbcf4445a96fe6/include
 
-LIBS  := $(shell root-config --libs) $(correction config --cflags --ldflags) -L/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/boost/1.80.0-4e27c6908892e3529bfbcf4445a96fe6/lib
+LIBS  := $(shell root-config --libs) $(shell correction config --cflags --ldflags) -L/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/boost/1.80.0-4e27c6908892e3529bfbcf4445a96fe6/lib
 
 # Analyzer sources and header
 ANALYZER_SRC := $(SRC)/LeptonEfficiencyCorrector.cc \
@@ -63,9 +63,28 @@ SKIM_ggH_EXECUTABLE := $(BIN)/SkimTuplesggH
 SKIM_VBF_EXECUTABLE := $(BIN)/SkimTuples_VBF
 TUPLE_EXECUTABLE := $(BIN)/CreateTuple
 
+
+# Reweighting and normalization
+REWEIGHTING_SRC := $(SRC)/reweighting_Zpt.cc
+REWEIGHTING_OBJECTS := reweighting_Zpt.o
+REWEIGHTING_EXECUTABLE := $(BIN)/reweighting_Zpt
+
+NORMALIZATION_SRC := $(SRC)/normalization.cc
+NORMALIZATION_OBJECTS := normalization.o
+NORMALIZATION_EXECUTABLE := $(BIN)/normalization
+
+EFF_SPLIT_SRC := $(SRC)/Eff_on_split_tuple.cc
+EFF_SPLIT_OBJECTS := Eff_on_split_tuple.o
+EFF_SPLIT_EXECUTABLE := $(BIN)/Eff_on_split_tuple
+
+SOURCES += $(REWEIGHTING_SRC) $(NORMALIZATION_SRC) $(EFF_SPLIT_SRC)
+OBJECTS += $(REWEIGHTING_OBJECTS) $(NORMALIZATION_OBJECTS) $(EFF_SPLIT_OBJECTS)
+
+
 # Default target: build both executables
 .PHONY: all
-all: $(ANALYZER_EXECUTABLE) $(HISTOGRAM_EXECUTABLE) $(SKIM_ggH_EXECUTABLE) $(SKIM_VBF_EXECUTABLE) $(TUPLE_EXECUTABLE)
+all: $(ANALYZER_EXECUTABLE) $(HISTOGRAM_EXECUTABLE) $(SKIM_ggH_EXECUTABLE) $(SKIM_VBF_EXECUTABLE) $(TUPLE_EXECUTABLE) \
+     $(REWEIGHTING_EXECUTABLE) $(NORMALIZATION_EXECUTABLE) $(EFF_SPLIT_EXECUTABLE)
 
 # Compile only the Analyzer
 .PHONY: analyzer
@@ -109,6 +128,7 @@ $(ANALYZER_EXECUTABLE): $(ANALYZER_OBJECTS)
 	$(CXX) $(FLAGS) -o $@ $^ $(LIBS)
 	@echo "done"
 
+
 # Linking for CrekteHistograms
 $(HISTOGRAM_EXECUTABLE): $(HISTOGRAM_OBJECTS)
 	@echo "Linking $(HISTOGRAM_EXECUTABLE)..."
@@ -132,6 +152,24 @@ $(SKIM_VBF_EXECUTABLE): $(SKIM_VBF_OBJECTS)
 	@echo "Linking $(SKIM_VBF_EXECUTABLE)..."
 	$(CXX) $(FLAGS) -o $@ $^ $(LIBS)
 	@echo "done"
+
+
+# Zpt Reweighting and normalization
+$(REWEIGHTING_EXECUTABLE): $(REWEIGHTING_SRC)
+	@echo "Compiling and linking $@..."
+	$(CXX) $(FLAGS) -o $@ $^ $(LIBS)
+	@echo "done"
+
+$(NORMALIZATION_EXECUTABLE): $(NORMALIZATION_SRC)
+	@echo "Compiling and linking $@..."
+	$(CXX) $(FLAGS) -o $@ $^ $(LIBS)
+	@echo "done"
+
+$(EFF_SPLIT_EXECUTABLE): $(SRC)/LeptonEfficiencyCorrector.cc $(EFF_SPLIT_SRC)
+	@echo "Compiling and linking $@..."
+	$(CXX) $(FLAGS) -o $@ $^ $(LIBS)
+	@echo "done"
+
 	
 # Specifying the object files as intermediates deletes them automatically after the build process.
 .INTERMEDIATE: $(ANALYZER_OBJECTS) $(HISTOGRAM_OBJECTS) $(SKIM_ggH_OBJECTS) $(SKIM_VBF_OBJECTS) $(TUPLE_OBJECTS)
@@ -139,4 +177,5 @@ $(SKIM_VBF_EXECUTABLE): $(SKIM_VBF_OBJECTS)
 # Clean target
 .PHONY: clean
 clean:
-	rm -f $(ANALYZER_OBJECTS) $(HISTOGRAM_OBJECTS) $(SKIM_ggH_OBJECTS) $(SKIM_VBF_OBJECTS) $(TUPLE_OBJECTS)	$(ANALYZER_EXECUTABLE) $(HISTOGRAM_EXECUTABLE) $(SKIM_ggH_EXECUTABLE) $(SKIM_VBF_EXECUTABLE) $(TUPLE_EXECUTABLE)
+	rm -f $(ANALYZER_OBJECTS) $(HISTOGRAM_OBJECTS) $(SKIM_ggH_OBJECTS) $(SKIM_VBF_OBJECTS) $(TUPLE_OBJECTS)	$(ANALYZER_EXECUTABLE) $(HISTOGRAM_EXECUTABLE) $(SKIM_ggH_EXECUTABLE) $(SKIM_VBF_EXECUTABLE) $(TUPLE_EXECUTABLE) \
+		$(NORMALIZATION_EXECUTABLE) $(EFF_SPLIT_EXECUTABLE) $(REWEIGHTING_EXECUTABLE) 

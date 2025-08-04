@@ -15,11 +15,28 @@
 #include "correction.h"
 #include "../lib/LeptonEfficiencyCorrector.h"
 
-// g++ "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/src/LeptonEfficiencyCorrector.cc" -o ./bin/Eff_on_tuple src/Eff_on_tuple.cc $(root-config --cflags --libs)  $(correction config --cflags --ldflags)
+// g++ ./src/LeptonEfficiencyCorrector.cc ./src/Eff_on_split_tuple.cc -o ./bin/Eff_on_split_tuple  $(root-config --cflags --libs)  $(correction config --cflags --ldflags)
+
+
+bool checkCondition(UInt_t n_jet, const TString& njet) {
+        if (njet == "nobin_" || njet == "") {
+            return (n_jet >= 0); // no jet bin
+        } 
+        else if (njet == "0" || njet == "1") {
+            return (n_jet == std::stoi(njet.Data())); 
+        } 
+        else if (njet == "2") {
+            return (n_jet >= 2);
+        } 
+        else {
+            std::cerr << "Invalid njet value: " << njet << std::endl;
+            return false; 
+        }
+}
 
 int main(int argc, char *argv[])
 {
-    if (argc != 7)
+    if (argc != 8)
     {
         std::cerr << "Please give 8 arguments: input, output, channel, era, is_data, njet, zone, coffi_csv"
                   << std::endl;
@@ -31,7 +48,8 @@ int main(int argc, char *argv[])
     TString era(argv[3]);
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
-    TString region(argv[6]);
+    TString njet(argv[6]);
+    TString region(argv[7]);
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
 
@@ -60,15 +78,16 @@ int main(int argc, char *argv[])
     float mu1_eta = 0;
     float mu2_pt = 0;
     float mu2_eta = 0;
+    UInt_t n_jet = 0;
     tree_input->SetBranchAddress("weight", &weight);
     tree_input->SetBranchAddress("diMuon_mass", &dimuon_mass);
     tree_input->SetBranchAddress("mu1_pt", &mu1_pt);
     tree_input->SetBranchAddress("mu1_eta", &mu1_eta);
     tree_input->SetBranchAddress("mu2_pt", &mu2_pt);
     tree_input->SetBranchAddress("mu2_eta", &mu2_eta);
+    tree_input->SetBranchAddress("n_jet", &n_jet);
 
-    ////TString output_file_path = output + njet +"jet/Zpt_self_normalization_reweighting_8-th/" + channel + "_" + era + "_skim.root";
-    TString output_file_path = output + region + "_eff/" + channel + "_" + era + "_skim.root";
+    TString output_file_path = output + njet + "jet/" + region + "/" + channel + "_" + era + "_skim.root";
 
     TString output_dir = gSystem->DirName(output_file_path);
 
@@ -94,11 +113,13 @@ int main(int argc, char *argv[])
     float Mu1_ISO_SF = 0;
     float Mu2_ID_SF = 0;
     float Mu2_ISO_SF = 0;
+    float DiMu_ID_ISO_SF = 0;
 
     tree_output->Branch("Mu1_ID_SF", &Mu1_ID_SF, "Mu1_ID_SF/F");
     tree_output->Branch("Mu1_ISO_SF", &Mu1_ISO_SF, "Mu1_ISO_SF/F");
     tree_output->Branch("Mu2_ID_SF", &Mu2_ID_SF, "Mu2_ID_SF/F");
     tree_output->Branch("Mu2_ISO_SF", &Mu2_ISO_SF, "Mu2_ISO_SF/F");
+    tree_output->Branch("DiMu_ID_ISO_SF", &DiMu_ID_ISO_SF, "DiMu_ID_ISO_SF/F");
 
     std::cout << "\nstart processing " << n_entries << " events..." << std::endl;
     std::cout << "\nregion:  " << region << std::endl;
@@ -106,34 +127,37 @@ int main(int argc, char *argv[])
     for (Long64_t i = 0; i < n_entries; i++)
     {
         tree_input->GetEntry(i);
+        bool condition = checkCondition(n_jet, njet);
 
-        if ((region == "ZCR" && dimuon_mass > 70 && dimuon_mass < 110) ||
-            (region == "SR" && dimuon_mass > 110 && dimuon_mass < 150)) {
+        if ((region == "ZCR" && dimuon_mass > 70 && dimuon_mass < 110) && condition ||
+            (region == "SR" && dimuon_mass > 110 && dimuon_mass < 150) && condition)
+        {
 
-            if (channel == "DY" || channel == "EWK" || channel == "TT" || channel == "DiBoson") {
+            if (channel == "DY" || channel == "EWK" || channel == "TT" || channel == "DiBoson")
+            {
                 Mu1_ID_SF = corrector.give_eff("Muon_eff_SF_ID", mu1_pt, mu1_eta);
                 Mu1_ISO_SF = corrector.give_eff("Muon_eff_SF_ISO", mu1_pt, mu1_eta);
                 Mu2_ID_SF = corrector.give_eff("Muon_eff_SF_ID", mu2_pt, mu2_eta);
                 Mu2_ISO_SF = corrector.give_eff("Muon_eff_SF_ISO", mu2_pt, mu2_eta);
+                DiMu_ID_ISO_SF = Mu1_ID_SF * Mu1_ISO_SF * Mu2_ID_SF * Mu2_ISO_SF;
 
                 weight = weight * Mu1_ID_SF * Mu1_ISO_SF * Mu2_ID_SF * Mu2_ISO_SF;
                 if (i < 10)
                 {
                     std::cout << "Muon1 eff (ID and ISO): " << Mu1_ID_SF << Mu1_ISO_SF << std::endl;
                 }
-
             }
-            
+
             tree_output->Fill();
         }
     }
 
-    output_file.cd();
-    tree_output->Write();
-    output_file.Close();
-    inputFile.Close();
+output_file.cd();
+tree_output->Write();
+output_file.Close();
+inputFile.Close();
 
-    std::cout << "file in: " << output_file_path << std::endl;
+std::cout << "file in: " << output_file_path << std::endl;
 
-    return 0;
+return 0;
 }

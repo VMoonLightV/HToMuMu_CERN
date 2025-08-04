@@ -12,7 +12,7 @@
 #include <TError.h>
 #include <algorithm>
 
-// g++ -o ./bin/reweighting_Zpt src/reweighting_Zpt.cc $(root-config --cflags --libs)
+// g++ -o ./bin/reweighting_Zpt ./src/reweighting_Zpt.cc $(root-config --cflags --libs)
 
 float Polynomial(const std::vector<float>& coefficients, float x) {
     float result = 0.0;
@@ -38,6 +38,7 @@ float PiecewisePolynomial(const std::vector<PolynomialSegment>& segments, float 
     if (seg == segments.end()) {
         return std::numeric_limits<float>::quiet_NaN(); 
     }
+    
     std::vector<float> coeffs;
     for (const auto& s : segments) {
         if (s.range_L == seg->range_L && s.range_R == seg->range_R) {
@@ -47,10 +48,12 @@ float PiecewisePolynomial(const std::vector<PolynomialSegment>& segments, float 
             coeffs[s.power] = s.coefficient;
         }
     }
+    
     float result = 0.0;
     for (size_t i = 0; i < coeffs.size(); i++) {
         result = result * x + coeffs[i];
     }
+    
     return result;
 }
 
@@ -69,7 +72,6 @@ int main(int argc, char *argv[]) {
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
     //TString njet(argv[6]);
-    //TString coeff_csv = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/plots/ratio/njet/"+ njet +"jet_ratio_table_dimuon_pt_ZCR_normalization_piecewise_8-th/polynomial_"+ era +"_coefficients.csv";
     TString coeff_csv(argv[6]);
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
@@ -90,19 +92,17 @@ int main(int argc, char *argv[]) {
         
         std::getline(iss, rangeL_str, ',');
         std::getline(iss, rangeR_str, ',');
-        std::getline(iss, power_str, ','); 
+        std::getline(iss, power_str,  ','); 
         std::getline(iss, coeff_str);
-        try {
-                PolynomialSegment seg{
+        
+        PolynomialSegment seg{
                     std::stod(rangeL_str),
                     std::stod(rangeR_str),
                     std::stoi(power_str),
                     std::stod(coeff_str)
-                };
-                segments.push_back(seg);
-        
-        } catch (...) {}
-        
+        };
+        segments.push_back(seg);
+            
     }
 
     TFile inputFile(input_name, "READ");
@@ -125,7 +125,6 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
     TString output_file_path = output + channel + "_" + era + "_skim.root";
-    //TString output_file_path = output + "SR_normalization_reweighting_6-th/" + channel + "_" + era + "_skim.root";
 
     TString output_dir = gSystem->DirName(output_file_path);
 
@@ -150,13 +149,12 @@ int main(int argc, char *argv[]) {
     for (Long64_t i = 0; i < n_entries; i++) {
         tree_input->GetEntry(i);  
         
-        //if (channel == "DY" || channel == "TT" || channel == "DiBoson" || channel == "EWK")  {
         if (channel == "DY") {
 
             if ((dimuon_pt) < 600.0) {
                 float f_pt = PiecewisePolynomial(segments, dimuon_pt);
                 weight = weight * f_pt;
-                if (i<10) {std::cout << f_pt << " in pt: " << dimuon_pt << std::endl;}
+                if (i<5) {std::cout << weight << " from " << f_pt << " in pt: " << dimuon_pt << std::endl;}
                 if (f_pt < 0.1) {
                     std::cout << "\n strange F(pt): " << f_pt << ", with dimuon_pt:" << dimuon_pt << std::endl;
                 }

@@ -107,7 +107,7 @@ def get_background_label_list(background_sources):
 
 
 def get_histograms_from_tuple(
-    sources, era, variables, is_background, use_puweight,
+    input_dir, sources, era, variables, is_background, use_puweight,
     use_ggH_category, use_VBF_category, njet, region, lumi_rescale=False, isZRange=False,
 ):
     if not use_puweight:
@@ -115,6 +115,7 @@ def get_histograms_from_tuple(
 
     histograms_list = []
     bins_list = []
+    DY_count = 0
 
     # For 2024 data there is not simulations yet!!!
     # so in the case we re escale the luminosity
@@ -136,8 +137,7 @@ def get_histograms_from_tuple(
 
     for source in sources:
         with ur.open(
-            ###f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/" + source + "_" + era + "_skim.root:tree_output"
-            f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/" + source + "_" + era + "_skim.root:tree_output"
+            input_dir + source + "_" + era + "_skim.root:tree_output"
         ) as file:
             branches = file.arrays(variables, library="np")
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
@@ -191,31 +191,12 @@ def get_histograms_from_tuple(
             bins_list.append(bins)
             # histograms_list[source] = histogram
             # bins_list[source] = bins
+            if source == "DY":
+                DY_count = histogram.sum()
+                print("DY in bkg list", DY_count)
 
-    return histograms_list, bins_list
+    return histograms_list, bins_list, DY_count
 
-
-'''
-def polyfit(df, output_name):
-
-    x = df['BinCenter'].values
-    y = df['RatioValue'].values
-
-    coefficients = np.polyfit(x, y, order)
-
-    poly_function = np.poly1d(coefficients)
-
-    coeff_df = pd.DataFrame({
-        'power': range(order, -1, -1),
-        'coefficient': coefficients
-    })
-    coeff_df.to_csv(output_name, index=False, mode='w')
-
-    print(f"\nploynominal in {output_name}: ")
-    print(poly_function)
-    
-    return coeff_df
-'''
 
 def piecewise_polyfit(df, min_x, max_x, output_name):
 
@@ -224,7 +205,7 @@ def piecewise_polyfit(df, min_x, max_x, output_name):
     
     #min_x, max_x = np.min(x), np.max(x)
     boundaries = [0,100,250,600]
-    orders = [order,3,3,3]
+    orders = [order,3,3]
 
     all_coeffs = []
     poly_functions = []
@@ -246,7 +227,6 @@ def piecewise_polyfit(df, min_x, max_x, output_name):
 
         poly_functions.append(poly_func)
         intervals.append((boundaries[i], boundaries[i+1]))
-        
 
         for power, coef in enumerate(coefficients[::-1]):
             all_coeffs.append({
@@ -285,6 +265,7 @@ def piecewise_polyval(x, poly_functions, boundaries):
     return results
 
 def draw_data_and_simul_and_ratio(
+    input_dir,
     variable,
     era,
     background_sources,
@@ -332,8 +313,7 @@ def draw_data_and_simul_and_ratio(
         variable_bin += "_VBF"
 
     with ur.open(
-        ###f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/Data_" + era + "_skim.root:tree_output"
-        f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet/{njet}jet/{region}/Data_" + era + "_skim.root:tree_output"
+        input_dir + "Data_" + era + "_skim.root:tree_output"
     ) as data_file:
         branches = data_file.arrays(variables, library="np")
         if "bsConstrained" in variable:
@@ -380,12 +360,13 @@ def draw_data_and_simul_and_ratio(
     ###num_jet=njet
 
     print(variables)
-    bkg_histograms_list, bkg_bins_list = get_histograms_from_tuple(
-        background_sources, simulation_era, variables, True, use_puweight,
+    DY_count = 0
+    bkg_histograms_list, bkg_bins_list, DY_count = get_histograms_from_tuple(
+        input_dir, background_sources, simulation_era, variables, True, use_puweight,
         use_ggH_category, use_VBF_category, njet, region, era == "2024", isZRange, 
     )
-    signal_histograms_list, signal_bins_list = get_histograms_from_tuple(
-        signal_sources, simulation_era, variables, False, use_puweight,
+    signal_histograms_list, signal_bins_list, no_meaning_value = get_histograms_from_tuple(
+        input_dir, signal_sources, simulation_era, variables, False, use_puweight,
         use_ggH_category, use_VBF_category, njet, region, era == "2024", isZRange, 
     )
     
@@ -456,41 +437,21 @@ def draw_data_and_simul_and_ratio(
         if i == 0:
             tot_bg_numpy_hist = bg_hist            
         else:
-            tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist
-            
-        if i ==3:
-            DY_count = bg_hist.sum()
-            
-    print(DY_count)
-            
+            tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist     
 
     ratio_hist, ratio_error = get_histograms_ratio(data_histogram, tot_bg_numpy_hist)
     
     #print(tot_bg_numpy_hist)
     sum_MC = sum([hist.sum() for hist in tot_bg_numpy_hist])
+
+    print(DY_count)
     print(sum_MC)
     
-    '''
-    if "R" in region:
-        print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
-        #if  variable != "n_jet":
-        #    with open(f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.txt", "a") as f:
-        #      f.write(f"{era} {njet}jet ZCR data/MC num_events ({variable}): {sum_data} / {sum_MC} = {sum_data/sum_MC}" + "\n")
-        
-        csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.csv"
-        write_header = not os.path.exists(csv_path)
-        with open(csv_path, 'a', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile)
-            
-            if write_header:
-                csv_writer.writerow(["Era", "Njet", "Variable", "Region", "Data_Events", "MC_Events", "DY_count", "Ratio"])
-            
-            csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC])
-    '''
+
     if "ZCR" in region:
         print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
         
-        csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}_inclusive.csv"
+        csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.csv"
         write_header = not os.path.exists(csv_path)
         with open(csv_path, 'a', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
@@ -499,11 +460,8 @@ def draw_data_and_simul_and_ratio(
                 csv_writer.writerow(["Era","Njet",  "Variable", "Region", "Data_Events", "MC_Events", "DY_count", "Ratio", 
                                      "no_DY_bkg", "Right_DY", "DY_factor"])
             
-            csv_writer.writerow([era,njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
+            csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
                                  sum_MC - DY_count, sum_data - sum_MC + DY_count, (sum_data - sum_MC + DY_count)/DY_count])
-    
-
-
 
     hep.histplot(
         ratio_hist,
@@ -526,9 +484,9 @@ def draw_data_and_simul_and_ratio(
     axs[1].set_xlabel(f"nobin_jet {region} "+x_labels[variable])
     
     if ("ZCR_normalization" in region) & (variable == "diMuon_pt"):
-      axs[1].set_ylim(0.0, 2.0)
+      axs[1].set_ylim(0.0, 5.0)
       
-      iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}_piecewise_{order}-th/" 
+      iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/" 
       os.makedirs(iter_dir, exist_ok=True)
             
       num_bins = len(ratio_hist)
@@ -548,13 +506,6 @@ def draw_data_and_simul_and_ratio(
       
       # draw fit curve
       output_file= f"{iter_dir}/polynomial_{era}_coefficients.csv"
-      
-      '''
-      coeff_df = polyfit(df, output_file)
-      coefficients = coeff_df['coefficient'].values
-      x_fit = np.linspace(data_bins[0], data_bins[-1], 500)
-      y_fit = np.polyval(coefficients, x_fit)
-      '''
             
       coeff_df, poly_funcs, boundaries = piecewise_polyfit(df, min_val, max_val, output_file)
       x_fit = np.linspace(df['BinCenter'].min(), df['BinCenter'].max(), 500)
@@ -565,16 +516,13 @@ def draw_data_and_simul_and_ratio(
               color='blue', 
               linewidth=2,
               linestyle='-',
-              ###label=f'{order}-th Polynomial Fit')
               label=f'Polynomial Fit')
   
       axs[1].legend(loc='best')
   
   
 
-    ###output_directory = f"../plots/ratio/njet/{njet}jet_{region}_piecewise_{order}-th/" + era + "/"
     output_directory = f"../plots/ratio/njet/{njet}jet_{region}/" + era + "/"
-    if ("ZCR_normalization" in region or "SR" in region): output_directory = f"../plots/ratio/njet/{njet}jet_{region}_piecewise_{order}-th/" + era + "/"
     if not use_puweight:
         output_directory = "../plots/ratio/" + era + "/no_puWeight/"
     if use_ggH_category:
