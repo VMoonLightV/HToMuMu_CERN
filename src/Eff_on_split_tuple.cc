@@ -113,6 +113,8 @@ int main(int argc, char *argv[])
     float Mu1_ISO_SF = 0;
     float Mu2_ID_SF = 0;
     float Mu2_ISO_SF = 0;
+    float DiMu_ID_SF = 0;
+    float DiMu_ISO_SF = 0;
     float DiMu_ID_ISO_SF = 0;
 
     tree_output->Branch("Mu1_ID_SF", &Mu1_ID_SF, "Mu1_ID_SF/F");
@@ -139,9 +141,11 @@ int main(int argc, char *argv[])
                 Mu1_ISO_SF = corrector.give_eff("Muon_eff_SF_ISO", mu1_pt, mu1_eta);
                 Mu2_ID_SF = corrector.give_eff("Muon_eff_SF_ID", mu2_pt, mu2_eta);
                 Mu2_ISO_SF = corrector.give_eff("Muon_eff_SF_ISO", mu2_pt, mu2_eta);
-                DiMu_ID_ISO_SF = Mu1_ID_SF * Mu1_ISO_SF * Mu2_ID_SF * Mu2_ISO_SF;
+                DiMu_ID_SF = 1 - (1 - Mu1_ID_SF) * (1 - Mu2_ID_SF);
+                DiMu_ISO_SF = 1 - (1 - Mu1_ISO_SF) * (1 - Mu2_ISO_SF);
+                DiMu_ID_ISO_SF = DiMu_ID_SF * DiMu_ISO_SF;
 
-                weight = weight * Mu1_ID_SF * Mu1_ISO_SF * Mu2_ID_SF * Mu2_ISO_SF;
+                weight = weight * DiMu_ID_ISO_SF;
                 if (i < 10)
                 {
                     std::cout << "Muon1 eff (ID and ISO): " << Mu1_ID_SF << Mu1_ISO_SF << std::endl;

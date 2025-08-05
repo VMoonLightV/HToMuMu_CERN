@@ -30,6 +30,8 @@ else:
     print(" > 2022, 2023, Combined, All")
     exit()
 
+eras =["Combined"]
+
 if len(sys.argv) == 3:
     background_subset = "Full"
     signal_subset = "NottH"
@@ -48,7 +50,7 @@ print("Signal subset: ", signal_subset)
 
 subset_title = "B" + background_subset + "_S" + signal_subset
 BDTvar = "BDT_" + channel_US
-BDTscore_path = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/" + channel_US + "/BDT_score/"
+BDTscore_path = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/BDT_score/" + channel_US + "/"
 N_max_iterations = 1 if channel_US == "ggH" else 2
 
 def find_bdt_categories(era, bdt_categories, bdf_cut_max=1, iteration=0):
