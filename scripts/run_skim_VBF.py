@@ -1,10 +1,12 @@
 import subprocess
+import os
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/SkimTuples_VBF"
 #input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/tuples/"
-input_directory = "./root_io/tuples/"
-output_directory = "./root_io/skim/"
+input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/"
+output_directory = "/eos/home-y/yulou/Fnal-hmm/BDT-skims/VBF/"
+os.makedirs(output_directory, exist_ok=True)
 
 eras = [
     "2022",

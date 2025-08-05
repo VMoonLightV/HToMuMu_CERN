@@ -3,25 +3,30 @@
 #include <TROOT.h>
 #include <TTree.h>
 #include <iostream>
-// g++ -o ./bin/SkimTuples_VBF src/SkimTuples_VBF.cc $(root-config --cflags
-// --libs)
+// g++ -o ./bin/SkimTuples_VBF src/SkimTuples_VBF.cc $(root-config --cflags --libs)
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 4) {
-        std::cerr << "Please give 3 arguments: input folder, channel, era."
+    if (argc != 6) {
+        std::cerr << "Please give 5 arguments: input, output, channel, era, is_data?."
                   << std::endl;
         return -1;
     }
 
-    TString input_path(argv[1]);
-    TString channel(argv[2]);
+    //TString input_path(argv[1]);
+    //TString channel(argv[2]);
+    //TString era(argv[3]);
+    
+    TString input_name(argv[1]);
+    TString output(argv[2]);
     TString era(argv[3]);
+    TString channel(argv[4]);
+    const bool is_data = *argv[5] == 'T';
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
 
     // Open the input ROOT file and get the TTree
-    TString input_name = input_path + channel + "_" + era + "_tuples.root";
+    //TString input_name = input_path + channel + "_" + era + "_tuples.root";
     TFile inputFile(input_name, "READ");
     if (inputFile.IsZombie()) {
         std::cerr << "Error opening input file!" << std::endl;
@@ -65,19 +70,21 @@ int main(int argc, char *argv[]) {
         "HT_pt5",
         "HT_pt10",
         "weight_no_lumi",
-        "is_ggH_category",
+        "weight",
+        //"is_ggH_category",
         "is_VBF_category",
+	"relative_diMuon_mass_error",
     };
     for (auto VBF_branch : branches)
         tree_input->SetBranchStatus(VBF_branch, 1);
 
     gROOT->cd();
     // Open the output ROOT file and create a new TTree
-    TFile output_file("./root_io/skim/VBF/" + channel + "_" + era + "_skim.root",
+    TFile output_file(output + channel + "_" + era + "_skim.root",
                       "RECREATE");
     TTree *tree_output = tree_input->CloneTree(0); // Clone the structure only
 
-    tree_output = tree_input->CopyTree("is_VBF_category == 1");
+    tree_output = tree_input->CopyTree("(is_VBF_category == 1) && (diMuon_mass > 115. && diMuon_mass < 135.)");
 
     // Write the selected tree to the output file
     output_file.cd();

@@ -3,8 +3,7 @@
 #include <TROOT.h>
 #include <TTree.h>
 #include <iostream>
-// g++ -o ./bin/SkimTuplesggH src/SkimTuplesggH.cc $(root-config --cflags
-// --libs)
+// g++ -o ./bin/SkimTuplesggH src/SkimTuplesggH.cc $(root-config --cflags --libs)
 
 int main(int argc, char *argv[]) {
 
@@ -57,16 +56,19 @@ int main(int argc, char *argv[]) {
                               "min_delta_eta_diMuon_jet",
                               "min_delta_phi_diMuon_jet",
                               "weight_no_lumi",
-                              "is_ggH_category"})
+                              "weight",
+                              "is_ggH_category",
+			      "relative_diMuon_mass_error"})
         tree_input->SetBranchStatus(ggh_branches, 1);
 
     gROOT->cd();
     // Open the output ROOT file and create a new TTree
-    TFile output_file("./root_io/skim/ggH/" + channel + "_" + era + "_skim.root",
+    TFile output_file(output + channel + "_" + era + "_skim.root",
                       "RECREATE");
     TTree *tree_output = tree_input->CloneTree(0); // Clone the structure only
 
-    tree_output = tree_input->CopyTree("is_ggH_category == 1");
+    tree_output = tree_input->CopyTree("(is_ggH_category == 1) && (diMuon_mass > 115. && diMuon_mass < 135.)");
+
     // Write the selected tree to the output file
 
     output_file.cd();

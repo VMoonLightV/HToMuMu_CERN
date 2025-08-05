@@ -1,14 +1,13 @@
 import subprocess
 import os
 
-
 # Define the path to your C++ executable
 cpp_executable = "./bin/SkimTuplesggH"
 
 # base_input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/"
-base_input_directory = "./root_io/tuples/"
-output_directory = "./root_io/skim/"
-os.makedirs(output_directory + "ggH/", exist_ok=True)
+base_input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/"
+output_directory = "/eos/home-y/yulou/Fnal-hmm/BDT-skims/ggH/"
+os.makedirs(output_directory, exist_ok=True)
 
 # eras = ["2022", "2022EE"]
 #eras = ["2024"]
