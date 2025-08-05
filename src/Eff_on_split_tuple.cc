@@ -109,18 +109,20 @@ int main(int argc, char *argv[])
     int zero_division_warnings = 0;
     const int MAX_WARNINGS = 5;
 
-    float Mu1_ID_SF = 0;
-    float Mu1_ISO_SF = 0;
-    float Mu2_ID_SF = 0;
-    float Mu2_ISO_SF = 0;
-    float DiMu_ID_SF = 0;
-    float DiMu_ISO_SF = 0;
-    float DiMu_ID_ISO_SF = 0;
+    float Mu1_ID_SF = 1;
+    float Mu1_ISO_SF = 1;
+    float Mu2_ID_SF = 1;
+    float Mu2_ISO_SF = 1;
+    float DiMu_ID_SF = 1;
+    float DiMu_ISO_SF = 1;
+    float DiMu_ID_ISO_SF = 1;
 
     tree_output->Branch("Mu1_ID_SF", &Mu1_ID_SF, "Mu1_ID_SF/F");
     tree_output->Branch("Mu1_ISO_SF", &Mu1_ISO_SF, "Mu1_ISO_SF/F");
     tree_output->Branch("Mu2_ID_SF", &Mu2_ID_SF, "Mu2_ID_SF/F");
     tree_output->Branch("Mu2_ISO_SF", &Mu2_ISO_SF, "Mu2_ISO_SF/F");
+    tree_output->Branch("DiMu_ID_SF", &DiMu_ID_SF, "DiMu_ID_SF/F");
+    tree_output->Branch("DiMu_ISO_SF", &DiMu_ISO_SF, "DiMu_ISO_SF/F");
     tree_output->Branch("DiMu_ID_ISO_SF", &DiMu_ID_ISO_SF, "DiMu_ID_ISO_SF/F");
 
     std::cout << "\nstart processing " << n_entries << " events..." << std::endl;
@@ -141,8 +143,11 @@ int main(int argc, char *argv[])
                 Mu1_ISO_SF = corrector.give_eff("Muon_eff_SF_ISO", mu1_pt, mu1_eta);
                 Mu2_ID_SF = corrector.give_eff("Muon_eff_SF_ID", mu2_pt, mu2_eta);
                 Mu2_ISO_SF = corrector.give_eff("Muon_eff_SF_ISO", mu2_pt, mu2_eta);
-                DiMu_ID_SF = 1 - (1 - Mu1_ID_SF) * (1 - Mu2_ID_SF);
-                DiMu_ISO_SF = 1 - (1 - Mu1_ISO_SF) * (1 - Mu2_ISO_SF);
+                DiMu_ID_SF = Mu1_ID_SF * Mu2_ID_SF;
+                DiMu_ISO_SF = Mu1_ISO_SF * Mu2_ISO_SF;
+
+                // this formul is for the trigger
+                //DiMu_TRIG_SF = 1 - (1 - Mu1_TRIG_SF) * (1 - Mu2_TRIG_SF);
                 DiMu_ID_ISO_SF = DiMu_ID_SF * DiMu_ISO_SF;
 
                 weight = weight * DiMu_ID_ISO_SF;
