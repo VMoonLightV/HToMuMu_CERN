@@ -347,6 +347,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     muon_pt_cut["2022EE"] = 26.0;
     muon_pt_cut["2023"] = 26.0;
     muon_pt_cut["2023BPix"] = 26.0;
+    muon_pt_cut["2024"] = 26.0;
 
     // Define b-tagging scores
     // b-tag particleNet LOOSE score selection
