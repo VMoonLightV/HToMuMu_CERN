@@ -76,7 +76,7 @@ Run the code for data/simulation :
 
 To run over all the data sets, look at condor/README.md to run it in condor jobs.   
 If you want to run it over a small dataset, look at scripts/README.md
-<span style="color:red"> My username(mbarrial) is hardcoded here, so this needs to be updated.
+$\color{red}[\text{ My username(mbarrial) is hardcoded here, so this needs to be updated.}$
 
 By default, these tuples are saved in:
 ```
@@ -90,8 +90,7 @@ cd ./root_io/tuples/
 bash hadd_tuples_EOS.sh
 bash hadd_tuples.sh
 ```
-
-<span style="color:Orange"> Probably will be good to have just one hadd script and also clean this one a little.
+$\color{orange}\text{Probably will be good to have just one hadd script and also clean this one a little}$
 
 If you want to add a variable to the tuples, you just need to go to ./lib/CreateTuple.h add the variable to the CreateTuple class, and to the CreateTuple::setBranchesAddressesInput() method.
 
@@ -132,7 +131,7 @@ The key variables of this code are in ./python/xgboost/train.py are.
 - APPEND_VARIABLES: if true, create new tuples with the BDT score saved on them.
 - USE_BSCONSTRAIN: if true, use the bsConstrain variables for the training
 
-<span style="color:orange"> Probably will be good to add this as inputs so you can run python3 train.py ggh Combined weight standardization bsConstrain, or something like that 
+$\color{orange}\text{Probably will be good to add this as inputs so you can run python3 train.py ggh Combined weight standardization bsConstrain, or something like that}$
 
 
 The code will generate one file containing the model (python/xgboost/models/model_ggH_Combined_BFull_SNottH.xgb), one file containing the roc curve (python/xgboost/roc/ggH_Combined_BFull_SNottH_roc.txt), and will add the BDT score to the tuples.
@@ -145,8 +144,7 @@ Again, we need to hadd these tuples. To do this, do
 bash scripts/hadd_bdt.sh
 ```
 
-
-<span style="color:Orange"> Here is a hardcoded path to VBF, the variable is called `path`. Change where it says VBF to ggH if you want that channel. It would be good to add an argument instead of changing the variable name.
+$\color{orange}\text{Here is a hardcoded path to VBF, the variable is called `path`. Change where it says VBF to ggH if you want that channel. It would be good to add an argument instead of changing the variable name.}$
 
 This will copy the hadd_template.sh file in the directories where the tuples are, so the next time you can just do.
 
@@ -156,7 +154,7 @@ bash hadd.sh
 ```
 ## Find Categories
 Once we have this, we can find the categories. The categories are selected by scanning the cut x < BDT_score < 1 and finding which value maximizes S/sqrt(B) (Signal events divided by the square root of the background events). After this, we repeat the process but looking at x < BDT_score < cat1. This process is done 2 times for ggH and 3 times for VBF. 
-<span style="color:Orange"> The number of iterations was chosen by eye, so it could be good to find a most rigorous way to do it.
+$\color{orange}\text{The number of iterations was chosen by eye, so it could be good to find a most rigorous way to do it.}$
 
 Run3
 
@@ -169,9 +167,9 @@ This will generate a plot showing the BDT output and the categories (plots/(ggH/
 
 Categories:  [0.0, 0.19184615384615372, 0.44615384615384546, 1.0]
 
-Once you have this list, you need to manually copy these numbers in the dictionary call bdt_selections in the file ./plot_macros/plot_sim_vs_data.py and into the dictionary call bdt_cuts in the file ./scripts/split_tuples.py. <span style="color:Orange"> Would be nice if this list is saved in some file, so there is no need to manually copy the numbers.
+Once you have this list, you need to manually copy these numbers in the dictionary call bdt_selections in the file ./plot_macros/plot_sim_vs_data.py and into the dictionary call bdt_cuts in the file ./scripts/split_tuples.py. $\color{orange}[\text{Would be nice if this list is saved in some file, so there is no need to manually copy the numbers.}$
 
-Inside the code, there is a variable called use_bsConstrain. If you train the BDT model using bsConstrain variable, set it to True, if you don't want to use bsConstrain variables set it to False. <span style="color:Orange"> Would be nice to add this as an input parameter.
+Inside the code, there is a variable called use_bsConstrain. If you train the BDT model using bsConstrain variable, set it to True, if you don't want to use bsConstrain variables set it to False. $\color{orange}\text{ Would be nice to add this as an input parameter.}$
 
 
 # Mass fits
@@ -187,18 +185,18 @@ The code requires a specific format for the tuples. To generate the necessary tu
 python3 script/split_tuples.py signal (ggH/VBF)
 python3 script/split_tuples.py data (ggH/VBF)
 ```
-Inside the code, there is a variable called use_bsConstrain. If you train the BDT model using bsConstrain variable, set it to True, if you don't want to use bsConstrain variables set it to False. <span style="color:Orange"> Would be nice to add this as an input parameter.
+Inside the code, there is a variable called use_bsConstrain. If you train the BDT model using bsConstrain variable, set it to True, if you don't want to use bsConstrain variables set it to False. $\color{orange}\text{ Would be nice to add this as an input parameter.}$
 
 ## Mass fits code
 
 Once you have the tuples set up, the [mass_fit_repo](https://github.com/MatBarria/flashggFinalFit) using the commands that are in the README
 
-<span style="color:red"> The code is now in my personal git account, you can move it to the organization if you want. However, if you want to change the name of the repo you will have to modify the code because the repo name is hardcoded in some file.
+$\color{red}\text{ The code is now in my personal git account, you can move it to the organization if you want. However, if you want to change the name of the repo you will have to modify the code because the repo name is hardcoded in some file.}$
 
 ## Fits 
 
 Once you have cloned the code (don't forget to run source setup.sh each time you close your lpc session), you can execute all the mass fits just by running the script. 
-<span style="color:red"> IMPORTANT: My paths are still hardcoded here, this must be changed!. For now, update manually the paths in the following files(changes what is before/HToMuMu/)
+$\color{red}\text{ IMPORTANT: My paths are still hardcoded here, this must be changed!. For now, update manually the paths in the following files(changes what is before/HToMuMu/)}$
 
 - ./run_fits.sh : 4 paths, lines 11, 18, 24, 30.
 - ./Signal/config_tutorial_combined.py : line 9
@@ -249,4 +247,25 @@ combine -M AsymptoticLimits Datacard_tutorial_(category)_mu_inclusive.root -m 12
 ```
 
 # Plotting 
+## MC vs Data
+MC vs data plots are generated using ./plot_macros/plot_sim_vs_data.py. Inside of these files, there are two lists called variables and eras that determine which plots will be generated, so you can modify them if you don't want to generate all the plots. You can execute the code by running. 
+```
+cd plot_macros/
+python3 plot_sim_vs_data.py
+```
+If you want to plot the events for just one channel (ggH or VBF) there is a dictionary called bdt_cuts, you must change the ggH or VBF entry to [] and run
+```
+python3 plot_sim_vs_data.py (ggH/VBF)
+```
+If you want to plot the events for the different categories, there is a dictionary called bdt_cuts. You must change the ggH or VBF entry to [0,cat1,cat2...,1] and run
+```
+python3 plot_sim_vs_data.py (ggH/VBF)
+```
+$\color{orange}\text{Have to change the bdt cuts to [] to plot the events for a specific \\ channel it's too complicated, so should be changed to the easiest way}$
+
+## MC signal vs MC background
+```
+cd plot_macros/
+python3 plot_sig_vs_bkg.py (ggH/VBF)
+```
 
