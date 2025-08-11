@@ -15,13 +15,14 @@ from .helper import (
 def draw_sig_and_bg_from_tuple(variable, era, standardize_variables=False, category="", bsubset="", ssubset=""):
     plt.style.use(hep.style.CMS)
 
-    files_path = "../root_io/tuples/BDT_score/" + category + "/"+ "B" + bsubset + "_S" + ssubset + "/" 
+    #files_path = "../root_io/tuples/BDT_score/" + category + "/"+ "B" + bsubset + "_S" + ssubset + "/" 
+    files_path = "../root_io/skim/" + category + "/" 
 
     print("PLOTTING: " , variable)
-    background_path = files_path + "background_" + era + ".root"
+    background_path = files_path + "background_" + era + "_skim_" + bsubset + ".root"
     with ur.open(background_path + ":tree_output") as file:
         background_branches = file.arrays([variable, "weight"], library="np")
-    signal_path = files_path + "signal_" + era + ".root"
+    signal_path = files_path + "signal_" + era + "_skim_" + bsubset + ".root"
     with ur.open(signal_path + ":tree_output") as file:
         signal_branches = file.arrays([variable, "weight"], library="np")
 

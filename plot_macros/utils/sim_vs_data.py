@@ -57,7 +57,10 @@ def get_histograms_from_tuple(
     era_reweight = 1
     if lumi_rescale:
         print("Re scaling lumi")
-        era_reweight = 109.08 / 9.45
+        if era == "2024":
+            era_reweight = 109.08 / 9.45
+        if era == "2025":
+            era_reweight = 802478 / 327501
         era = "2023BPix"
 
     variable_bin = variables[0]
@@ -66,12 +69,12 @@ def get_histograms_from_tuple(
         variable_bin += "_" + production_channel
 
     tuple_path = "../root_io/tuples/"
-    if bdt_subset != "" and len(bdt_cuts) != 0:
+    if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
 
     for source in sources:
         file_name = source + "_" + era + "_tuples.root:tree_output"
-        if bdt_subset != "" and len(bdt_cuts) != 0:
+        if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
             file_name = source + "_" + era + "_" + bdt_subset + ".root:tree_output"
 
         with ur.open(tuple_path + file_name) as file:
@@ -150,7 +153,7 @@ def get_data_histograms_from_tuple(
 ):
     tuple_path = "../root_io/tuples/"
     file_name = "Data_" + era + "_tuples.root:tree_output"
-    if bdt_subset != "" and len(bdt_cuts) != 0:
+    if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
         file_name = "Data_" + era + "_" + bdt_subset + ".root:tree_output"
 
@@ -259,7 +262,7 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era == "2024",
+        era in ["2024", "2025"],
         Z_study=Z_study
     )
 
@@ -272,7 +275,7 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era == "2024",
+        era in ["2024", "2025"],
         Z_study=Z_study
     )
 
