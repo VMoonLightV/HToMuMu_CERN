@@ -354,6 +354,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     btagLoose_cut["2022EE"] = 0.0499;
     btagLoose_cut["2023"] = 0.0358;
     btagLoose_cut["2023BPix"] = 0.0359;
+    btagLoose_cut["2024"] = 0.0359;// 2024 values NEED to be checked. Other values probaly too
 
     // b-tag deepFlav MEDIUM score selection
     btagMedium_cut["2016"] = 0.6321;
@@ -364,6 +365,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     btagMedium_cut["2022EE"] = 0.2605;
     btagMedium_cut["2023"] = 0.1917;
     btagMedium_cut["2023BPix"] = 0.1919;
+    btagMedium_cut["2024"] = 0.1917;// 2024 values NEED to be checked. Other values probaly too
 
     if (!is_data) {
         getPileupHistograms();
