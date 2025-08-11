@@ -108,6 +108,19 @@ void HmmAnalyzer::EventLoop() {
             continue;
         }
 
+        //add in MET variables
+        t_MET_phi = MET_phi;
+        t_MET_pt = MET_pt;
+        t_MET_sumEt = MET_sumEt;
+
+        t_ChsMET_phi = ChsMET_phi;
+        t_ChsMET_pt = ChsMET_pt;
+        t_ChsMET_sumEt = ChsMET_sumEt;
+
+        t_PuppiMET_phi = PuppiMET_phi;
+        t_PuppiMET_pt = PuppiMET_pt;
+        t_PuppiMET_sumEt = PuppiMET_sumEt;
+
         int index_mu1 = INT_NULL_VALUE;
         int index_mu2 = INT_NULL_VALUE;
         vector<float> mu_pt_Roch_corr, mu_ptErr_Roch_corr, mu_Iso_Roch_corr;

@@ -24,10 +24,6 @@ ANALYZER_HEADERS := $(LIB)/BTagCalibrationStandalone.h \
 				$(LIB)/HmmAnalyzer.h
 
 
-# Histogram sources and header
-HISTOGRAM_SRC := $(SRC)/CreateHistograms.cc
-HISTOGRAM_HEADERS := $(LIB)/Run3Constants.h $(LIB)/Constants.h $(LIB)/CreateHistograms.h
-
 # Tuple sources and header
 TUPLE_SRC := $(SRC)/CreateTuple.cc
 TUPLE_HEADERS := $(LIB)/Run3Constants.h $(LIB)/Constants.h $(LIB)/CreateTuple.h
@@ -47,33 +43,28 @@ ANALYZER_OBJECTS := LeptonEfficiencyCorrector.o \
 				WeightCalculatorFromHistogram.o \
 				HmmAnalyzer.o
  
-HISTOGRAM_OBJECTS := CreateHistograms.o
+
 
 TUPLE_OBJECTS := CreateTuple.o
 
 SKIM_ggH_OBJECTS := SkimTuplesggH.o
 SKIM_VBF_OBJECTS := SkimTuples_VBF.o
 
-OBJECTS := $(ANALYZER_OBJECTS) $(HISTOGRAM_OBJECTS) $(TUPLE_OBJECTS)
+OBJECTS := $(ANALYZER_OBJECTS) $(TUPLE_OBJECTS)
 
 # Executables
 ANALYZER_EXECUTABLE := $(BIN)/HmmAnalyzer
-HISTOGRAM_EXECUTABLE := $(BIN)/CreateHistograms
 SKIM_ggH_EXECUTABLE := $(BIN)/SkimTuplesggH
 SKIM_VBF_EXECUTABLE := $(BIN)/SkimTuples_VBF
 TUPLE_EXECUTABLE := $(BIN)/CreateTuple
 
 # Default target: build both executables
 .PHONY: all
-all: $(ANALYZER_EXECUTABLE) $(HISTOGRAM_EXECUTABLE) $(SKIM_ggH_EXECUTABLE) $(SKIM_VBF_EXECUTABLE) $(TUPLE_EXECUTABLE)
+all: $(ANALYZER_EXECUTABLE) $(SKIM_ggH_EXECUTABLE) $(SKIM_VBF_EXECUTABLE) $(TUPLE_EXECUTABLE)
 
 # Compile only the Analyzer
 .PHONY: analyzer
 analyzer: $(ANALYZER_EXECUTABLE)
-
-# Compile only the Histograms
-.PHONY: histogram
-histogram: $(HISTOGRAM_EXECUTABLE)
 
 # Compile only the tuples 
 .PHONY: tuple

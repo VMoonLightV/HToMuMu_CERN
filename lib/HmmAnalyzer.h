@@ -203,9 +203,9 @@ class HmmAnalyzer : public MainEvent {
     float t_diMuon_mass;
     float t_diMuon_bsConstrainedMass;
 
-    float t_MET_phi;
-    float t_MET_pt;
-    float t_MET_sumEt;
+    float t_MET_phi, t_ChsMET_phi, t_PuppiMET_phi;
+    float t_MET_pt, t_ChsMET_pt, t_PuppiMET_pt;
+    float t_MET_sumEt, t_ChsMET_sumEt, t_PuppiMET_sumEt;
 
     std::vector<float> *t_FatJet_area;
     std::vector<float> *t_FatJet_btagCMVA;
@@ -825,6 +825,14 @@ void HmmAnalyzer::clearTreeVectors() {
     t_MET_pt = FLOAT_NULL_VALUE;
     t_MET_sumEt = FLOAT_NULL_VALUE;
 
+    t_ChsMET_phi = FLOAT_NULL_VALUE;
+    t_ChsMET_pt = FLOAT_NULL_VALUE;
+    t_ChsMET_sumEt = FLOAT_NULL_VALUE;
+
+    t_PuppiMET_phi = FLOAT_NULL_VALUE;
+    t_PuppiMET_pt = FLOAT_NULL_VALUE;
+    t_PuppiMET_sumEt = FLOAT_NULL_VALUE;
+
     t_FatJet_area->clear();
     t_FatJet_btagCMVA->clear();
     t_FatJet_btagCSVV2->clear();
@@ -1114,6 +1122,14 @@ void HmmAnalyzer::BookTreeBranches() {
     tree->Branch("t_MET_phi", &t_MET_phi, "t_MET_phi/F");
     tree->Branch("t_MET_pt", &t_MET_pt, "t_MET_pt/F");
     tree->Branch("t_MET_sumEt", &t_MET_sumEt, "t_MET_sumEt/F");
+
+    tree->Branch("t_ChsMET_phi", &t_ChsMET_phi, "t_ChsMET_phi/F");
+    tree->Branch("t_ChsMET_pt", &t_ChsMET_pt, "t_ChsMET_pt/F");
+    tree->Branch("t_ChsMET_sumEt", &t_ChsMET_sumEt, "t_ChsMET_sumEt/F");
+
+    tree->Branch("t_PuppiMET_phi", &t_PuppiMET_phi, "t_PuppiMET_phi/F");
+    tree->Branch("t_PuppiMET_pt", &t_PuppiMET_pt, "t_PuppiMET_pt/F");
+    tree->Branch("t_PuppiMET_sumEt", &t_PuppiMET_sumEt, "t_PuppiMET_sumEt/F");
 
     t_FatJet_area = new std::vector<float>();
     t_FatJet_btagCMVA = new std::vector<float>();

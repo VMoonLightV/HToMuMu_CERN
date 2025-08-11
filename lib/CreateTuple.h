@@ -96,6 +96,11 @@ class CreateTuple {
     /** Read DiMuon variables */
     float diMuon_mass, diMuon_bsConstrainedMass, diMuon_pt, diMuon_bsConstrainedPt, diMuon_phi, diMuon_eta;
 
+    /** Read MET variables **/
+    float MET_phi, MET_pt, MET_sumEt;
+    float ChsMET_phi, ChsMET_pt, ChsMET_sumEt;
+    float PuppiMET_phi, PuppiMET_pt, PuppiMET_sumEt;
+
     /** Read Muon variables */
     int mu1_index, mu2_index;
     std::vector<int> *mu_charge;
@@ -234,6 +239,19 @@ void CreateTuple::setBranchesAddressesOutput() {
     tree_output->Branch("diMuon_rapidity", &diMuon_rapidity,
                         "diMuon_rapidity/f");
 
+    // MET variables
+    tree_output->Branch("MET_phi", &MET_phi, "MET_phi/f");
+    tree_output->Branch("MET_pt", &MET_pt, "MET_pt/f");
+    tree_output->Branch("MET_sumEt", &MET_sumEt, "MET_sumEt/f");
+
+    tree_output->Branch("ChsMET_phi", &ChsMET_phi, "ChsMET_phi/f");
+    tree_output->Branch("ChsMET_pt", &ChsMET_pt, "ChsMET_pt/f");
+    tree_output->Branch("ChsMET_sumEt", &ChsMET_sumEt, "ChsMET_sumEt/f");
+
+    tree_output->Branch("PuppiMET_phi", &PuppiMET_phi, "PuppiMET_phi/f");
+    tree_output->Branch("PuppiMET_pt", &PuppiMET_pt, "PuppiMET_pt/f");
+    tree_output->Branch("PuppiMET_sumEt", &PuppiMET_sumEt, "PuppiMET_sumEt/f");
+
     // Muon variables
     tree_output->Branch("mu1_pt_mass_ratio", &mu1_pt_mass_ratio,
                         "mu1_pt_mass_ratio/f");
@@ -315,6 +333,19 @@ void CreateTuple::setBranchesAddressesInput() {
     tree_input->SetBranchAddress("t_diMuon_phi", &diMuon_phi);
     tree_input->SetBranchAddress("t_diMuon_eta", &diMuon_eta);
 
+    // MET varaibles
+    tree_input->SetBranchAddress("t_MET_phi", &MET_phi);
+    tree_input->SetBranchAddress("t_MET_pt", &MET_pt);
+    tree_input->SetBranchAddress("t_MET_sumEt", &MET_sumEt);
+
+    tree_input->SetBranchAddress("t_ChsMET_phi", &ChsMET_phi);
+    tree_input->SetBranchAddress("t_ChsMET_pt", &ChsMET_pt);
+    tree_input->SetBranchAddress("t_ChsMET_sumEt", &ChsMET_sumEt);
+
+    tree_input->SetBranchAddress("t_PuppiMET_phi", &PuppiMET_phi);
+    tree_input->SetBranchAddress("t_PuppiMET_pt", &PuppiMET_pt);
+    tree_input->SetBranchAddress("t_PuppiMET_sumEt", &PuppiMET_sumEt);
+
     // Muon variables
     tree_input->SetBranchAddress("t_mu1", &mu1_index);
     tree_input->SetBranchAddress("t_mu2", &mu2_index);
@@ -361,7 +392,8 @@ void CreateTuple::fillOutputTree() {
     for (int event_index = 0; event_index < total_entries; event_index++) {
         tree_input->GetEntry(event_index);
         // if (diMuon_mass < 110 || diMuon_mass > 150)
-        if (diMuon_mass < 100 || diMuon_mass > 180)
+        // if (diMuon_mass < 100 || diMuon_mass > 180)
+        if (diMuon_mass < 70 || diMuon_mass > 180)
             continue;
 
         weight = GetEventWeight(gen_weight, pileup_weight, scale_factor);

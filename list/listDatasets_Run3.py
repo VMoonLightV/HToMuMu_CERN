@@ -15,6 +15,8 @@ datasets_info = {
                    "/Muon/Run2022C-22Sep2023-v1/NANOAOD"],
     "Muon_2022D": ["T", 2, "2022", "Data",
                    "/Muon/Run2022D-22Sep2023-v1/NANOAOD"],
+    "SingleMuon_2022C": ["T", 2, "2022", "Data",
+                   "/SingleMuon/Run2022C-22Sep2023-v1/NANOAOD"],
     ####################################################################################################
     # 2022EE  Datasets
     ####################################################################################################
@@ -105,24 +107,22 @@ datasets_info = {
                        "/Muon1/Run2024I-PromptReco-v1/NANOAOD"],
     "Muon1_2024I_v2": ["T", 2, "2024", "Data",
                        "/Muon1/Run2024I-PromptReco-v2/NANOAOD"],
-
     ####################################################################################################
     # 2025  Datasets
     ####################################################################################################
-    "Muon0_2025B": ["T", 2, "2024", "Data", 
+    "Muon0_2025B": ["T", 2, "2025", "Data",
                        "/Muon0/Run2025B-PromptReco-v1/NANOAOD"],
-    "Muon0_2025C_v1": ["T", 2, "2024", "Data",
+    "Muon0_2025C_v1": ["T", 2, "2025", "Data",
                        "/Muon0/Run2025C-PromptReco-v1/NANOAOD"],
-    "Muon0_2025C_v2": ["T", 2, "2024", "Data",
+    "Muon0_2025C_v2": ["T", 2, "2025", "Data",
                        "/Muon0/Run2025C-PromptReco-v2/NANOAOD"],
-    "Muon1_2025B": ["T", 2, "2024", "Data",
-                    "/Muon1/Run2025B-PromptReco-v1/NANOAOD"],
-    "Muon1_2025C_v1": ["T", 2, "2024", "Data",
-                       "/Muon1/Run2025C-PromptReco-v1/NANOAOD"],
-    "Muon1_2025C_v2": ["T", 2, "2024", "Data",
-                       "/Muon1/Run2025C-PromptReco-v2/NANOAOD"],
 
-    
+    "Muon1_2025B": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025B-PromptReco-v1/NANOAOD"],
+    "Muon1_2025C_v1": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025C-PromptReco-v1/NANOAOD"],
+    "Muon1_2025C_v2": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025C-PromptReco-v2/NANOAOD"],
     
     ####################################################################################################
     # 2022 Simulations Backgrounds
@@ -142,13 +142,13 @@ datasets_info = {
          "/DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM"],
     "DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer22": ["F", 1, "2022", "MC_background",
          "/DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM"],
-    "DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer22": ["F", 2, "2022", "MC_background", ""],
-    "DYto2Mu_012J_5F_amcatnloFXFX_Summer22": ["F", 2, "2022", "MC_background", ""],
+    #"DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer22": ["F", 2, "2022", "MC_background", ""],
+    #"DYto2Mu_012J_5F_amcatnloFXFX_Summer22": ["F", 2, "2022", "MC_background", ""],
     
     # EWK Backgrounds
     "EWK_2L2J_Summer22": ["F", 2, "2022", "MC_background",
             "/EWK_2L2J_TuneCH3_13p6TeV_madgraph-herwig7/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM"],
-    "LLJJ_SM_M105-160_MJJ120_13p6TeV_dipole_Summer22":["F", 2, "2022", "MC_background", ""],
+    #"LLJJ_SM_M105-160_MJJ120_13p6TeV_dipole_Summer22":["F", 2, "2022", "MC_background", ""],
 
     
     # Top Backgrounds
@@ -262,7 +262,7 @@ datasets_info = {
             "/DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM"],
     "DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": ["F", 2, "2022EE", "MC_background",
             "/DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2/NANOAODSIM"],
-    "DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer22EE": ["F", 2, "2022EE", "MC_background", ""],
+    #"DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer22EE": ["F", 2, "2022EE", "MC_background", ""],
 
     
     # EWK Backgrounds
@@ -374,7 +374,7 @@ datasets_info = {
             "/DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v14-v3/NANOAODSIM"],
     "DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer23": ["F", 1, "2022EE", "MC_background",
             "/DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23NanoAODv12-130X_mcRun3_2023_realistic_v15-v2/NANOAODSIM"],
-    "DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer23": ["F", 2, "2023", "MC_background", ""],
+    #"DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer23": ["F", 2, "2023", "MC_background", ""],
 
     # EWK Backgrounds
     "EWK_2L2J_Summer23": ["F", 2, "2023", "MC_background",
@@ -439,13 +439,14 @@ datasets_info = {
             "/DYto2Mu_MLL-50to120_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM"],
     "DY120to200_Summer23BPix": ["F", 2, "2023BPix", "MC_background",
             "/DYto2Mu_MLL-120to200_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM"],
+    
     "DYto2L-2Jets_MLL-50_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer23BPix": ["F", 1, "2022EE", "MC_background",
             "/DYto2L-2Jets_MLL-50_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM"],
     "DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer23BPix": ["F", 1, "2022EE", "MC_background",
             "/DYto2L-2Jets_MLL-50_1J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM"],
     "DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer23BPix": ["F", 1, "2022EE", "MC_background",
             "/DYto2Mu-2Jets_MLL-105To160_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
-    "DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer23BPix": ["F", 2, "2023BPix", "MC_background", ""],
+    #"DYto2Mu_MLL_105To180_012J_5F_amcatnloFXFX_Summer23BPix": ["F", 2, "2023BPix", "MC_background", ""],
 
 
     
@@ -517,31 +518,28 @@ datasets_info = {
     #"DYJetstoLL_Summer24": ["F", 2, "2024", "MC_background",
     #        "/DYJetsToLL_M-50_TuneCP5_13p6TeV-madgraphMLM-pythia8/RunIII2024Summer24NanoAOD-Pilot2024wmLHEGS_140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
     #"DYto2L-2Jets_Summer22": ["F", 1, "2022", "MC_background",
-    #        ""],    
-    #"DYto2Mu_Bin-MLL-120to200_TuneCP5_13p6TeV_powheg-pythia8_Summer24": ["F", 2, "2024", "MC_background",
-    #         "/DYto2Mu_Bin-MLL-120to200_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM"],
-    #"DYto2Mu-2Jets_Bin-MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer24": ["F", 2, "2024", "MC_background",
-    #         "/DYto2Mu-2Jets_Bin-MLL-50_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v6/NANOAODSIM"],
-    #"DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8_Summer24": ["F", 2, "2024", "MC_background",
-    #         "/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM"],
-
+    #        ""],
 
     # EWK Backgrounds
-    #"EWK_2L2J_Summer24": ["F", 2, "2024", "MC_background",
-    #        ""],
+    "EWK_2L2J_Summer24": ["F", 2, "2024", "MC_background",
+            "/EWK-2L2J_Bin-MLL-50-MJJ-120_TuneCH3_13p6TeV_madgraph-herwig7/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
 
     # Top Backgrounds
     "TTto2L2Nu_Summer24": ["F", 2, "2024", "MC_background",
             "/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
     "TTtoLNu2Q_Summer24": ["F", 2, "2024", "MC_background",
             "/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
-
+    
     #"TWminusto2L2Nu_Summer24": ["F", 2, "20234", "MC_background",
     #        ""],
     #"TWminusto4Q_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
     #"TWminustoLNu2Q_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
+    "TbarWplusto2L2Nu_Summer24": ["F", 2, "2024", "MC_background",
+            "/TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
+    "TbarWplusto4Q_Summer24": ["F", 2, "2024", "MC_background",
+            "/TbarWplusto4Q_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
     #"TbarQtoLNu-t-channel_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
     #"TQbartoLNu-t-channel_Summer24": ["F", 2, "2024", "MC_background",
@@ -580,6 +578,7 @@ datasets_info = {
     #        ""],
     #"WWW_4F_Summer24": ["F", 2, "2024", "MC_background",
     #        ""],
+
     ####################################################################################################
     # 2022 Simulations Signal
     ####################################################################################################
@@ -641,9 +640,23 @@ datasets_info = {
             "/WminusH_Hto2Mu_WtoAll_M-125_TuneCP5_13p6TeV_powheg-minlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
     "ZH_Summer23BPix": ["F", 2, "2023BPix", "MC_signal",
             "/ZH_Hto2Mu_ZtoAll_M-125_TuneCP5_13p6TeV_powheg-minlo-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v6-v2/NANOAODSIM"],
-
+        
     ####################################################################################################
     # 2024 Simulations Signal
     ####################################################################################################
     #All missing currently
+    "ggH_Summer24": ["F", 2, "2024", "MC_signal",
+            "/GluGluH-Hto2Mu_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+    "VBF_Summer24": ["F", 2, "2024", "MC_signal",
+            "/VBFH-Hto2Mu_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+    "ttH_Summer24": ["F", 2, "2024", "MC_signal",
+            "/TTH-Hto2Mu_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+
+    #"WplusH_Summer24": ["F", 2, "2024", "MC_signal",
+     #       "/WplusH-Hto2Mu_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+    #"WminusH_Summer24": ["F", 2, "2024", "MC_signal",
+     #       "/WminusH-Hto2Mu_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v3/NANOAODSIM"],
+    #"ZH_Summer24": ["F", 2, "2024", "MC_signal",
+     #       "/ZH-Hto2Mu_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+
 }
