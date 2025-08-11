@@ -23,7 +23,17 @@ from .helper import (
 )
 
 # polynominal fit for ZCR_normalization
-order = 6
+boundaries = [0,100,200,600]
+orders = [6,3,3]
+
+bin600 = True
+use_discrete_bin = False
+use_F_test = True
+
+bins_0_200 = np.linspace(0, 200, 81)
+if bin600 == True : bins_0_200 = np.linspace(0, 200, 41)
+bins_tail = [250, 300, 350, 400, 500, 10000]
+dimuon_pt_bins = np.concatenate([bins_0_200, bins_tail])
 
 signal_colors = {"ggH": "red", "VBF": "blue", "ttH": "lime"}
 
@@ -173,7 +183,9 @@ def get_histograms_from_tuple(
                 variable_bin = "diMuon_mass_Z"
 
             base_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
-            if (variables[0] == "diMuon_pt"): base_bins[-1] = 10000
+            #if (variables[0] == "diMuon_pt"): base_bins[-1] = 10000
+            if (variables[0] == "diMuon_pt"): 
+                base_bins = dimuon_pt_bins
 
             histogram, bins = np.histogram(
                 branches[variables[0]],
@@ -198,14 +210,40 @@ def get_histograms_from_tuple(
     return histograms_list, bins_list, DY_count
 
 
-def piecewise_polyfit(df, min_x, max_x, output_name):
+from scipy.stats import f
+
+def f_test_polyfit(x, y, order_low, order_high):
+
+    coef_low = np.polyfit(x, y, order_low)
+    y_pred_low = np.polyval(coef_low, x)
+    RSS_low = np.sum((y - y_pred_low) ** 2)
+    
+    coef_high = np.polyfit(x, y, order_high)
+    y_pred_high = np.polyval(coef_high, x)
+    RSS_high = np.sum((y - y_pred_high) ** 2)
+    
+    # degree of freedom
+    df_low = order_low + 1
+    df_high = order_high + 1
+    n = len(x)
+    
+    # F-test
+    numerator = (RSS_low - RSS_high) / (df_high - df_low)
+    denominator = RSS_high / (n - df_high)
+    F_value = numerator / denominator
+    
+    # p-value
+    p_value = f.sf(F_value, df_high - df_low, n - df_high)
+    
+    return F_value, p_value, #(RSS_low, RSS_high)
+
+
+def piecewise_polyfit(df, output_name):
 
     x = df['BinCenter'].values
     y = df['RatioValue'].values
     
     #min_x, max_x = np.min(x), np.max(x)
-    boundaries = [0,100,250,600]
-    orders = [order,3,3]
 
     all_coeffs = []
     poly_functions = []
@@ -221,10 +259,19 @@ def piecewise_polyfit(df, min_x, max_x, output_name):
             print(f"warning: [{boundaries[i]:.2f}, {boundaries[i+1]:.2f}] don't have enough data point.")
             continue
             
+        #print(x_segment, y_segment, order_i)
+
+        if (i == 0) & (use_F_test == True):
+            print(f"start F-test in [{boundaries[i]}, {boundaries[i+1]}]")
+            for order_l in range(1, 9):
+                for j in range(1, 9-order_l):
+                    order_h = order_l +j 
+                    F_val, p_val= f_test_polyfit(x_segment, y_segment, order_l, order_h)
+                    print(f"p-value = {p_val:.4f}, F-value = {F_val:.4f}, from order {order_l} to {order_h}")
+
         coefficients = np.polyfit(x_segment, y_segment, order_i)
         poly_func = np.poly1d(coefficients)
         
-
         poly_functions.append(poly_func)
         intervals.append((boundaries[i], boundaries[i+1]))
 
@@ -247,9 +294,9 @@ def piecewise_polyfit(df, min_x, max_x, output_name):
         print(f"in range {interval}: ")
         print(func)
     
-    return coeff_df, poly_functions, boundaries
+    return coeff_df, poly_functions
 
-def piecewise_polyval(x, poly_functions, boundaries):
+def piecewise_polyval(x, poly_functions):
 
     if np.any(x < boundaries[0]) or np.any(x > boundaries[-1]):
         print("warning: input pt value not in fitting range, use endpoint value.")
@@ -259,6 +306,7 @@ def piecewise_polyval(x, poly_functions, boundaries):
         mask = (x >= boundaries[i]) & (x <= boundaries[i+1])
         if i == len(poly_functions) - 1:
             mask = (x >= boundaries[i]) & (x <= boundaries[i+1] + 1e-9)
+            print(poly_functions[i])
         
         results[mask] = poly_functions[i](x[mask])
     
@@ -340,7 +388,8 @@ def draw_data_and_simul_and_ratio(
 
         print(x_range[variable_bin], n_bins[variable_bin])
         base_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
-        if (variable == "diMuon_pt"): base_bins[-1] = 10000
+        if (variable == "diMuon_pt"): 
+            base_bins = dimuon_pt_bins
 
         data_histogram, data_bins = np.histogram(
             branches[variable],
@@ -386,7 +435,9 @@ def draw_data_and_simul_and_ratio(
         color=get_color_list(len(background_sources)),
     )
 
-    if (variable == "diMuon_pt"): data_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
+    if (variable == "diMuon_pt"): 
+            data_bins = dimuon_pt_bins
+            data_bins[-1] = 600
     hep.histplot(
         data_histogram,
         data_bins,
@@ -425,7 +476,10 @@ def draw_data_and_simul_and_ratio(
     # axs[0].set_ylim(0.1, y_axis_max_range[variable])
     axs[0].set_ylim(0.1, 1000 * np.max(data_histogram))
     axs[0].set_xlim(data_bins[0], data_bins[-1])
-    if (variable == "diMuon_pt"): axs[0].set_xlim(x_range[variable][0], x_range[variable][1])
+    if (variable == "diMuon_pt"): 
+        if bin600 == False: axs[0].set_xlim(0, 200)
+        else: axs[0].set_xlim(data_bins[0], data_bins[-1])
+    
     axs[0].set_yscale("log")
     axs[0].legend(frameon=False, loc="upper right", ncols=2)
     axs[0].tick_params(axis="x", which="both", bottom=True, top=True, labelbottom=False)
@@ -440,7 +494,7 @@ def draw_data_and_simul_and_ratio(
             tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist     
 
     ratio_hist, ratio_error = get_histograms_ratio(data_histogram, tot_bg_numpy_hist)
-    
+
     #print(tot_bg_numpy_hist)
     sum_MC = sum([hist.sum() for hist in tot_bg_numpy_hist])
 
@@ -451,7 +505,8 @@ def draw_data_and_simul_and_ratio(
     if "ZCR" in region:
         print(f"{era} {njet}jet {region} data/MC num_events ({variable}): {sum_data} / {sum_MC}") #= {sum_data/sum_MC}")
         
-        csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}.csv"
+        if njet=="nobin_" : csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}_nobin.csv"
+        else : csv_path = f"/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/HToMuMu/scripts/event_counts_{region}_bin.csv"
 
         if (era=="2022" and (njet=="0" or njet=="nobin_") and variable == "diMuon_pt"):
             with open(csv_path, 'w', newline='') as csvfile:
@@ -467,7 +522,7 @@ def draw_data_and_simul_and_ratio(
         else: 
             with open(csv_path, 'a', newline='') as csvfile:
                 csv_writer = csv.writer(csvfile)
-                csv_writer.writerow([era, njet, variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
+                csv_writer.writerow([era, str(njet), variable, region, sum_data, sum_MC, DY_count, sum_data/sum_MC, 
                                  sum_MC - DY_count, sum_data - sum_MC + DY_count, (sum_data - sum_MC + DY_count)/DY_count])
 
     hep.histplot(
@@ -486,22 +541,21 @@ def draw_data_and_simul_and_ratio(
         axs[1].set_ylabel("Data/MC", loc="center")
     axs[1].set_ylim(0.5, 1.5)
     axs[1].set_xlim(data_bins[0], data_bins[-1])
-    if (variable == "diMuon_pt"): axs[1].set_xlim(x_range[variable][0], x_range[variable][1])
-    ###axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable])
-    axs[1].set_xlabel(f"nobin_jet {region} "+x_labels[variable])
+    #if (variable == "diMuon_pt"): axs[1].set_xlim(x_range[variable][0], x_range[variable][1])
+    if (variable == "diMuon_pt"): 
+        if bin600 == False: axs[1].set_xlim(0, 200)
+    axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable])
     
     if ("ZCR_normalization" in region) & (variable == "diMuon_pt"):
-      axs[1].set_ylim(0.0, 5.0)
+      axs[1].set_ylim(0.5, 1.5)
       
       iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/" 
+      if bin600 == True : iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}_0-600/" 
+
       os.makedirs(iter_dir, exist_ok=True)
             
-      num_bins = len(ratio_hist)
-      min_val, max_val= x_range[variable]
-      range_val = max_val - min_val
-      bin_width = range_val/num_bins
-      bin_edges = np.linspace(0, range_val, num_bins + 1)
-      bin_centers = bin_edges[:-1] + bin_width / 2
+      bin_centers = 0.5 * (data_bins[:-1] + data_bins[1:])
+
             
       df = pd.DataFrame({
                 'BinCenter': bin_centers,
@@ -514,9 +568,9 @@ def draw_data_and_simul_and_ratio(
       # draw fit curve
       output_file= f"{iter_dir}/polynomial_{era}_coefficients.csv"
             
-      coeff_df, poly_funcs, boundaries = piecewise_polyfit(df, min_val, max_val, output_file)
+      coeff_df, poly_funcs= piecewise_polyfit(df,  output_file)
       x_fit = np.linspace(df['BinCenter'].min(), df['BinCenter'].max(), 500)
-      y_fit = piecewise_polyval(x_fit, poly_funcs, boundaries)
+      y_fit = piecewise_polyval(x_fit, poly_funcs)
         
   
       axs[1].plot(x_fit, y_fit, 
@@ -527,9 +581,9 @@ def draw_data_and_simul_and_ratio(
   
       axs[1].legend(loc='best')
   
-  
-
     output_directory = f"../plots/ratio/njet/{njet}jet_{region}/" + era + "/"
+    if bin600 == False : output_directory = f"../plots/ratio/njet/{njet}jet_{region}_0-200/" + era + "/"
+    else : output_directory = f"../plots/ratio/njet/{njet}jet_{region}_0-600/" + era + "/"
     if not use_puweight:
         output_directory = "../plots/ratio/" + era + "/no_puWeight/"
     if use_ggH_category:

@@ -5,8 +5,8 @@ import sys
 import os
 
 # change to your own path
-base_input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
-base_output_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
+base_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
+coeff_head = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/A_test/plots/ratio/njet/"
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/normalization"
@@ -39,29 +39,36 @@ input_arguments = []
 
 # normalization only for DY
 for njet in njet_group:
-    output_directory = base_output_directory + njet + "jet/ZCR_normalization/"
+    # normalization only for DY
+    if "ZCR" in region:
+        base_input_directory = base_directory + njet + "jet/ZCR_normalization/"
+        output_directory = base_directory + njet + "jet/ZCR_self_reweighting_discrete_bin/"
+    if "SR" in region:
+        base_input_directory = base_directory + njet + "jet/SR/"
+        output_directory = base_directory + njet + "jet/SR_reweighting_discrete_bin/"
     if not os.path.exists(output_directory):
             os.makedirs(output_directory, exist_ok=True)
+
     for era in eras:
-        input = base_input_directory + njet +"jet/ZCR/" + "Data_" + era + "_skim.root"
-        #input_arguments.append([input, output_directory, era, "Data", "T", 
-                                #str(df[(df['Era'] == era) & (df['Variable'] == variable)]['DY_factor'].values[0])])
+        #coeff = coeff_head + njet + "jet_ratio_table_dimuon_pt_ZCR_normalization/polynomial_" + era +"_coefficients.csv"
+        coeff = coeff_head + njet + "jet_ratio_table_dimuon_pt_ZCR_normalization/" + era +"_ratiotable.csv"
+        input = base_input_directory + "Data_" + era + "_skim.root"
         shutil.copy2(input, output_directory)
         print("copy: ", input)
+        #input_arguments.append([input, output_directory, era, "Data", "T", coeff])
         for dataset in signal_datasets:
-            input = base_input_directory + njet +"jet/ZCR/" + dataset + "_" + era + "_skim.root"
+            input = base_input_directory + dataset + "_" + era + "_skim.root"
             shutil.copy2(input, output_directory)
             print("copy: ", input)
-            #input_arguments.append([input, output_directory, era, dataset, "F", 
-                                #str(df[(df['Era'] == era) & (df['Variable'] == variable)]['DY_factor'].values[0])])
+            #input_arguments.append([input, output_directory, era, dataset, "F", coeff])
         for dataset in background_datasets:
-            input = base_input_directory + njet +"jet/ZCR/" + dataset + "_" + era + "_skim.root"
+            input = base_input_directory + dataset + "_" + era + "_skim.root"
             if dataset != "DY" : 
                 shutil.copy2(input, output_directory)
                 print("copy: ", input)
-            else: input_arguments.append([input, output_directory, era, dataset, "F", 
-                                str(df[(df['Era'] == era) & (df['Variable'] == variable) & (df['Njet'] == njet)]['DY_factor'].values[0])])
-        
+            else: input_arguments.append([input, output_directory, era, dataset, "F",coeff])
+            
+    
 print(input_arguments)
 
 # Loop over each set of input arguments and execute the C++ program
