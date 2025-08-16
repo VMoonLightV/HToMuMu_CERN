@@ -309,71 +309,124 @@ void CreateTuple::setBranchesAddressesOutput() {
 
 void CreateTuple::setBranchesAddressesInput() {
 
+    tree_input->SetBranchStatus("*", 0);
+
+    tree_input->SetBranchStatus("t_puWeight", 1);
     tree_input->SetBranchAddress("t_puWeight", &pileup_weight);
+    tree_input->SetBranchStatus("t_puWeightUp", 1);
     tree_input->SetBranchAddress("t_puWeightUp", &pileup_weight_up);
+    tree_input->SetBranchStatus("t_puWeightDown", 1);
     tree_input->SetBranchAddress("t_puWeightDown", &pileup_weight_down);
+    tree_input->SetBranchStatus("t_genWeight", 1);
     tree_input->SetBranchAddress("t_genWeight", &gen_weight);
+    tree_input->SetBranchStatus("t_Rho", 1);
     tree_input->SetBranchAddress("t_Rho", &rho);
+    tree_input->SetBranchStatus("t_PV_npvsGood", 1);
     tree_input->SetBranchAddress("t_PV_npvsGood", &pv);
+    tree_input->SetBranchStatus("t_SoftActivityJetNjets2", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetNjets2", &n_SoftJet_pt2);
+    tree_input->SetBranchStatus("t_SoftActivityJetNjets5", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetNjets5", &n_SoftJet_pt5);
+    tree_input->SetBranchStatus("t_SoftActivityJetNjets10", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetNjets10", &n_SoftJet_pt10);
 
+    tree_input->SetBranchStatus("t_SoftActivityJetHT", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT", &HT);
+    tree_input->SetBranchStatus("t_SoftActivityJetHT2", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT2", &HT_pt2);
+    tree_input->SetBranchStatus("t_SoftActivityJetHT5", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT5", &HT_pt5);
+    tree_input->SetBranchStatus("t_SoftActivityJetHT10", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT10", &HT_pt10);
 
+    tree_input->SetBranchStatus("t_genWeight", 1);
     tree_input->SetBranchAddress("t_genWeight", &gen_weight);
     // DiMuon variables
+    tree_input->SetBranchStatus("t_diMuon_bsConstrainedMass", 1);
     tree_input->SetBranchAddress("t_diMuon_bsConstrainedMass", &diMuon_bsConstrainedMass);
+    tree_input->SetBranchStatus("t_diMuon_bsConstrainedPt", 1);
     tree_input->SetBranchAddress("t_diMuon_bsConstrainedPt", &diMuon_bsConstrainedPt);
+    tree_input->SetBranchStatus("t_diMuon_mass", 1);
     tree_input->SetBranchAddress("t_diMuon_mass", &diMuon_mass);
+    tree_input->SetBranchStatus("t_diMuon_pt", 1);
     tree_input->SetBranchAddress("t_diMuon_pt", &diMuon_pt);
+    tree_input->SetBranchStatus("t_diMuon_phi", 1);
     tree_input->SetBranchAddress("t_diMuon_phi", &diMuon_phi);
+    tree_input->SetBranchStatus("t_diMuon_eta", 1);
     tree_input->SetBranchAddress("t_diMuon_eta", &diMuon_eta);
 
     // MET varaibles
+    tree_input->SetBranchStatus("t_MET_phi", 1);
     tree_input->SetBranchAddress("t_MET_phi", &MET_phi);
+    tree_input->SetBranchStatus("t_MET_pt", 1);
     tree_input->SetBranchAddress("t_MET_pt", &MET_pt);
+    tree_input->SetBranchStatus("t_MET_sumEt", 1);
     tree_input->SetBranchAddress("t_MET_sumEt", &MET_sumEt);
 
+    tree_input->SetBranchStatus("t_ChsMET_phi", 1);
     tree_input->SetBranchAddress("t_ChsMET_phi", &ChsMET_phi);
+    tree_input->SetBranchStatus("t_ChsMET_pt", 1);
     tree_input->SetBranchAddress("t_ChsMET_pt", &ChsMET_pt);
+    tree_input->SetBranchStatus("t_ChsMET_sumEt", 1);
     tree_input->SetBranchAddress("t_ChsMET_sumEt", &ChsMET_sumEt);
 
+    tree_input->SetBranchStatus("t_PuppiMET_phi", 1);
     tree_input->SetBranchAddress("t_PuppiMET_phi", &PuppiMET_phi);
+    tree_input->SetBranchStatus("t_PuppiMET_pt", 1);
     tree_input->SetBranchAddress("t_PuppiMET_pt", &PuppiMET_pt);
+    tree_input->SetBranchStatus("t_PuppiMET_sumEt", 1);
     tree_input->SetBranchAddress("t_PuppiMET_sumEt", &PuppiMET_sumEt);
 
     // Muon variables
+    tree_input->SetBranchStatus("t_mu1", 1);
     tree_input->SetBranchAddress("t_mu1", &mu1_index);
+    tree_input->SetBranchStatus("t_mu2", 1);
     tree_input->SetBranchAddress("t_mu2", &mu2_index);
+    tree_input->SetBranchStatus("t_Mu_charge", 1);
     tree_input->SetBranchAddress("t_Mu_charge", &mu_charge);
+    tree_input->SetBranchStatus("t_Mu_pt", 1);
     tree_input->SetBranchAddress("t_Mu_pt", &mu_pt);
+    tree_input->SetBranchStatus("t_Mu_bsConstrainedPt", 1);
     tree_input->SetBranchAddress("t_Mu_bsConstrainedPt", &mu_bsConstrainedPt);
+    tree_input->SetBranchStatus("t_Mu_ptErr", 1);
     tree_input->SetBranchAddress("t_Mu_ptErr", &mu_ptErr);
+    tree_input->SetBranchStatus("t_Mu_bsConstrainedPtErr", 1);
     tree_input->SetBranchAddress("t_Mu_bsConstrainedPtErr", &mu_bsConstrainedPtErr);
+    tree_input->SetBranchStatus("t_Mu_phi", 1);
     tree_input->SetBranchAddress("t_Mu_phi", &mu_phi);
+    tree_input->SetBranchStatus("t_Mu_eta", 1);
     tree_input->SetBranchAddress("t_Mu_eta", &mu_eta);
 
     // Electron variables
+    tree_input->SetBranchStatus("t_El_pt", 1);
     tree_input->SetBranchAddress("t_El_pt", &elec_pt);
 
     // Jet variables
+    tree_input->SetBranchStatus("t_nbJet", 1);
     tree_input->SetBranchAddress("t_nbJet", &n_bjet);
+    tree_input->SetBranchStatus("t_nbJet_Loose", 1);
     tree_input->SetBranchAddress("t_nbJet_Loose", &n_bjet_Loose);
+    tree_input->SetBranchStatus("t_nJet", 1);
     tree_input->SetBranchAddress("t_nJet", &n_jet);
+    tree_input->SetBranchStatus("t_Jet_mass", 1);
     tree_input->SetBranchAddress("t_Jet_mass", &jet_mass);
+    tree_input->SetBranchStatus("t_Jet_pt", 1);
     tree_input->SetBranchAddress("t_Jet_pt", &jet_pt);
+    tree_input->SetBranchStatus("t_Jet_phi", 1);
     tree_input->SetBranchAddress("t_Jet_phi", &jet_phi);
+    tree_input->SetBranchStatus("t_Jet_eta", 1);
     tree_input->SetBranchAddress("t_Jet_eta", &jet_eta);
 
     // DiJet variables
+    tree_input->SetBranchStatus("t_diJet_mass", 1);
     tree_input->SetBranchAddress("t_diJet_mass", &diJet_mass);
+    tree_input->SetBranchStatus("t_diJet_mass_mo", 1);
     tree_input->SetBranchAddress("t_diJet_mass_mo", &diJet_mass_mo);
+    tree_input->SetBranchStatus("t_diJet_pt", 1);
     tree_input->SetBranchAddress("t_diJet_pt", &diJet_pt);
+    tree_input->SetBranchStatus("t_diJet_phi", 1);
     tree_input->SetBranchAddress("t_diJet_phi", &diJet_phi);
+    tree_input->SetBranchStatus("t_diJet_eta", 1);
     tree_input->SetBranchAddress("t_diJet_eta", &diJet_eta);
 
     std::cout << "Input Branches addressed setted" << std::endl;
