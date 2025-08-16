@@ -5,6 +5,7 @@
 ###############################
 dataset_name=$1
 FILESDIR=$2
+ANALYZER_VERSION_NUMBER=$3
 # cmssw_version=$3
 cmssw_version="CMSSW_14_0_14"
 
@@ -23,7 +24,7 @@ eval `scram runtime -sh`
 mkdir -p rootfiles
 NFILES=$(xrdfs root://cmseos.fnal.gov ls -1 /${FILESDIR}|wc -l)
 for i in $(seq 1 $NFILES); do
-    xrdcp root://cmseos.fnal.gov//${FILESDIR}/HiggsMuMu_$i.root ./rootfiles/
+    xrdcp root://cmseos.fnal.gov//${FILESDIR}/HiggsMuMu_${ANALYZER_VERSION_NUMBER}_$i.root ./rootfiles/
 done
 ls -lh rootfiles
 FILES2MERGE="rootfiles/HiggsMuMu_*.root"
@@ -32,7 +33,7 @@ NFILES=$(xrdfs root://cmseos.fnal.gov ls -1 /${FILESDIR}_ext1|wc -l)
 if [[ $NFILES -ge 1 ]]; then
     mkdir -p rootfiles_ext1
     for i in $(seq 1 $NFILES); do
-        xrdcp root://cmseos.fnal.gov//${FILESDIR}_ext1/HiggsMuMu_$i.root ./rootfiles_ext1/
+        xrdcp root://cmseos.fnal.gov//${FILESDIR}_ext1/HiggsMuMu_${ANALYZER_VERSION_NUMBER}_$i.root ./rootfiles_ext1/
     done
     ls -lh rootfiles_ext1
     FILES2MERGE="${FILES2MERGE} rootfiles_ext1/HiggsMuMu_*.root"

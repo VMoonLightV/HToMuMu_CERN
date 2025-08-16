@@ -142,8 +142,8 @@ for dataset in list_datasets:
             print("Skipping.")
             continue
 
-    analysis_ran = os.path.exists("analyzer_HiggsMuMu/" + dataset)
-    log_path = "analyzer_HiggsMuMu/" + dataset + "/log"
+    analysis_ran = os.path.exists("analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset)
+    log_path = "analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/log"
     if analysis_ran and (len(os.listdir(log_path)) == 0):
         print(" Analyzer /log/ already empty. Send analyzer jobs first!")
         continue
@@ -179,7 +179,7 @@ for dataset in list_datasets:
     jobfile = open("hadd_%s.jdl"%(dataset), "w+")
     jobfile.write("Universe  = vanilla" + "\n")
     jobfile.write("Executable = ./hadd_datasets.sh" + "\n")
-    args = dataset + " " + FILESDIR
+    args = dataset + " " + FILESDIR + " " + v.ANALYZER_VERSION_NUMBER
     jobfile.write("Arguments = " + args + "\n")
 
     jobfile.write("Log = hadd_" + v.ANALYZER_VERSION_NUMBER + "/%s/log/jobHadd.$(Cluster).log"%(dataset) + "\n")

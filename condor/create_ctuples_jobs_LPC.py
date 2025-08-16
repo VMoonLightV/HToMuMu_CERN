@@ -102,7 +102,7 @@ for dataset_name in list_datasets:
             print("Skipping.")
             continue
 
-    JOB_DIR = CONDOR_BASE_DIR + "ctuples/" + "%s/"%(dataset_name)
+    JOB_DIR = CONDOR_BASE_DIR + "ctuples_" + v.TUPLES_VERSION_NUMBER + "/" + "%s/"%(dataset_name)
 
     if os.path.exists(JOB_DIR):
         if len(os.listdir(JOB_DIR+"/log/")) != len(os.listdir(JOB_DIR+"/out/")):
