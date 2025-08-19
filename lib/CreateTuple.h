@@ -97,8 +97,6 @@ class CreateTuple {
     float diMuon_mass, diMuon_bsConstrainedMass, diMuon_pt, diMuon_bsConstrainedPt, diMuon_phi, diMuon_eta;
 
     /** Read MET variables **/
-    float MET_phi, MET_pt, MET_sumEt;
-    float ChsMET_phi, ChsMET_pt, ChsMET_sumEt;
     float PuppiMET_phi, PuppiMET_pt, PuppiMET_sumEt;
 
     /** Read Muon variables */
@@ -240,14 +238,6 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "diMuon_rapidity/f");
 
     // MET variables
-    tree_output->Branch("MET_phi", &MET_phi, "MET_phi/f");
-    tree_output->Branch("MET_pt", &MET_pt, "MET_pt/f");
-    tree_output->Branch("MET_sumEt", &MET_sumEt, "MET_sumEt/f");
-
-    tree_output->Branch("ChsMET_phi", &ChsMET_phi, "ChsMET_phi/f");
-    tree_output->Branch("ChsMET_pt", &ChsMET_pt, "ChsMET_pt/f");
-    tree_output->Branch("ChsMET_sumEt", &ChsMET_sumEt, "ChsMET_sumEt/f");
-
     tree_output->Branch("PuppiMET_phi", &PuppiMET_phi, "PuppiMET_phi/f");
     tree_output->Branch("PuppiMET_pt", &PuppiMET_pt, "PuppiMET_pt/f");
     tree_output->Branch("PuppiMET_sumEt", &PuppiMET_sumEt, "PuppiMET_sumEt/f");
@@ -356,20 +346,6 @@ void CreateTuple::setBranchesAddressesInput() {
     tree_input->SetBranchAddress("t_diMuon_eta", &diMuon_eta);
 
     // MET varaibles
-    tree_input->SetBranchStatus("t_MET_phi", 1);
-    tree_input->SetBranchAddress("t_MET_phi", &MET_phi);
-    tree_input->SetBranchStatus("t_MET_pt", 1);
-    tree_input->SetBranchAddress("t_MET_pt", &MET_pt);
-    tree_input->SetBranchStatus("t_MET_sumEt", 1);
-    tree_input->SetBranchAddress("t_MET_sumEt", &MET_sumEt);
-
-    tree_input->SetBranchStatus("t_ChsMET_phi", 1);
-    tree_input->SetBranchAddress("t_ChsMET_phi", &ChsMET_phi);
-    tree_input->SetBranchStatus("t_ChsMET_pt", 1);
-    tree_input->SetBranchAddress("t_ChsMET_pt", &ChsMET_pt);
-    tree_input->SetBranchStatus("t_ChsMET_sumEt", 1);
-    tree_input->SetBranchAddress("t_ChsMET_sumEt", &ChsMET_sumEt);
-
     tree_input->SetBranchStatus("t_PuppiMET_phi", 1);
     tree_input->SetBranchAddress("t_PuppiMET_phi", &PuppiMET_phi);
     tree_input->SetBranchStatus("t_PuppiMET_pt", 1);

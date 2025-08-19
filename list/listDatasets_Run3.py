@@ -116,6 +116,8 @@ datasets_info = {
                        "/Muon0/Run2025C-PromptReco-v1/NANOAOD"],
     "Muon0_2025C_v2": ["T", 2, "2025", "Data",
                        "/Muon0/Run2025C-PromptReco-v2/NANOAOD"],
+    "Muon0_2025D": ["T", 2, "2025", "Data",
+                       "/Muon0/Run2025D-PromptReco-v1/NANOAOD"],
 
     "Muon1_2025B": ["T", 2, "2025", "Data",
                        "/Muon1/Run2025B-PromptReco-v1/NANOAOD"],
@@ -123,6 +125,8 @@ datasets_info = {
                        "/Muon1/Run2025C-PromptReco-v1/NANOAOD"],
     "Muon1_2025C_v2": ["T", 2, "2025", "Data",
                        "/Muon1/Run2025C-PromptReco-v2/NANOAOD"],
+    "Muon1_2025D": ["T", 2, "2025", "Data",
+                       "/Muon1/Run2025D-PromptReco-v1/NANOAOD"],
     
     ####################################################################################################
     # 2022 Simulations Backgrounds

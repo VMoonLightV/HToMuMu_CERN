@@ -88,9 +88,9 @@ public :
    // Float_t         CaloMET_phi;
    // Float_t         CaloMET_pt;
    // Float_t         CaloMET_sumEt;
-   Float_t         ChsMET_phi;
-   Float_t         ChsMET_pt;
-   Float_t         ChsMET_sumEt;
+   // Float_t         ChsMET_phi;
+   // Float_t         ChsMET_pt;
+   // Float_t         ChsMET_sumEt;
    // Int_t           nCorrT1METJet;
    // Float_t         CorrT1METJet_area[15];   //[nCorrT1METJet]
    // Float_t         CorrT1METJet_eta[15];   //[nCorrT1METJet]
@@ -384,10 +384,10 @@ public :
    //Float_t         MET_covXX;
    //Float_t         MET_covXY;
    //Float_t         MET_covYY;
-   Float_t         MET_phi;
-   Float_t         MET_pt;
+   //Float_t         MET_phi;
+   //Float_t         MET_pt;
    //Float_t         MET_significance;
-   Float_t         MET_sumEt;
+   //Float_t         MET_sumEt;
    //Float_t         MET_sumPtUnclustered;
    Int_t           nMuon;
    UChar_t         Muon_highPtId[6];   //[nMuon]
@@ -1930,9 +1930,9 @@ public :
    // TBranch        *b_CaloMET_phi;   //!
    // TBranch        *b_CaloMET_pt;   //!
    // TBranch        *b_CaloMET_sumEt;   //!
-   TBranch        *b_ChsMET_phi;   //!
-   TBranch        *b_ChsMET_pt;   //!
-   TBranch        *b_ChsMET_sumEt;   //!
+   // TBranch        *b_ChsMET_phi;   //!
+   // TBranch        *b_ChsMET_pt;   //!
+   // TBranch        *b_ChsMET_sumEt;   //!
    // TBranch        *b_nCorrT1METJet;   //!
    // TBranch        *b_CorrT1METJet_area;   //!
    // TBranch        *b_CorrT1METJet_eta;   //!
@@ -2226,10 +2226,10 @@ public :
    //TBranch        *b_MET_covXX;   //!
    //TBranch        *b_MET_covXY;   //!
    //TBranch        *b_MET_covYY;   //!
-   TBranch        *b_MET_phi;   //!
-   TBranch        *b_MET_pt;   //!
+   // TBranch        *b_MET_phi;   //!
+   // TBranch        *b_MET_pt;   //!
    //TBranch        *b_MET_significance;   //!
-   TBranch        *b_MET_sumEt;   //!
+   // TBranch        *b_MET_sumEt;   //!
    //TBranch        *b_MET_sumPtUnclustered;   //!
    TBranch        *b_nMuon;   //!
    TBranch        *b_Muon_highPtId;   //!
@@ -3784,9 +3784,9 @@ void MainEvent::Init(TTree *tree)
    // fChain->SetBranchAddress("CaloMET_phi", &CaloMET_phi, &b_CaloMET_phi);
    // fChain->SetBranchAddress("CaloMET_pt", &CaloMET_pt, &b_CaloMET_pt);
    // fChain->SetBranchAddress("CaloMET_sumEt", &CaloMET_sumEt, &b_CaloMET_sumEt);
-   fChain->SetBranchAddress("ChsMET_phi", &ChsMET_phi, &b_ChsMET_phi);
-   fChain->SetBranchAddress("ChsMET_pt", &ChsMET_pt, &b_ChsMET_pt);
-   fChain->SetBranchAddress("ChsMET_sumEt", &ChsMET_sumEt, &b_ChsMET_sumEt);
+   // fChain->SetBranchAddress("ChsMET_phi", &ChsMET_phi, &b_ChsMET_phi);
+   // fChain->SetBranchAddress("ChsMET_pt", &ChsMET_pt, &b_ChsMET_pt);
+   // fChain->SetBranchAddress("ChsMET_sumEt", &ChsMET_sumEt, &b_ChsMET_sumEt);
    // fChain->SetBranchAddress("nCorrT1METJet", &nCorrT1METJet, &b_nCorrT1METJet);
    // fChain->SetBranchAddress("CorrT1METJet_area", CorrT1METJet_area, &b_CorrT1METJet_area);
    // fChain->SetBranchAddress("CorrT1METJet_eta", CorrT1METJet_eta, &b_CorrT1METJet_eta);
@@ -3998,10 +3998,10 @@ void MainEvent::Init(TTree *tree)
    //fChain->SetBranchAddress("MET_covXX", &MET_covXX, &b_MET_covXX);
    //fChain->SetBranchAddress("MET_covXY", &MET_covXY, &b_MET_covXY);
    //fChain->SetBranchAddress("MET_covYY", &MET_covYY, &b_MET_covYY);
-   fChain->SetBranchAddress("MET_phi", &MET_phi, &b_MET_phi);
-   fChain->SetBranchAddress("MET_pt", &MET_pt, &b_MET_pt);
+   // fChain->SetBranchAddress("MET_phi", &MET_phi, &b_MET_phi);
+   // fChain->SetBranchAddress("MET_pt", &MET_pt, &b_MET_pt);
    //fChain->SetBranchAddress("MET_significance", &MET_significance, &b_MET_significance);
-   fChain->SetBranchAddress("MET_sumEt", &MET_sumEt, &b_MET_sumEt);
+   // fChain->SetBranchAddress("MET_sumEt", &MET_sumEt, &b_MET_sumEt);
    //fChain->SetBranchAddress("MET_sumPtUnclustered", &MET_sumPtUnclustered, &b_MET_sumPtUnclustered);
    fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
    fChain->SetBranchAddress("Muon_highPtId", Muon_highPtId, &b_Muon_highPtId);
