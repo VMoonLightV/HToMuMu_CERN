@@ -5,6 +5,8 @@ import sys
 
 base_input_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
 
+EVE_mass_reso_plot = True
+
 njet_arg = sys.argv[1]
 region = sys.argv[2]
 
@@ -43,22 +45,36 @@ if "SR" in region : variables += ["diMuon_mass"]
 if njet_arg == "nobin": njet_group = ["nobin_"]
 if njet_arg == "bin": njet_group = ["0","1","2"]
 
-for njet in njet_group:
-    for era in eras:
-        input_dir = f"{base_input_dir}{njet}jet/{region}/"
-        for variable in variables:
-            draw_data_and_simul_and_ratio(input_dir, variable, era, background_sources,
-                                          signal_sources,
-                                          njet, region,
-                                          use_ggH_category=use_ggH,
-                                          use_VBF_category=use_VBF,
-                                          )
 
-    # draw_data_and_simul_and_ratio("PV", era, background_sources, signal_sources)
-    # draw_data_and_simul_and_ratio("rho", era, background_sources, signal_sources)
-    # draw_data_and_simul_and_ratio(
-    #     "PV", era, background_sources, signal_sources, use_puweight=False
-    # )
-    # draw_data_and_simul_and_ratio(
-    #     "rho", era, background_sources, signal_sources, use_puweight=False
-    # )
+
+            
+if EVE_mass_reso_plot == False:
+    for njet in njet_group:
+        for era in eras:
+            input_dir = f"{base_input_dir}{njet}jet/{region}/"
+            for variable in variables:
+                draw_data_and_simul_and_ratio(input_dir, variable, era, background_sources,
+                                            signal_sources,
+                                            njet, region,
+                                            use_ggH_category=use_ggH,
+                                            use_VBF_category=use_VBF,
+                                            )
+
+
+else: 
+    
+    variables = [
+        "relative_diMuon_bsConstrainedMass_error",
+        "calibrated_diMuon_bsConstrainedMass_error"
+    ]
+    
+    for njet in njet_group:
+        for era in eras:
+            input_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105_calibrated/"
+            for variable in variables:
+                draw_data_and_simul_and_ratio(input_dir, variable, era, background_sources,
+                                            signal_sources,
+                                            njet, region,
+                                            use_ggH_category=use_ggH,
+                                            use_VBF_category=use_VBF,
+                                            )

@@ -5,13 +5,13 @@ import os
 cpp_executable = "./bin/SkimTuplesggH"
 
 # base_input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/"
-base_input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/"
-output_directory = "/eos/home-y/yulou/Fnal-hmm/BDT-skims/ggH/"
+base_input_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
+output_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/ggH/"
 os.makedirs(output_directory, exist_ok=True)
 
 # eras = ["2022", "2022EE"]
 #eras = ["2024"]
-eras = ["2022EE", "2022", "2023", "2023BPix"]
+eras = ["2022EE", "2022", "2023", "2023BPix","2024"]
 
 
 # data_datasets = ["DoubleMuon_2022C", "Muon_2022C", "Muon_2022D", "Muon_2022E", "Muon_2022F", "Muon_2022G"]

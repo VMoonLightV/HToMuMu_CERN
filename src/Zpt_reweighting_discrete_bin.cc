@@ -11,8 +11,13 @@
 #include <TSystem.h>
 #include <TError.h>
 
-// g++ -o ./bin/normalization src/normalization.cc $(root-config --cflags --libs)
+// g++ -o ./bin/Zpt_reweighting_discrete_bin src/Zpt_reweighting_discrete_bin.cc $(root-config --cflags --libs)
 
+struct BinInfo {
+    double binL;
+    double binR;
+    double ratioValue;
+};
 
 int main(int argc, char *argv[]) {
     if (argc != 7) {
@@ -27,10 +32,10 @@ int main(int argc, char *argv[]) {
     TString channel(argv[4]);
     const bool is_data = *argv[5] == 'T';
     TString njet(argv[6]);
-    double ratio = atof(argv[6]);
+    TString csvFile(argv[6]);
     std::cout << "channel: " << channel << std::endl;
     std::cout << "era: " << era << std::endl;
-    std::cout << "ratio: " << ratio << std::endl;
+    std::cout << "ratio_file " << csvFile << std::endl;
     
     TFile inputFile(input_name, "READ");
     if (inputFile.IsZombie()) {
@@ -49,6 +54,7 @@ int main(int argc, char *argv[]) {
     double weight = 0;
     float dimuon_pt = 0;
     tree_input->SetBranchAddress("weight", &weight);
+    tree_input->SetBranchAddress("diMuon_pt", &dimuon_pt);
 
     TString output_file_path = output + channel + "_" + era + "_skim.root";
     TString output_dir = gSystem->DirName(output_file_path);
@@ -70,6 +76,40 @@ int main(int argc, char *argv[]) {
     Long64_t n_selected = 0;
     int zero_division_warnings = 0;
     const int MAX_WARNINGS = 5;
+
+
+
+
+    std::ifstream file(csvFile);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << csvFile << std::endl;
+        return 1;
+    }
+
+    std::string line;
+    std::vector<BinInfo> bins;
+
+    std::getline(file, line);
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string cell;
+        BinInfo bin;
+
+        std::getline(ss, cell, ',');
+        bin.binL = std::stod(cell);
+
+        std::getline(ss, cell, ',');
+        bin.binR = std::stod(cell);
+
+        std::getline(ss, cell, ',');
+
+        std::getline(ss, cell, ','); 
+        bin.ratioValue = std::stod(cell);
+
+        bins.push_back(bin);
+    }
+    file.close();
     
     std::cout << "\n start processing " << n_entries << " events..." << std::endl;
     
@@ -80,10 +120,15 @@ int main(int argc, char *argv[]) {
             
         if (channel == "DY")  {
             //std::cout << "\n start normalization for DY" << std::endl;
-            weight = weight * ratio;
-                
+            //weight = weight * ratio;
+            for (const auto &bin : bins) {
+                if (dimuon_pt >= bin.binL && dimuon_pt < bin.binR) {
+                    weight *= bin.ratioValue;
+                    break;
+                }  
+            }
+            tree_output->Fill();
         }
-        tree_output->Fill();
             
     }
     

@@ -4,8 +4,8 @@ import os
 # Define the path to your C++ executable
 cpp_executable = "./bin/SkimTuples_VBF"
 #input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/tuples/"
-input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/"
-output_directory = "/eos/home-y/yulou/Fnal-hmm/BDT-skims/VBF/"
+input_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
+output_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/VBF/"
 os.makedirs(output_directory, exist_ok=True)
 
 eras = [
@@ -13,6 +13,7 @@ eras = [
     "2022EE",
     "2023",
     "2023BPix",
+    "2024"
 ]
 
 background_datasets= [

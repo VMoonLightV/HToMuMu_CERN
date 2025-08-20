@@ -9,10 +9,12 @@ base_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
 coeff_head = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/A_test/plots/ratio/njet/"
 
 # Define the path to your C++ executable
-cpp_executable = "./bin/normalization"
+cpp_executable = "./bin/Zpt_reweighting_discrete_bin"
 
 njet_arg = sys.argv[1]
-count_file = sys.argv[2]
+region = sys.argv[2]
+#count_file = sys.argv[3]
+#df = pd.read_csv(count_file)
 
 eras = ["2022", "2022EE", "2023", "2023BPix"]
 
@@ -28,7 +30,7 @@ signal_datasets = [
      "ttH",
 ]
 
-df = pd.read_csv(count_file)
+
 variable = 'diMuon_mass'
 
 if njet_arg == "nobin": njet_group = ["nobin_"]
@@ -51,7 +53,7 @@ for njet in njet_group:
 
     for era in eras:
         #coeff = coeff_head + njet + "jet_ratio_table_dimuon_pt_ZCR_normalization/polynomial_" + era +"_coefficients.csv"
-        coeff = coeff_head + njet + "jet_ratio_table_dimuon_pt_ZCR_normalization/" + era +"_ratiotable.csv"
+        coeff = coeff_head + njet + "jet_ratio_table_dimuon_pt_ZCR_normalization_0-600/" + era +"_ratio_table.csv"
         input = base_input_directory + "Data_" + era + "_skim.root"
         shutil.copy2(input, output_directory)
         print("copy: ", input)

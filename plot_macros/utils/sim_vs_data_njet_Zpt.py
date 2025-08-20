@@ -26,9 +26,11 @@ from .helper import (
 boundaries = [0,100,200,600]
 orders = [6,3,3]
 
-bin600 = True
+bin600 = False
 use_discrete_bin = False
-use_F_test = True
+use_F_test = False
+
+use_CubicSpline = True
 
 bins_0_200 = np.linspace(0, 200, 81)
 if bin600 == True : bins_0_200 = np.linspace(0, 200, 41)
@@ -181,6 +183,8 @@ def get_histograms_from_tuple(
 
             if(isZRange):
                 variable_bin = "diMuon_mass_Z"
+            elif variables[0] == 'calibrated_diMuon_bsConstrainedMass_error': 
+                variable_bin = 'relative_diMuon_bsConstrainedMass_error'
 
             base_bins = np.linspace(x_range[variable_bin][0],x_range[variable_bin][1], n_bins[variable_bin]+1)
             #if (variables[0] == "diMuon_pt"): base_bins[-1] = 10000
@@ -249,29 +253,32 @@ def piecewise_polyfit(df, output_name):
     poly_functions = []
     intervals = []
     
+    
+    print("--- Mode: Independent Piecewise Polyfit ---")
+            
     for i,order_i in zip(range(len(boundaries) - 1), orders):
 
         mask = (x >= boundaries[i]) & (x <= boundaries[i+1])
         x_segment = x[mask]
         y_segment = y[mask]
-        
-        if len(x_segment) < order_i:
-            print(f"warning: [{boundaries[i]:.2f}, {boundaries[i+1]:.2f}] don't have enough data point.")
-            continue
             
-        #print(x_segment, y_segment, order_i)
+        if len(x_segment) < order_i:
+                print(f"warning: [{boundaries[i]:.2f}, {boundaries[i+1]:.2f}] don't have enough data point.")
+                continue
+                
+            #print(x_segment, y_segment, order_i)
 
         if (i == 0) & (use_F_test == True):
-            print(f"start F-test in [{boundaries[i]}, {boundaries[i+1]}]")
-            for order_l in range(1, 9):
-                for j in range(1, 9-order_l):
-                    order_h = order_l +j 
-                    F_val, p_val= f_test_polyfit(x_segment, y_segment, order_l, order_h)
-                    print(f"p-value = {p_val:.4f}, F-value = {F_val:.4f}, from order {order_l} to {order_h}")
+                print(f"start F-test in [{boundaries[i]}, {boundaries[i+1]}]")
+                for order_l in range(1, 9):
+                    for j in range(1, 2):
+                        order_h = order_l +j 
+                        F_val, p_val= f_test_polyfit(x_segment, y_segment, order_l, order_h)
+                        print(f"p-value = {p_val:.4f}, F-value = {F_val:.4f}, from order {order_l} to {order_h}")
 
         coefficients = np.polyfit(x_segment, y_segment, order_i)
         poly_func = np.poly1d(coefficients)
-        
+            
         poly_functions.append(poly_func)
         intervals.append((boundaries[i], boundaries[i+1]))
 
@@ -352,7 +359,9 @@ def draw_data_and_simul_and_ratio(
 
     if(isZRange):
         variable_bin = "diMuon_mass_Z"
-    else: 
+    elif variable == 'calibrated_diMuon_bsConstrainedMass_error': 
+        variable_bin = 'relative_diMuon_bsConstrainedMass_error'
+    else :
         variable_bin = variable
 
     if use_ggH_category and (variable + "_ggH" in x_range):
@@ -544,7 +553,7 @@ def draw_data_and_simul_and_ratio(
     #if (variable == "diMuon_pt"): axs[1].set_xlim(x_range[variable][0], x_range[variable][1])
     if (variable == "diMuon_pt"): 
         if bin600 == False: axs[1].set_xlim(0, 200)
-    axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable])
+    axs[1].set_xlabel(f"{njet}jet {region} "+x_labels[variable_bin])
     
     if ("ZCR_normalization" in region) & (variable == "diMuon_pt"):
       axs[1].set_ylim(0.5, 1.5)
@@ -558,6 +567,8 @@ def draw_data_and_simul_and_ratio(
 
             
       df = pd.DataFrame({
+                'binL':data_bins[:-1],
+                'binR':data_bins[1:],
                 'BinCenter': bin_centers,
                 'RatioValue': ratio_hist,
                 'RatioError': ratio_error  

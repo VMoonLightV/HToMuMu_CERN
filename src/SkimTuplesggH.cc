@@ -37,10 +37,14 @@ int main(int argc, char *argv[]) {
     tree_input->SetBranchStatus("*", 0);
 
     for (auto ggh_branches : {"diMuon_mass",
+                              "diMuon_bsConstrainedMass",
                               "diMuon_pt",
+                              "diMuon_bsConstrainedPt",
                               "diMuon_rapidity",
                               "mu1_pt_mass_ratio",
                               "mu2_pt_mass_ratio",
+                              "mu1_bsConstrainedPt_mass_ratio",
+                              "mu2_bsConstrainedPt_mass_ratio",
                               "mu1_eta",
                               "mu2_eta",
                               "phi_CS",
@@ -55,10 +59,12 @@ int main(int argc, char *argv[]) {
                               "z_zeppenfeld",
                               "min_delta_eta_diMuon_jet",
                               "min_delta_phi_diMuon_jet",
-                              "weight_no_lumi",
+                              //"weight_no_lumi",
                               "weight",
                               "is_ggH_category",
-			      "relative_diMuon_mass_error"})
+			                  "relative_diMuon_mass_error",
+                              "relative_diMuon_bsConstrainedMass_error",
+                            })
         tree_input->SetBranchStatus(ggh_branches, 1);
 
     gROOT->cd();
@@ -67,7 +73,7 @@ int main(int argc, char *argv[]) {
                       "RECREATE");
     TTree *tree_output = tree_input->CloneTree(0); // Clone the structure only
 
-    tree_output = tree_input->CopyTree("(is_ggH_category == 1) && (diMuon_mass > 115. && diMuon_mass < 135.)");
+    tree_output = tree_input->CopyTree("(is_ggH_category == 1) && ((diMuon_mass > 115. && diMuon_mass < 135.) || (diMuon_bsConstrainedMass > 115. && diMuon_bsConstrainedMass < 135.) )");
 
     // Write the selected tree to the output file
 

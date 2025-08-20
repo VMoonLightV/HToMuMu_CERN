@@ -22,15 +22,13 @@ elif era_input == "2022":
 elif era_input == "2023":
     eras = ["2023", "2023BPix", "2023Combined"]
 elif era_input == "Combined":
-    eras = ["2022Combined", "2023Combined", "Combined"]
+    eras = ["Combined"]
 elif era_input == "All":
-    eras = ["2022", "2022EE", "2023","2023BPix","Combined"]
+    eras = ["2022", "2022EE", "2023", "2023BPix", "Combined"]
 else:
     print("Set era to be one of the available sets:")
     print(" > 2022, 2023, Combined, All")
     exit()
-
-eras =["Combined"]
 
 if len(sys.argv) == 3:
     background_subset = "Full"
@@ -50,20 +48,22 @@ print("Signal subset: ", signal_subset)
 
 subset_title = "B" + background_subset + "_S" + signal_subset
 BDTvar = "BDT_" + channel_US
-BDTscore_path = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/BDT_score/" + channel_US + "/"
+BDTscore_path = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/BDT_score/" + channel_US + "/BFull_SNottH/"
 N_max_iterations = 1 if channel_US == "ggH" else 2
 
 def find_bdt_categories(era, bdt_categories, bdf_cut_max=1, iteration=0):
     # print("BDF Max Cut: ", bdf_cut_max)
     plt.style.use(hep.style.CMS)
     with ur.open(
-        BDTscore_path + "background_" + era + "_skim_" + subset_title + ".root:tree_output"
+        #BDTscore_path + "background_" + era + "_skim_" + subset_title + ".root:tree_output"
+        BDTscore_path + "background_" + era + ".root:tree_output"
     ) as file:
         bkg_branches = file.arrays(
             [BDTvar, "weight_no_lumi", "diMuon_mass"], library="np"
         )
     with ur.open(
-        BDTscore_path + "signal_" + era + "_skim_" + subset_title + ".root:tree_output"
+        #BDTscore_path + "signal_" + era + "_skim_" + subset_title + ".root:tree_output"
+        BDTscore_path + "signal_" + era + ".root:tree_output"
     ) as file:
         signal_branches = file.arrays(
             [BDTvar, "weight_no_lumi", "diMuon_mass"], library="np"
@@ -177,7 +177,8 @@ def draw_bdt_categories(era):
     print("Categories: ", bdt_categories)
 
     with ur.open(
-        BDTscore_path + "background_" + era + "_skim_" + subset_title + ".root:tree_output"
+        #BDTscore_path + "background_" + era + "_skim_" + subset_title + ".root:tree_output"
+        BDTscore_path + "background_" + era + ".root:tree_output"
     ) as file:
         bkg_branches = file.arrays(
             [BDTvar, "weight_no_lumi", "diMuon_mass"], library="np"
@@ -190,7 +191,8 @@ def draw_bdt_categories(era):
         )
 
     with ur.open(
-        BDTscore_path + "signal_" + era + "_skim_" + subset_title + ".root:tree_output"
+        #BDTscore_path + "signal_" + era + "_skim_" + subset_title + ".root:tree_output"
+        BDTscore_path + "signal_" + era + ".root:tree_output"
     ) as file:
         signal_branches = file.arrays(
             [BDTvar, "weight_no_lumi", "diMuon_mass"], library="np"

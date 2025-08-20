@@ -18,80 +18,10 @@ from .helper import (
     get_output_directory,
     clean_null_values,
 )
-
-signal_colors = {"ggH": "red", "VBF": "blue", "ttH": "lime"}
-
-y_axis_max_range = {
-    "mu1_pt_mass_ratio": 10e6,
-    "mu2_pt_mass_ratio": 10e6,
-    "mu1_bsConstrainedPt_mass_ratio": 10e6,
-    "mu2_bsConstrainedPt_mass_ratio": 10e6,
-    "mu1_eta": 10e6,
-    "mu2_eta": 10e6,
-    "phi_CS": 10e6,
-    "cos_theta_CS": 10e6,
-    "mu1_pt": 10e8,
-    "mu2_pt": 10e8,
-    "mu1_ptErr": 10e8,
-    "mu2_ptErr": 10e8,
-    "mu1_bsConstrainedPt": 10e8,
-    "mu2_bsConstrainedPt": 10e8,
-    "mu1_bsConstrainedPtErr": 10e8,
-    "mu2_bsConstrainedPtErr": 10e8,
-    "diMuon_mass": 10e6,
-    "diMuon_bsConstrainedMass": 10e6,
-    "diMuon_rapidity": 10e6,
-    "diMuon_mass_full_range": 10e8,
-    "diMuon_bsConstrainedMass_full_range": 10e8,
-    "diMuon_bsConstrainedPt": 10e8,
-    "diMuon_pt": 10e8,
-    "diMuon_phi": 10e8,
-    "diMuon_eta": 10e8,
-    "relative_diMuon_mass_error": 10e6,
-    "relative_diMuon_bsConstrainedMass_error": 10e6,
-    "n_jet": 10e8,
-    "jet_pt": 10e8,
-    "jet_eta": 10e8,
-    "jet_phi": 10e8,
-    "jet_mass": 10e8,
-    "diJet_pt": 10e8,
-    "diJet_eta": 10e8,
-    "diJet_phi": 10e8,
-    "diJet_mass": 10e8,
-    "diJet_mass_mo": 10e8,
-    "diJet_DeltaEta": 10e8,
-    "pt_balance": 10e8,
-    "pt_centrality": 10e8,
-    "n_SoftJet_pt2": 10e8,
-    "n_SoftJet_pt5": 10e8,
-    "n_SoftJet_pt10": 10e8,
-    "HT": 10e8,
-    "HT_pt2": 10e8,
-    "HT_pt5": 10e8,
-    "HT_pt10": 10e8,
-}
-
-
-def get_color_list(number_of_histograms):
-    colors = [
-        "#3f90da",
-        "#ffa90e",
-        "#bd1f01",
-        "#94a4a2",
-        "#832db6",
-        "#a96b59",
-        "#e76300",
-        "#b9ac70",
-        "#717581",
-        "#92dadd",
-    ]
-
-    color_list = []
-    for i in range(number_of_histograms):
-        color_list.append(colors[i])
-
-    return color_list
-
+from .colors import(
+    signal_colors,
+    get_color_list,
+)
 
 def get_background_label_list(background_sources):
     labels_list = []
@@ -101,11 +31,23 @@ def get_background_label_list(background_sources):
 
 
 def get_histograms_from_tuple(
-    sources, era, variables, is_background, use_puweight,
-    use_ggH_category, use_VBF_category,  lumi_rescale=False, isZRange=False,
+    sources,
+    era,
+    variables,
+    is_background,
+    use_puweight,
+    production_channel,
+    bdt_cuts=[],
+    bdt_subset="",
+    lumi_rescale=False,
+    Z_study=False,
 ):
+    
     if not use_puweight:
         variables.append("pileup_weight")
+    # variables.append("pileup_weight")
+    # variables.append("pileup_weight_down")
+
 
     histograms_list = []
     bins_list = []
@@ -113,75 +55,162 @@ def get_histograms_from_tuple(
     # For 2024 data there is not simulations yet!!!
     # so in the case we re escale the luminosity
     era_reweight = 1
-    
     if lumi_rescale:
-        #era_reweight = 106.45/9.45
-        if(use_ggH_category):
-            era_reweight = 50112710/5438017
-        elif(use_VBF_category):
-            era_reweight = 127867/28980
+        print("Re scaling lumi")
+        if era == "2024":
+            era_reweight = 109.08 / 9.45
+        if era == "2025":
+            era_reweight = 802478 / 327501
         era = "2023BPix"
 
     variable_bin = variables[0]
-    if use_ggH_category and (variable_bin + "_ggH" in x_range):
-        variable_bin += "_ggH"
-    if use_VBF_category and (variable_bin + "_VBF" in x_range):
-        variable_bin += "_VBF"
+
+    if variable_bin + "_" + production_channel in x_range:
+        variable_bin += "_" + production_channel
+
+    tuple_path = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
+    if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
+        tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
 
     for source in sources:
-        with ur.open(
-            "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/" + source + "_" + era + "_tuples.root:tree_output"
-        ) as file:
+        file_name = source + "_" + era + "_tuples.root:tree_output"
+        if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
+            file_name = source + "_" + era + "_" + bdt_subset + ".root:tree_output"
+
+        with ur.open(tuple_path + file_name) as file:
             branches = file.arrays(variables, library="np")
+
+            bool_list = np.ones(len(branches[variables[0]]), dtype=bool)
+
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
-                bool_list = (branches["diMuon_bsConstrainedMass"] > 130) | (
+                bool_list = (bool_list) & (branches["diMuon_bsConstrainedMass"] > 130) | (
                     branches["diMuon_bsConstrainedMass"] < 120
                 )
-                for variable in variables:
-                    branches[variable] = branches[variable][bool_list]
+                if not Z_study:
+                    bool_list = (bool_list) & (branches["diMuon_bsConstrainedMass"] > 110) & (
+                        branches["diMuon_bsConstrainedMass"] < 150
+                    )
 
-            elif (variables[0] != "diMuon_mass" and variables[0] != "diMuon_bsConstrainedMass" and is_background):
-                bool_list = (branches["diMuon_mass"] > 130) | (
-                    branches["diMuon_mass"] < 120
+
+            elif variables[0] != "diMuon_mass" and ("bsConstrained" not in variables[0]) and is_background:
+                bool_list = (bool_list) & (
+                    ((branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120))
                 )
-                for variable in variables:
-                    branches[variable] = branches[variable][bool_list]
+                if not Z_study:
+                    bool_list = (bool_list) & (branches["diMuon_mass"] > 110) & (
+                        branches["diMuon_mass"] < 150
+                    )
+
+            if production_channel != "":
+                bool_list = (bool_list) & (
+                    branches["is_" + production_channel + "_category"] == 1
+                )
+
+            if len(bdt_cuts) > 1:
+                bdt_bool = (branches["BDT_" + production_channel] > bdt_cuts[0]) & (
+                    branches["BDT_" + production_channel] < bdt_cuts[1]
+                )
+                bool_list = (bool_list) & (bdt_bool)
+
+            for var in variables:
+                branches[var] = branches[var][bool_list]
 
             clean_null_values(branches, variables, variables_type)
 
-            if use_ggH_category:
-                bool_list = branches["is_ggH_category"] == 1
-                for variable in variables:
-                    branches[variable] = branches[variable][bool_list]
-            elif use_VBF_category:
-                bool_list = branches["is_VBF_category"] == 1
-                for variable in variables:
-                    branches[variable] = branches[variable][bool_list]
-
-            #print(variables)
             if "delta_phi" in variables[0]:
                 branches[variables[0]] = np.absolute(branches[variables[0]])
 
-            if(isZRange):
-                variable_bin = "diMuon_mass_Z"
+            if ((variables[0] == "diMuon_mass") | (variables[0] == "diMuon_bsConstrainedMass")) and Z_study:
+                number_of_bins = 80; 
+                x_range_histos = (85,100)
+            else:
+                number_of_bins = n_bins[variable_bin]
+                x_range_histos = x_range[variable_bin]
 
             histogram, bins = np.histogram(
                 branches[variables[0]],
-                bins=n_bins[variable_bin],
-                range=x_range[variable_bin],
-                # weights=branches["weight"],
+                bins=number_of_bins,
+                range=x_range_histos,
                 weights=(
-                    branches["weight"]*era_reweight
+                    branches["weight"] * era_reweight
+                    # branches["weight"] * (branches["pileup_weight_down"] / branches["pileup_weight"])
                     if use_puweight
-                    else branches["weight"]/ branches["pileup_weight"]
+                    else branches["weight"] / branches["pileup_weight"]
                 ),
             )
             histograms_list.append(histogram)
             bins_list.append(bins)
-            # histograms_list[source] = histogram
-            # bins_list[source] = bins
-
     return histograms_list, bins_list
+
+
+def get_data_histograms_from_tuple(
+    era,
+    variables,
+    production_channel,
+    bdt_cuts,
+    bdt_subset="",
+    Z_study=False
+):
+    tuple_path = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
+    file_name = "Data_" + era + "_tuples.root:tree_output"
+    if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
+        tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
+        file_name = "Data_" + era + "_" + bdt_subset + ".root:tree_output"
+
+    with ur.open(tuple_path + file_name) as data_file:
+        branches = data_file.arrays(variables, library="np")
+
+        variable_bin = variables[0]
+        if variable_bin + "_" + production_channel in x_range:
+            variable_bin += "_" + production_channel
+
+
+        if "bsConstrained" in variables[0]:
+            bool_list = ((branches["diMuon_bsConstrainedMass"] > 130) | (branches["diMuon_bsConstrainedMass"] < 120))
+            if not Z_study:
+                bool_list = (bool_list) & (branches["diMuon_bsConstrainedMass"] > 110) & (
+                    branches["diMuon_bsConstrainedMass"] < 150
+                )
+        else:
+            bool_list = ((branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120))
+            if not Z_study:
+                bool_list = (bool_list) & (branches["diMuon_mass"] > 110) & (
+                    branches["diMuon_mass"] < 150
+                )
+        
+        if production_channel != "":
+            bool_list = (bool_list) & (
+                branches["is_" + production_channel + "_category"] == 1
+            )
+
+        if len(bdt_cuts) > 1:
+            bdt_bool = (branches["BDT_" + production_channel] > bdt_cuts[0]) & (
+                branches["BDT_" + production_channel] < bdt_cuts[1]
+            )
+            bool_list = (bool_list) & (bdt_bool)
+
+        for var in variables:
+            branches[var] = branches[var][bool_list]
+
+        clean_null_values(branches, variables, variables_type)
+
+        if "delta_phi" in variables[0]:
+            branches[variables[0]] = np.absolute(branches[variables[0]])
+
+        if (( variables[0] == "diMuon_mass") | (variables[0] == "diMuon_bsConstrainedMass")) and Z_study:
+            number_of_bins = 80; 
+            x_range_histos = (85,100)
+        else:
+            number_of_bins = n_bins[variable_bin]
+            x_range_histos = x_range[variable_bin]
+        
+        data_histogram, data_bins = np.histogram(
+            branches[variables[0]],
+            bins=number_of_bins,
+            range=x_range_histos,
+        )
+
+    return data_histogram, data_bins
 
 
 def draw_data_and_simul_and_ratio(
@@ -190,93 +219,65 @@ def draw_data_and_simul_and_ratio(
     background_sources,
     signal_sources,
     use_puweight=True,
-    use_ggH_category=False,
-    use_VBF_category=False,
+    production_channel="",
+    bdt_cuts=[],
+    bdt_subset="",
+    Z_study=False,
 ):
     plt.style.use(hep.style.CMS)
 
     print("*" * len("****** PLOTTING " + variable + " *****"))
-    print("****** PLOTTING " + variable + " *****")
+    print("****** PLOTTING " + variable + " ERA " + era + " *****")
     print("*" * len("****** PLOTTING " + variable + " *****"))
 
-    isZRange = False
-    if(variable == "diMuon_mass_Z"):
-        variable = "diMuon_mass"
-        isZRange = True
-
-    elif(variable == "diMuon_bsConstrainedMass_Z"):
-        variable = "diMuon_bsConstrainedMass"
-        isZRange = True
-
-    variables = [variable, "weight"]
+    variables = [variable, "weight"] 
     if (("bsConstrained" in variable) and variable != "diMuon_bsConstrainedMass"):
         variables.append("diMuon_bsConstrainedMass")
-    elif (variable != "diMuon_mass" and variable != "diMuon_bsConstrainedMass"):
+    elif (variable != "diMuon_mass" and ("bsConstrained" not in variable)):
         variables.append("diMuon_mass")
-    if use_ggH_category:
-        variables.append("is_ggH_category")
-    elif use_VBF_category:
-        variables.append("is_VBF_category")
+    # if variable != "diMuon_mass":
+    if production_channel != "":
+        variables.append("is_" + production_channel + "_category")
+    if len(bdt_cuts) != 0:
+        variables.append("BDT_" + production_channel)
 
-    if(isZRange):
-        variable_bin = "diMuon_mass_Z"
-    else: 
-        variable_bin = variable
-
-    if use_ggH_category and (variable + "_ggH" in x_range):
-        variable_bin += "_ggH"
-    if use_VBF_category and (variable + "_VBF" in x_range):
-        variable_bin += "_VBF"
-
-    with ur.open(
-        "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/Data_" + era + "_tuples.root:tree_output"
-    ) as data_file:
-        branches = data_file.arrays(variables, library="np")
-        if "bsConstrained" in variable:
-            bool_list = (branches["diMuon_bsConstrainedMass"] > 130) | (branches["diMuon_bsConstrainedMass"] < 120)
-        else:
-            bool_list = (branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120)
-
-        for var in variables:
-            branches[var] = branches[var][bool_list]
-        # branches[variable] = branches[variable][
-
-        if "delta_phi" in variable:
-            branches[variable] = np.absolute(branches[variable])
-
-        if use_ggH_category:
-            bool_list = branches["is_ggH_category"] == 1
-            for var in variables:
-                branches[var] = branches[var][bool_list]
-        elif use_VBF_category:
-            bool_list = branches["is_VBF_category"] == 1
-            for var in variables:
-                branches[var] = branches[var][bool_list]
-
-        data_histogram, data_bins = np.histogram(
-            branches[variable],
-            bins=n_bins[variable_bin],
-            range=x_range[variable_bin],
-        )
+    data_histogram, data_bins = get_data_histograms_from_tuple(
+        era,
+        variables,
+        production_channel,
+        bdt_cuts,
+        bdt_subset,
+        Z_study=Z_study,
+    )
 
     if variable == "diMuon_mass" or variable == "diMuon_bsConstrainedMass":
-        data_histogram[data_histogram == 0] = -100.0
-        print("Era: " + era + " | Events: " + str(len(branches[variable])))
+        data_histogram[data_histogram == 0] = 1e-10 # !!! -100.0
 
-    simulation_era = era
-    #if era == "2024":
-        #simulation_era = "2023BPix"
-
-    print(variables)
     bkg_histograms_list, bkg_bins_list = get_histograms_from_tuple(
-        background_sources, simulation_era, variables, True, use_puweight,
-        use_ggH_category, use_VBF_category, era == "2024", isZRange,
-    )
-    signal_histograms_list, signal_bins_list = get_histograms_from_tuple(
-        signal_sources, simulation_era, variables, False, use_puweight,
-        use_ggH_category, use_VBF_category, era == "2024", isZRange,
+        background_sources,
+        era,
+        variables,
+        True,
+        use_puweight,
+        production_channel,
+        bdt_cuts,
+        bdt_subset,
+        era in ["2024", "2025"],
+        Z_study=Z_study
     )
 
+    signal_histograms_list, signal_bins_list = get_histograms_from_tuple(
+        signal_sources,
+        era,
+        variables,
+        False,
+        use_puweight,
+        production_channel,
+        bdt_cuts,
+        bdt_subset,
+        era in ["2024", "2025"],
+        Z_study=Z_study
+    )
 
     fig, axs = get_canvas(True)
 
@@ -301,10 +302,8 @@ def draw_data_and_simul_and_ratio(
         ax=axs[0],
     )
 
-    signal_scale_factor = 100
+    signal_scale_factor = 10
     for source, histogram in zip(signal_sources, signal_histograms_list):
-        if(source == "ttH"):
-            signal_scale_factor *= 10
         hep.histplot(
             histogram * signal_scale_factor,
             signal_bins_list[0],
@@ -315,9 +314,14 @@ def draw_data_and_simul_and_ratio(
             ax=axs[0],
         )
 
+    label = ""
+    if not use_puweight:
+        label = "No PU weight"
+    if len(bdt_cuts) > 1:
+        label = "Cat" + str(len(bdt_cuts) - 1)
     hep.cms.label(
         data="True",
-        label="" if use_puweight else "No pu weight",
+        label=label,
         year=era,
         com="13.6",
         lumi=luminosity[era],
@@ -325,8 +329,6 @@ def draw_data_and_simul_and_ratio(
     )
 
     axs[0].set_ylabel(r"Events")
-    # axs[0].set_ylim(-10000, y_axis_max_range[variable])
-    # axs[0].set_ylim(0.1, y_axis_max_range[variable])
     axs[0].set_ylim(0.1, 1000 * np.max(data_histogram))
     axs[0].set_xlim(data_bins[0], data_bins[-1])
     axs[0].set_yscale("log")
@@ -343,8 +345,6 @@ def draw_data_and_simul_and_ratio(
             tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist
 
     ratio_hist, ratio_error = get_histograms_ratio(data_histogram, tot_bg_numpy_hist)
-    
-    #normalization could be calculated here
 
     hep.histplot(
         ratio_hist,
@@ -365,17 +365,35 @@ def draw_data_and_simul_and_ratio(
     axs[1].set_xlabel(x_labels[variable])
 
     output_directory = "../plots/ratio/" + era + "/"
+    output_name = variable + "_" + era + "_MCData_ratio"
+    if Z_study:
+        output_name = variable + "_Z_included_" + era + "_MCData_ratio"
+
     if not use_puweight:
         output_directory = "../plots/ratio/" + era + "/no_puWeight/"
-    if use_ggH_category:
-        output_directory = "../plots/ratio/ggH_category/" + era + "/"
-    elif use_VBF_category:
-        output_directory = "../plots/ratio/VBF_category/" + era + "/"
+    if production_channel != "":
+        output_directory = (
+            "../plots/ratio/" + production_channel + "_category/" + era + "/"
+        )
+        output_directory = "../plots/ratio/" + production_channel + "_category/bdt_selections/" + era + "/"
+    if len(bdt_cuts) > 1:
+        output_name += label
 
     output_directory = get_output_directory(variable, output_directory, variables_type)
 
-    if(isZRange):
-        save_figure(fig, output_directory, variable + "_Z_" + era + "_MCData_ratio")
-    else:
-        save_figure(fig, output_directory, variable + "_" + era + "_MCData_ratio")
+    save_figure(fig, output_directory, output_name)
+
     plt.close()
+
+    if len(bdt_cuts) > 2:
+        draw_data_and_simul_and_ratio(
+            variable,
+            era,
+            background_sources,
+            signal_sources,
+            use_puweight=use_puweight,
+            production_channel=production_channel,
+            bdt_cuts=bdt_cuts[1:],
+            bdt_subset=bdt_subset,
+            Z_study=Z_study,
+        )

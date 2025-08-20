@@ -22,6 +22,8 @@ elif era_input == "2023":
     eras = ["2023", "2023BPix", "2023Combined"]
 elif era_input == "Combined":
     eras = ["2022Combined", "2023Combined", "Combined"]
+elif era_input == "only_Combined":
+    eras = ["Combined"]
 elif era_input == "All":
     eras = ["2022", "2022EE", "2023","2023BPix","Combined"]
 else:
