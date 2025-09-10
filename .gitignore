@@ -2,5 +2,6 @@
 *__pycache__*
 *.pyc
 plots/
+scripts/*.csv
 *.root
 scripts/makeDataPileupHist.sh
