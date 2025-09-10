@@ -52,13 +52,11 @@ def get_histograms_from_tuple(
     histograms_list = []
     bins_list = []
 
-    # For 2024 data there is not simulations yet!!!
+    # For 2025 data there is not simulations yet!!!
     # so in the case we re escale the luminosity
     era_reweight = 1
     if lumi_rescale:
         print("Re scaling lumi")
-        if era == "2024":
-            era_reweight = 109.08 / 9.45
         if era == "2025":
             era_reweight = 802478 / 327501
         era = "2023BPix"
@@ -226,9 +224,9 @@ def draw_data_and_simul_and_ratio(
 ):
     plt.style.use(hep.style.CMS)
 
-    print("*" * len("****** PLOTTING " + variable + " *****"))
+    print("*" * len("****** PLOTTING " + variable + era + " *****"))
     print("****** PLOTTING " + variable + " ERA " + era + " *****")
-    print("*" * len("****** PLOTTING " + variable + " *****"))
+    print("*" * len("****** PLOTTING " + variable + era + " *****"))
 
     variables = [variable, "weight"] 
     if (("bsConstrained" in variable) and variable != "diMuon_bsConstrainedMass"):
@@ -262,7 +260,7 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era in ["2024", "2025"],
+        era in ["2025"],
         Z_study=Z_study
     )
 
@@ -275,7 +273,7 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era in ["2024", "2025"],
+        era in ["2025"],
         Z_study=Z_study
     )
 
@@ -356,7 +354,7 @@ def draw_data_and_simul_and_ratio(
         ax=axs[1],
     )
 
-    if(era == "2024"):
+    if(era == "2025"):
         axs[1].set_ylabel("Data/MC(2023BPix)", loc="center")
     else:
         axs[1].set_ylabel("Data/MC", loc="center")

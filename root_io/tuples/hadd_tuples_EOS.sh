@@ -1,7 +1,10 @@
-EOS_PATH="/eos/uscms/store/group/lpchmumu/$USER/analyzer_HiggsMuMu/tuples/"
+ANALYZER_VERSION="v1.1"
+TUPLES_VERSION="v1.1.0"
+EOS_PATH="/eos/uscms/store/group/lpchmumu/$USER/analyzer_HiggsMuMu_$ANALYZER_VERSION/tuples_$TUPLES_VERSION/"
 
 ##############  2022  ##############
-hadd -f Data_2022_tuples.root ${EOS_PATH}Muon_2022C_2022_tuples.root ${EOS_PATH}Muon_2022D_2022_tuples.root
+<<com
+hadd -f Data_2022_tuples.root ${EOS_PATH}Muon_2022C_2022_tuples.root ${EOS_PATH}Muon_2022D_2022_tuples.root ${EOS_PATH}SingleMuon_2022C_2022_tuples.root
 
 hadd -f DY_2022_tuples.root ${EOS_PATH}DY50to120_2022_tuples.root ${EOS_PATH}DY120to200_2022_tuples.root
 hadd -f EWK_2022_tuples.root ${EOS_PATH}EWK_2L2J_2022_tuples.root
@@ -57,8 +60,16 @@ hadd -f ttH_2023BPix_tuples.root ${EOS_PATH}ttH_2023BPix_tuples.root
 hadd -f Data_2024_tuples.root ${EOS_PATH}Muon0_2024B_2024_tuples.root ${EOS_PATH}Muon0_2024F_2024_tuples.root ${EOS_PATH}Muon1_2024B_2024_tuples.root ${EOS_PATH}Muon1_2024F_2024_tuples.root  ${EOS_PATH}Muon0_2024C_2024_tuples.root ${EOS_PATH}Muon0_2024G_2024_tuples.root ${EOS_PATH}Muon1_2024C_2024_tuples.root ${EOS_PATH}Muon1_2024G_2024_tuples.root ${EOS_PATH}Muon0_2024D_2024_tuples.root ${EOS_PATH}Muon0_2024H_2024_tuples.root ${EOS_PATH}Muon1_2024D_2024_tuples.root ${EOS_PATH}Muon1_2024H_2024_tuples.root ${EOS_PATH}Muon0_2024E_v1_2024_tuples.root ${EOS_PATH}Muon0_2024I_v1_2024_tuples.root ${EOS_PATH}Muon1_2024E_v1_2024_tuples.root ${EOS_PATH}Muon1_2024I_v1_2024_tuples.root ${EOS_PATH}Muon0_2024E_v2_2024_tuples.root ${EOS_PATH}Muon0_2024I_v2_2024_tuples.root ${EOS_PATH}Muon1_2024E_v2_2024_tuples.root  ${EOS_PATH}Muon1_2024I_v2_2024_tuples.root 
 
 hadd -f DY_2024_tuples.root ${EOS_PATH}DY50to120_2024_tuples.root ${EOS_PATH}DY120to200_2024_tuples.root
-#hadd -f DY120to200_2024_tuples.root  ${EOS_PATH}DY120to200_2024_tuples.root
+hadd -f DY120to200_2024_tuples.root  ${EOS_PATH}DY120to200_2024_tuples.root
 hadd -f EWK_2024_tuples.root ${EOS_PATH}EWK_2L2J_2024_tuples.root
 hadd -f TT_2024_tuples.root ${EOS_PATH}TTto2L2Nu_2024_tuples.root ${EOS_PATH}TTtoLNu2Q_2024_tuples.root
 hadd -f DiBoson_2024_tuples.root ${EOS_PATH}WZto2L2Q_2024_tuples.root ${EOS_PATH}WZto3LNu_2024_tuples.root ${EOS_PATH}ZZto2L2Nu_2024_tuples.root ${EOS_PATH}ZZto2L2Q_2024_tuples.root ${EOS_PATH}ZZto4L_2024_tuples.root ${EOS_PATH}WWto2L2Nu_2024_tuples.root
 
+hadd -f ggH_2024_tuples.root ${EOS_PATH}ggH_2024_tuples.root
+hadd -f VBF_2024_tuples.root ${EOS_PATH}VBF_2024_tuples.root
+hadd -f ttH_2024_tuples.root ${EOS_PATH}ttH_2024_tuples.root 
+com
+
+##############  2025  ##############
+
+hadd -f Data_2025_tuples.root ${EOS_PATH}Muon0_2025B_2025_tuples.root ${EOS_PATH}Muon0_2025C_v1_2025_tuples.root ${EOS_PATH}Muon0_2025C_v2_2025_tuples.root ${EOS_PATH}Muon0_2025D_2025B_tuples.root ${EOS_PATH}Muon1_2025B_2025_tuples.root ${EOS_PATH}Muon1_2025C_v1_2025_tuples.root ${EOS_PATH}Muon1_2025C_v2_2025_tuples.root ${EOS_PATH}Muon1_2025D_2025B_tuples.root

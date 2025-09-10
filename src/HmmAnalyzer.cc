@@ -335,7 +335,7 @@ void HmmAnalyzer::EventLoop() {
         t_SoftActivityJetHT2 = SoftActivityJetHT2;
         t_SoftActivityJetHT5 = SoftActivityJetHT5;
 
-        if(t_diMuon_bsConstrainedMass < 110 || t_diMuon_bsConstrainedMass > 180){
+        if(t_diMuon_bsConstrainedMass < 70 || t_diMuon_bsConstrainedMass > 180){
             continue; //not in signal range
         }
 

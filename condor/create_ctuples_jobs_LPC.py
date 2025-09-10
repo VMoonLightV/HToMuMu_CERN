@@ -73,7 +73,12 @@ for dataset_name in list_datasets:
     user = os.getenv('LOGNAME')
     EOS_BASE_DIR = "/store/group/lpchmumu/" + user + "/analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/"
 
-    INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
+    if(isData=='T'):
+        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight_goodLumi.root"
+        if("2025" in era): #Because 2025 doesn't have a good lumi file yet
+            INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
+    else:
+        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
     if not os.path.exists("/eos/uscms/" + INPUT_FILE):
         print("Merged file does not exist. Skipping!")
         continue
@@ -149,7 +154,7 @@ for dataset_name in list_datasets:
 
     jobfile_JDL.write("should_transfer_files = YES" + "\n")
     jobfile_JDL.write("when_to_transfer_output = ON_EXIT" + "\n\n# Resources request\n")
-    jobfile_JDL.write("RequestMemory = 3100 \n\n# Jobs selection\n")
+    jobfile_JDL.write("RequestMemory = 4500 \n\n# Jobs selection\n")
 
     jobfile_JDL.write("Queue 1\n")
     jobfile_JDL.close()
