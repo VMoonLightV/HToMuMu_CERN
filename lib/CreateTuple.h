@@ -96,6 +96,9 @@ class CreateTuple {
     /** Read DiMuon variables */
     float diMuon_mass, diMuon_bsConstrainedMass, diMuon_pt, diMuon_bsConstrainedPt, diMuon_phi, diMuon_eta;
 
+    /** Read MET variables **/
+    float PuppiMET_phi, PuppiMET_pt, PuppiMET_sumEt;
+
     /** Read Muon variables */
     int mu1_index, mu2_index;
     std::vector<int> *mu_charge;
@@ -123,7 +126,6 @@ class CreateTuple {
 
     /** New DiMuon variables*/
     float diMuon_rapidity;
-    Double_t diMuon_mass_write;
 
     /** New Muon variables*/
     float mu1_pt_mass_ratio, mu2_pt_mass_ratio, mu1_bsConstrainedPt_mass_ratio,
@@ -133,7 +135,7 @@ class CreateTuple {
     float relative_diMuon_mass_error, relative_diMuon_bsConstrainedMass_error;
 
     /** New jets variables*/
-    float leading_jet_pt, leading_jet_eta, subleading_jet_pt;
+    float leading_jet_pt, leading_jet_eta, subleading_jet_pt, subleading_jet_eta;
 
     /** New DiJets variables*/
     float delta_eta_diJet, delta_phi_diJet, z_zeppenfeld, pt_balance,
@@ -226,7 +228,7 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "is_VBF_category/i");
 
     // DiMuon variables
-    tree_output->Branch("diMuon_mass", &diMuon_mass_write, "diMuon_mass/D");
+    tree_output->Branch("diMuon_mass", &diMuon_mass, "diMuon_mass/f");
     tree_output->Branch("diMuon_bsConstrainedMass", &diMuon_bsConstrainedMass, "diMuon_bsConstrainedMass/f");
     tree_output->Branch("diMuon_pt", &diMuon_pt, "diMuon_pt/f");
     tree_output->Branch("diMuon_bsConstrainedPt", &diMuon_bsConstrainedPt, "diMuon_bsConstrainedPt/f");
@@ -234,6 +236,11 @@ void CreateTuple::setBranchesAddressesOutput() {
     tree_output->Branch("diMuon_eta", &diMuon_eta, "diMuon_eta/f");
     tree_output->Branch("diMuon_rapidity", &diMuon_rapidity,
                         "diMuon_rapidity/f");
+
+    // MET variables
+    tree_output->Branch("PuppiMET_phi", &PuppiMET_phi, "PuppiMET_phi/f");
+    tree_output->Branch("PuppiMET_pt", &PuppiMET_pt, "PuppiMET_pt/f");
+    tree_output->Branch("PuppiMET_sumEt", &PuppiMET_sumEt, "PuppiMET_sumEt/f");
 
     // Muon variables
     tree_output->Branch("mu1_pt_mass_ratio", &mu1_pt_mass_ratio,
@@ -263,11 +270,15 @@ void CreateTuple::setBranchesAddressesOutput() {
 
     // Jet variables
     tree_output->Branch("n_jet", &n_jet, "n_jet/i");
+    tree_output->Branch("n_bjet", &n_bjet, "n_bjet/i");
+    tree_output->Branch("n_bjet_Loose", &n_bjet_Loose, "n_bjet_Loose/i");
     tree_output->Branch("leading_jet_pt", &leading_jet_pt, "leading_jet_pt/f");
     tree_output->Branch("leading_jet_eta", &leading_jet_eta,
                         "leading_jet_eta/f");
     tree_output->Branch("subleading_jet_pt", &subleading_jet_pt,
                         "subleading_jet_pt/f");
+    tree_output->Branch("subleading_jet_eta", &subleading_jet_eta,
+                        "subleading_jet_eta/f");
     //
     // diJet variables
     tree_output->Branch("diJet_mass", &diJet_mass, "diJet_mass/f");
@@ -288,58 +299,110 @@ void CreateTuple::setBranchesAddressesOutput() {
 
 void CreateTuple::setBranchesAddressesInput() {
 
+    tree_input->SetBranchStatus("*", 0);
+
+    tree_input->SetBranchStatus("t_puWeight", 1);
     tree_input->SetBranchAddress("t_puWeight", &pileup_weight);
+    tree_input->SetBranchStatus("t_puWeightUp", 1);
     tree_input->SetBranchAddress("t_puWeightUp", &pileup_weight_up);
+    tree_input->SetBranchStatus("t_puWeightDown", 1);
     tree_input->SetBranchAddress("t_puWeightDown", &pileup_weight_down);
+    tree_input->SetBranchStatus("t_genWeight", 1);
     tree_input->SetBranchAddress("t_genWeight", &gen_weight);
+    tree_input->SetBranchStatus("t_Rho", 1);
     tree_input->SetBranchAddress("t_Rho", &rho);
+    tree_input->SetBranchStatus("t_PV_npvsGood", 1);
     tree_input->SetBranchAddress("t_PV_npvsGood", &pv);
+    tree_input->SetBranchStatus("t_SoftActivityJetNjets2", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetNjets2", &n_SoftJet_pt2);
+    tree_input->SetBranchStatus("t_SoftActivityJetNjets5", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetNjets5", &n_SoftJet_pt5);
+    tree_input->SetBranchStatus("t_SoftActivityJetNjets10", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetNjets10", &n_SoftJet_pt10);
 
+    tree_input->SetBranchStatus("t_SoftActivityJetHT", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT", &HT);
+    tree_input->SetBranchStatus("t_SoftActivityJetHT2", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT2", &HT_pt2);
+    tree_input->SetBranchStatus("t_SoftActivityJetHT5", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT5", &HT_pt5);
+    tree_input->SetBranchStatus("t_SoftActivityJetHT10", 1);
     tree_input->SetBranchAddress("t_SoftActivityJetHT10", &HT_pt10);
 
+    tree_input->SetBranchStatus("t_genWeight", 1);
     tree_input->SetBranchAddress("t_genWeight", &gen_weight);
     // DiMuon variables
+    tree_input->SetBranchStatus("t_diMuon_bsConstrainedMass", 1);
     tree_input->SetBranchAddress("t_diMuon_bsConstrainedMass", &diMuon_bsConstrainedMass);
+    tree_input->SetBranchStatus("t_diMuon_bsConstrainedPt", 1);
     tree_input->SetBranchAddress("t_diMuon_bsConstrainedPt", &diMuon_bsConstrainedPt);
+    tree_input->SetBranchStatus("t_diMuon_mass", 1);
     tree_input->SetBranchAddress("t_diMuon_mass", &diMuon_mass);
+    tree_input->SetBranchStatus("t_diMuon_pt", 1);
     tree_input->SetBranchAddress("t_diMuon_pt", &diMuon_pt);
+    tree_input->SetBranchStatus("t_diMuon_phi", 1);
     tree_input->SetBranchAddress("t_diMuon_phi", &diMuon_phi);
+    tree_input->SetBranchStatus("t_diMuon_eta", 1);
     tree_input->SetBranchAddress("t_diMuon_eta", &diMuon_eta);
 
+    // MET varaibles
+    tree_input->SetBranchStatus("t_PuppiMET_phi", 1);
+    tree_input->SetBranchAddress("t_PuppiMET_phi", &PuppiMET_phi);
+    tree_input->SetBranchStatus("t_PuppiMET_pt", 1);
+    tree_input->SetBranchAddress("t_PuppiMET_pt", &PuppiMET_pt);
+    tree_input->SetBranchStatus("t_PuppiMET_sumEt", 1);
+    tree_input->SetBranchAddress("t_PuppiMET_sumEt", &PuppiMET_sumEt);
+
     // Muon variables
+    tree_input->SetBranchStatus("t_mu1", 1);
     tree_input->SetBranchAddress("t_mu1", &mu1_index);
+    tree_input->SetBranchStatus("t_mu2", 1);
     tree_input->SetBranchAddress("t_mu2", &mu2_index);
+    tree_input->SetBranchStatus("t_Mu_charge", 1);
     tree_input->SetBranchAddress("t_Mu_charge", &mu_charge);
+    tree_input->SetBranchStatus("t_Mu_pt", 1);
     tree_input->SetBranchAddress("t_Mu_pt", &mu_pt);
+    tree_input->SetBranchStatus("t_Mu_bsConstrainedPt", 1);
     tree_input->SetBranchAddress("t_Mu_bsConstrainedPt", &mu_bsConstrainedPt);
+    tree_input->SetBranchStatus("t_Mu_ptErr", 1);
     tree_input->SetBranchAddress("t_Mu_ptErr", &mu_ptErr);
+    tree_input->SetBranchStatus("t_Mu_bsConstrainedPtErr", 1);
     tree_input->SetBranchAddress("t_Mu_bsConstrainedPtErr", &mu_bsConstrainedPtErr);
+    tree_input->SetBranchStatus("t_Mu_phi", 1);
     tree_input->SetBranchAddress("t_Mu_phi", &mu_phi);
+    tree_input->SetBranchStatus("t_Mu_eta", 1);
     tree_input->SetBranchAddress("t_Mu_eta", &mu_eta);
 
     // Electron variables
+    tree_input->SetBranchStatus("t_El_pt", 1);
     tree_input->SetBranchAddress("t_El_pt", &elec_pt);
 
     // Jet variables
+    tree_input->SetBranchStatus("t_nbJet", 1);
     tree_input->SetBranchAddress("t_nbJet", &n_bjet);
+    tree_input->SetBranchStatus("t_nbJet_Loose", 1);
     tree_input->SetBranchAddress("t_nbJet_Loose", &n_bjet_Loose);
+    tree_input->SetBranchStatus("t_nJet", 1);
     tree_input->SetBranchAddress("t_nJet", &n_jet);
+    tree_input->SetBranchStatus("t_Jet_mass", 1);
     tree_input->SetBranchAddress("t_Jet_mass", &jet_mass);
+    tree_input->SetBranchStatus("t_Jet_pt", 1);
     tree_input->SetBranchAddress("t_Jet_pt", &jet_pt);
+    tree_input->SetBranchStatus("t_Jet_phi", 1);
     tree_input->SetBranchAddress("t_Jet_phi", &jet_phi);
+    tree_input->SetBranchStatus("t_Jet_eta", 1);
     tree_input->SetBranchAddress("t_Jet_eta", &jet_eta);
 
     // DiJet variables
+    tree_input->SetBranchStatus("t_diJet_mass", 1);
     tree_input->SetBranchAddress("t_diJet_mass", &diJet_mass);
+    tree_input->SetBranchStatus("t_diJet_mass_mo", 1);
     tree_input->SetBranchAddress("t_diJet_mass_mo", &diJet_mass_mo);
+    tree_input->SetBranchStatus("t_diJet_pt", 1);
     tree_input->SetBranchAddress("t_diJet_pt", &diJet_pt);
+    tree_input->SetBranchStatus("t_diJet_phi", 1);
     tree_input->SetBranchAddress("t_diJet_phi", &diJet_phi);
+    tree_input->SetBranchStatus("t_diJet_eta", 1);
     tree_input->SetBranchAddress("t_diJet_eta", &diJet_eta);
 
     std::cout << "Input Branches addressed setted" << std::endl;
@@ -358,6 +421,7 @@ void CreateTuple::fillOutputTree() {
     for (int event_index = 0; event_index < total_entries; event_index++) {
         tree_input->GetEntry(event_index);
         // if (diMuon_mass < 110 || diMuon_mass > 150)
+        // if (diMuon_mass < 100 || diMuon_mass > 180)
         if (diMuon_mass < 70 || diMuon_mass > 180)
             continue;
 
@@ -366,7 +430,6 @@ void CreateTuple::fillOutputTree() {
 
         // DiMuon variables
         diMuon_rapidity = (mu1_vector + mu2_vector).Rapidity();
-        diMuon_mass_write = static_cast<Double_t>(diMuon_mass);
 
         // Muon variables
         mu1_vector.SetPtEtaPhiM((*mu_pt)[mu1_index], (*mu_eta)[mu1_index],
@@ -405,6 +468,7 @@ void CreateTuple::fillOutputTree() {
             leading_jet_eta = 0;
             diJet_mass = 0;
             subleading_jet_pt = 0;
+            subleading_jet_eta = 0;
             delta_eta_diJet = 0;
             delta_phi_diJet = -1;
             z_zeppenfeld = 0;
@@ -417,6 +481,7 @@ void CreateTuple::fillOutputTree() {
             leading_jet_eta = jet_eta->at(0);
             diJet_mass = 0;
             subleading_jet_pt = 0;
+            subleading_jet_eta = 0;
             delta_eta_diJet = 0;
             delta_phi_diJet = -1;
             z_zeppenfeld = 0;
@@ -427,8 +492,8 @@ void CreateTuple::fillOutputTree() {
         } else {
             leading_jet_pt = jet_pt->at(0);
             leading_jet_eta = jet_eta->at(0);
-            // diJet_mass;
             subleading_jet_pt = jet_pt->at(1);
+            subleading_jet_eta = jet_eta->at(1);
             delta_eta_diJet = DeltaEta(jet_eta->at(0), jet_eta->at(1));
             delta_phi_diJet = DeltaPhi(jet_phi->at(0), jet_phi->at(1));
             z_zeppenfeld = GetZZeppenfeldVariable(diMuon_rapidity, jet_pt,
@@ -442,8 +507,8 @@ void CreateTuple::fillOutputTree() {
                 TMath::Min(DeltaEta(diMuon_eta, jet_eta->at(0)),
                            DeltaEta(diMuon_eta, jet_eta->at(1)));
             min_delta_phi_diMuon_jet =
-                TMath::Min(TMath::Abs(DeltaPhi(diMuon_eta, jet_eta->at(0))),
-                           TMath::Abs(DeltaPhi(diMuon_eta, jet_eta->at(1))));
+                TMath::Min(TMath::Abs(DeltaPhi(diMuon_phi, jet_phi->at(0))),
+                           TMath::Abs(DeltaPhi(diMuon_phi, jet_phi->at(1))));
         }
 
         // Choose category

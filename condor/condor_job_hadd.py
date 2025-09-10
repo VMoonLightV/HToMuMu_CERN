@@ -8,9 +8,12 @@ import glob
 import sys
 from collections import OrderedDict
 
+import utils.version as v
+
+
 def all_jobs_were_saved(dataset_name):
-    LOG_DIR = "analyzer_HiggsMuMu/" + dataset_name + "/log/"
-    OUT_DIR = "analyzer_HiggsMuMu/" + dataset_name + "/out/"
+    LOG_DIR = "analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset_name + "/log/"
+    OUT_DIR = "analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset_name + "/out/"
     N_in_log = len(os.listdir(LOG_DIR))
     N_in_out = len(os.listdir(OUT_DIR))
 
@@ -23,7 +26,7 @@ def all_jobs_were_saved(dataset_name):
     return same_N_files
 
 def create_task_to_submit(dataset_name):
-    DATASET_DIR = "analyzer_HiggsMuMu/" + dataset_name
+    DATASET_DIR = "analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset_name
     i = 1
     while os.path.exists(DATASET_DIR + "/V%i"%(i)):
         i += 1
@@ -95,10 +98,11 @@ analysis_job_sender.close()
 #     "DY50to120_Summer23",
 # ]
 
-os.system("mkdir -p hadd/")
+os.system("mkdir -p hadd_" + v.ANALYZER_VERSION_NUMBER + "/")
 
+print("Job hadd for analyzer version " + v.ANALYZER_VERSION_NUMBER)
 user = os.getenv('LOGNAME')
-DIR_eos = "store/group/lpchmumu/" + user + "/analyzer_HiggsMuMu"
+DIR_eos = "store/group/lpchmumu/" + user + "/analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER
 
 analysis_new_job_sender = open("condor_job_sender_missing_files.sh", "w")
 manual_hadd = ""
@@ -116,9 +120,9 @@ for dataset in list_datasets:
         print("No folder found for " + dataset + " :(. Skipping.")
         continue
 
-    os.system("mkdir -p hadd/" + dataset + "/log/")
-    os.system("mkdir -p hadd/" + dataset + "/out/")
-    os.system("mkdir -p hadd/" + dataset + "/err/")
+    os.system("mkdir -p hadd_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/log/")
+    os.system("mkdir -p hadd_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/out/")
+    os.system("mkdir -p hadd_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/err/")
 
     hadd_exists = os.path.exists("/eos/uscms/" + FILESDIR + "/SumGenWeight.root")
     hadd_copy_exists = os.path.exists("/eos/uscms/" + FILESDIR + "/SumGenWeight_v1.root")
@@ -138,19 +142,19 @@ for dataset in list_datasets:
             print("Skipping.")
             continue
 
-    analysis_ran = os.path.exists("analyzer_HiggsMuMu/" + dataset)
-    log_path = "analyzer_HiggsMuMu/" + dataset + "/log"
+    analysis_ran = os.path.exists("analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset)
+    log_path = "analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/log"
     if analysis_ran and (len(os.listdir(log_path)) == 0):
         print(" Analyzer /log/ already empty. Send analyzer jobs first!")
         continue
-    hadd_ran = os.path.exists("hadd/" + dataset)
-    out_path = "hadd/" + dataset + "/out"
-    log_path = "hadd/" + dataset + "/log"
+    hadd_ran = os.path.exists("hadd_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset)
+    out_path = "hadd_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/out"
+    log_path = "hadd_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "/log"
     if hadd_ran and (len(os.listdir(out_path)) != len(os.listdir(log_path))):
         print("Hadd job ran and didn't finish. Consider running manually with:")
         command = "cd /eos/uscms/" + FILESDIR + "; "
-        command += "hadd SumGenWeight.root HiggsMuMu_*.root"
-        if os.path.exists("analyzer_HiggsMuMu/" + dataset + "_ext1"):
+        command += "hadd SumGenWeight.root HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER +"*.root"
+        if os.path.exists("analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/" + dataset + "_ext1"):
             command += " ../" + dataset + "_ext1/HiggsMuMu_*.root"
         print(" > " + command)
         manual_hadd += command + "\n"
@@ -161,7 +165,7 @@ for dataset in list_datasets:
         new_line = create_task_to_submit(dataset)
         analysis_new_job_sender.write(new_line + "\n")
         skip = True
-    if os.path.exists("analyzer_HiggsMuMu/" + dataset + "_ext1"):
+    if os.path.exists("analyzer_HiggsMuMu_"+ v.ANALYZER_VERSION_NUMBER + "/" + dataset + "_ext1"):
         if not all_jobs_were_saved(dataset + "_ext1"):
             new_line = create_task_to_submit(dataset + "_ext1")
             analysis_new_job_sender.write(new_line + "\n")
@@ -175,12 +179,12 @@ for dataset in list_datasets:
     jobfile = open("hadd_%s.jdl"%(dataset), "w+")
     jobfile.write("Universe  = vanilla" + "\n")
     jobfile.write("Executable = ./hadd_datasets.sh" + "\n")
-    args = dataset + " " + FILESDIR
+    args = dataset + " " + FILESDIR + " " + v.ANALYZER_VERSION_NUMBER
     jobfile.write("Arguments = " + args + "\n")
 
-    jobfile.write("Log = hadd/%s/log/jobHadd.$(Cluster).log"%(dataset) + "\n")
-    jobfile.write("Output = hadd/%s/out/jobHadd.$(Cluster).out"%(dataset) + "\n")
-    jobfile.write("Error = hadd/%s/err/jobHadd.$(Cluster).err"%(dataset) + "\n")
+    jobfile.write("Log = hadd_" + v.ANALYZER_VERSION_NUMBER + "/%s/log/jobHadd.$(Cluster).log"%(dataset) + "\n")
+    jobfile.write("Output = hadd_" + v.ANALYZER_VERSION_NUMBER + "/%s/out/jobHadd.$(Cluster).out"%(dataset) + "\n")
+    jobfile.write("Error = hadd_" + v.ANALYZER_VERSION_NUMBER + "/%s/err/jobHadd.$(Cluster).err"%(dataset) + "\n")
     jobfile.write("x509userproxy = $ENV(X509_USER_PROXY)" + "\n")
 
     transfer_files = "hadd_datasets.sh, "

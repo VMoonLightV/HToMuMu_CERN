@@ -5,14 +5,17 @@ import sys
 sys.path.append('../list')
 from listDatasets_Run3 import datasets_info
 
+import utils.version as v
+
 analyzer = "HmmAnalyzer"
 analysis = "HiggsMuMu"
-outputfile = analysis
+outputfile = analysis + "_" + v.ANALYZER_VERSION_NUMBER
 
 # Skip these datasets
 skip_dataset = [
     "DoubleMuon_2022A",
     "DoubleMuon_2022B",
+    "DoubleMuon_2022C",
     "Muon0_2023B",
     "Muon1_2023B",
 ]
@@ -48,6 +51,7 @@ Inputfiles_DIR = Analyzer_DIR + "list/"
 
 cmsswReleaseVersion = CMSSW_BASE_DIR.split("/")[-1]
 print("Using CMSSW version " + cmsswReleaseVersion)
+print("Running analysis version " + v.ANALYZER_VERSION_NUMBER)
 
 # Create script to send all of the jobs directly
 send_all_jobs = open(Condor_BASE_DIR + "/condor_job_sender.sh", "w+")

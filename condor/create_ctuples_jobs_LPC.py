@@ -5,6 +5,8 @@ import sys
 sys.path.append('../list')
 from listDatasets_Run3 import datasets_info
 
+import utils.version as v
+
 # analyzer = "HmmAnalyzer"
 # analysis = "HiggsMuMu"
 # outputfile = analysis
@@ -13,6 +15,7 @@ from listDatasets_Run3 import datasets_info
 skip_dataset = [
     "DoubleMuon_2022A",
     "DoubleMuon_2022B",
+    "DoubleMuon_2022C",
     "Muon0_2023B",
     "Muon1_2023B",
 ]
@@ -51,6 +54,7 @@ ANALYZER_DIR = CONDOR_BASE_DIR.split("condor/")[0]
 
 cmsswReleaseVersion = CMSSW_BASE_DIR.split("/")[-1]
 print("Using CMSSW version " + cmsswReleaseVersion)
+print("Running tuples version " + v.TUPLES_VERSION_NUMBER)
 
 # Create script to send all of the jobs directly
 send_all_jobs = open(CONDOR_BASE_DIR + "/condor_ctuple_job_sender.sh", "w+")
@@ -67,14 +71,19 @@ for dataset_name in list_datasets:
     channel = dataset_name.split("_Summer")[0]
 
     user = os.getenv('LOGNAME')
-    EOS_BASE_DIR = "/store/group/lpchmumu/" + user + "/analyzer_HiggsMuMu/"
+    EOS_BASE_DIR = "/store/group/lpchmumu/" + user + "/analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/"
 
-    INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
+    if(isData=='T'):
+        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight_goodLumi.root"
+        if("2025" in era): #Because 2025 doesn't have a good lumi file yet
+            INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
+    else:
+        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
     if not os.path.exists("/eos/uscms/" + INPUT_FILE):
         print("Merged file does not exist. Skipping!")
         continue
 
-    OUTPUT_DIR = EOS_BASE_DIR + "tuples/"
+    OUTPUT_DIR = EOS_BASE_DIR + "tuples_" + v.TUPLES_VERSION_NUMBER + "/"
     os.system("xrdfs root://cmseos.fnal.gov mkdir -p "+ OUTPUT_DIR)
     file_name = channel + "_" + era + "_tuples.root"
     file_copy_name = channel + "_" + era + "_tuples_v1.root"
@@ -98,7 +107,7 @@ for dataset_name in list_datasets:
             print("Skipping.")
             continue
 
-    JOB_DIR = CONDOR_BASE_DIR + "ctuples/" + "%s/"%(dataset_name)
+    JOB_DIR = CONDOR_BASE_DIR + "ctuples_" + v.TUPLES_VERSION_NUMBER + "/" + "%s/"%(dataset_name)
 
     if os.path.exists(JOB_DIR):
         if len(os.listdir(JOB_DIR+"/log/")) != len(os.listdir(JOB_DIR+"/out/")):
@@ -145,7 +154,7 @@ for dataset_name in list_datasets:
 
     jobfile_JDL.write("should_transfer_files = YES" + "\n")
     jobfile_JDL.write("when_to_transfer_output = ON_EXIT" + "\n\n# Resources request\n")
-    jobfile_JDL.write("RequestMemory = 2100 \n\n# Jobs selection\n")
+    jobfile_JDL.write("RequestMemory = 4500 \n\n# Jobs selection\n")
 
     jobfile_JDL.write("Queue 1\n")
     jobfile_JDL.close()

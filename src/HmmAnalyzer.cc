@@ -69,8 +69,9 @@ void HmmAnalyzer::EventLoop() {
                 BTagEntry::FLAV_B, // btag flavour
                 "comb");           // measurement type
 
+                
     long nentries = fChain->GetEntriesFast();
-    // long nentries = 6;
+    //long nentries = 2500;
     long nbytes = 0;
     long nb = 0;
     for (long jentry = 0; jentry < nentries; jentry++) {
@@ -118,6 +119,11 @@ void HmmAnalyzer::EventLoop() {
         if (!run_muChecks) {
             continue;
         }
+
+        //add in MET variable
+        t_PuppiMET_phi = PuppiMET_phi;
+        t_PuppiMET_pt = PuppiMET_pt;
+        t_PuppiMET_sumEt = PuppiMET_sumEt;
 
         int index_mu1 = INT_NULL_VALUE;
         int index_mu2 = INT_NULL_VALUE;
@@ -350,6 +356,10 @@ void HmmAnalyzer::EventLoop() {
         t_SoftActivityJetHT2 = SoftActivityJetHT2;
         t_SoftActivityJetHT5 = SoftActivityJetHT5;
 
+        if(t_diMuon_bsConstrainedMass < 70 || t_diMuon_bsConstrainedMass > 180){
+            continue; //not in signal range
+        }
+
         for (int j = 0; j < nJet; j++) {
             if (!isValidJet(j)) {
                 continue;
@@ -415,6 +425,7 @@ void HmmAnalyzer::EventLoop() {
             if (!is_data) {
                 continue;
             }
+
 
             double jet_scalefactor =
                 reader.eval_auto_bounds("central", BTagEntry::FLAV_B,

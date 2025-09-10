@@ -97,28 +97,18 @@ variables = [
     "HT_pt10",
 ]
 
-eras = ["2022EE", "2023", "2023BPix","2024"]
+# eras = ["2022EE", "2022", "2023", "2023BPix", "2024"]#, "2025"]
 # eras = ["2022", "2022EE", "2023", "2023BPix","2024"]
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
 #eras = ["2023BPix"]
-#eras = ["2024"]
+eras = ["2025"]
 #eras = ["Combined"]
 
 for era in eras:
-    # for variable in variables:
-        # draw_data_and_simul_and_ratio(
-            # variable,
-            # era,
-            # background_sources,
-            # signal_sources,
-            # True,
-            # production_channel,
-            # bdt_selections[production_channel][bdt_subset],
-            # bdt_subset,
-        # )
-    draw_data_and_simul_and_ratio(
-            "diMuon_mass",
+    for variable in variables:
+        draw_data_and_simul_and_ratio(
+            variable,
             era,
             background_sources,
             signal_sources,
@@ -126,19 +116,29 @@ for era in eras:
             production_channel,
             bdt_selections[production_channel][bdt_subset],
             bdt_subset,
-            True,
         )
-    draw_data_and_simul_and_ratio(
-            "diMuon_bsConstrainedMass",
-            era,
-            background_sources,
-            signal_sources,
-            True,
-            production_channel,
-            bdt_selections[production_channel][bdt_subset],
-            bdt_subset,
-            True,
-        )
+    #draw_data_and_simul_and_ratio(
+    #        "diMuon_mass",
+    #        era,
+    #        background_sources,
+    #        signal_sources,
+    #        True,
+    #        production_channel,
+    #        bdt_selections[production_channel][bdt_subset],
+    #        bdt_subset,
+    #        True,
+    #    )
+    #draw_data_and_simul_and_ratio(
+    #        "diMuon_bsConstrainedMass",
+    #        era,
+    #        background_sources,
+    #        signal_sources,
+    #        True,
+    #        production_channel,
+    #        bdt_selections[production_channel][bdt_subset],
+    #        bdt_subset,
+    #        False,
+    #    )
 
     # draw_data_and_simul_and_ratio("PV", era, background_sources, signal_sources)
     # draw_data_and_simul_and_ratio("rho", era, background_sources, signal_sources)

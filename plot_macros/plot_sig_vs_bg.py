@@ -44,16 +44,18 @@ variables = [
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
 # eras = ["2022", "2022EE", "2023", "2023BPix"]
-eras = ["2022Combined", "2023Combined", "Combined"]
-background_subset = ["Full", "NoDY50"]
+eras = ["Combined"]
+background_subset = ["Full"]
 # background_subset = ["NoDY50"]
 # signal_subset = ["Full", "NottH", "VBF"]
-signal_subset = ["NottH", "VBF"]
+signal_subset = ["NottH"]
 # signal_subset = ["VBF"]
 
 for bsubset in background_subset:
     for ssubset in signal_subset:
         for era in eras:
             for variable in variables:
-                draw_sig_and_bg_from_tuple(variable, era, channel_US,
-                                           bsubset, ssubset)
+                draw_sig_and_bg_from_tuple(variable, era, False,
+                        channel_US, bsubset, ssubset)
+                draw_sig_and_bg_from_tuple(variable, era, True,
+                        channel_US, bsubset, ssubset)

@@ -14,10 +14,6 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    //TString input_path(argv[1]);
-    //TString channel(argv[2]);
-    //TString era(argv[3]);
-    
     TString input_name(argv[1]);
     TString output(argv[2]);
     TString era(argv[3]);
@@ -43,10 +39,14 @@ int main(int argc, char *argv[]) {
 
     std::vector<TString> branches = {
         "diMuon_mass",
+        "diMuon_bsConstrainedMass",
         "diMuon_pt",
+        "diMuon_bsConstrainedPt",   
         "diMuon_rapidity",
         "mu1_pt_mass_ratio",
         "mu2_pt_mass_ratio",
+        "mu1_bsConstrainedPt_mass_ratio",
+        "mu2_bsConstrainedPt_mass_ratio",
         "mu1_eta",
         "mu2_eta",
         "phi_CS",
@@ -70,10 +70,11 @@ int main(int argc, char *argv[]) {
         "HT_pt2",
         "HT_pt5",
         "HT_pt10",
-        "weight_no_lumi",
+        //"weight_no_lumi",
         "weight",
-        //"is_ggH_category",
         "is_VBF_category",
+	    "relative_diMuon_mass_error",
+        "relative_diMuon_bsConstrainedMass_error",
     };
     for (auto VBF_branch : branches)
         tree_input->SetBranchStatus(VBF_branch, 1);
@@ -84,7 +85,7 @@ int main(int argc, char *argv[]) {
                       "RECREATE");
     TTree *tree_output = tree_input->CloneTree(0); // Clone the structure only
 
-    tree_output = tree_input->CopyTree("(is_VBF_category == 1) && (diMuon_mass > 115. && diMuon_mass < 135.)");
+    tree_output = tree_input->CopyTree("(is_VBF_category == 1) && ((diMuon_mass > 115. && diMuon_mass < 135.) || (diMuon_bsConstrainedMass > 115. && diMuon_bsConstrainedMass < 135.) )");
 
     // Write the selected tree to the output file
     output_file.cd();

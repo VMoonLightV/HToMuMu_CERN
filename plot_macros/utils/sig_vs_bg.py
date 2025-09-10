@@ -12,41 +12,56 @@ from .helper import (
     get_output_directory,
 )
 
-def draw_sig_and_bg_from_tuple(variable, era, category="", bsubset="", ssubset=""):
+def draw_sig_and_bg_from_tuple(variable, era, standardize_variables=False, category="", bsubset="", ssubset=""):
     plt.style.use(hep.style.CMS)
 
-    files_path = "../root_io/skim/" + category + "/"
-    if category == "VBF": files_path += "merged/"
+    #files_path = "../root_io/tuples/BDT_score/" + category + "/"+ "B" + bsubset + "_S" + ssubset + "/" 
+    files_path = "../root_io/skim/" + category + "/" 
 
-    background_path = files_path + "background_" + era + "_skim" + bsubset + ".root"
+    print("PLOTTING: " , variable)
+    background_path = files_path + "background_" + era + "_skim_" + bsubset + ".root"
     with ur.open(background_path + ":tree_output") as file:
-        background_branches = file.arrays([variable, "weight_no_lumi"], library="np")
-    signal_path = files_path + "signal_" + era + "_skim" + ssubset + ".root"
+        background_branches = file.arrays([variable, "weight"], library="np")
+    signal_path = files_path + "signal_" + era + "_skim_" + bsubset + ".root"
     with ur.open(signal_path + ":tree_output") as file:
-        signal_branches = file.arrays([variable, "weight_no_lumi"], library="np")
+        signal_branches = file.arrays([variable, "weight"], library="np")
 
-    clean_null_values(signal_branches, [variable, "weight_no_lumi"], variables_type)
-    clean_null_values(background_branches, [variable, "weight_no_lumi"], variables_type)
+    clean_null_values(signal_branches, [variable, "weight"], variables_type)
+    clean_null_values(background_branches, [variable, "weight"], variables_type)
 
-    if "delta_phi" in variable:
-        signal_branches[variable] = np.absolute(signal_branches[variable])
-        background_branches[variable] = np.absolute(background_branches[variable])
+    if standardize_variables:
+        combined_variable = np.concatenate([background_branches[variable], signal_branches[variable]])
+        print("is there nan values?: ", len(combined_variable[np.isnan(combined_variable)]))
+        combined_variable[np.isnan(combined_variable)] = 0.
+        
+        mean = combined_variable.mean()
+        std = combined_variable.std()
+        print("[Info]: Sample Mean: ", mean)
+        print("[Info]: Sample std: ", std)
+        signal_branches[variable] = (signal_branches[variable] - mean) / std
+        background_branches[variable] = (background_branches[variable] - mean) / std
+        combined_variable = (combined_variable - mean) / std
+
+
+    #if "delta_phi" in variable:
+    #    signal_branches[variable] = np.absolute(signal_branches[variable])
+    #    background_branches[variable] = np.absolute(background_branches[variable])
 
     variable_bin = variable
     if variable + "_" + category in x_range:
         variable_bin += "_" + category
-
     bkg_histogram, bins = np.histogram(
         background_branches[variable],
         bins=n_bins[variable_bin],
-        range=x_range[variable_bin],
-        weights=background_branches["weight_no_lumi"],
+        range=(x_range[variable_bin] if not standardize_variables else (1.2*np.min(combined_variable), 1.2*np.max(combined_variable))),
+        weights=background_branches["weight"],
     )
     signal_histogram, _ = np.histogram(
         signal_branches[variable],
         bins=n_bins[variable_bin],
-        range=x_range[variable_bin],
-        weights=signal_branches["weight_no_lumi"],
+        #range=x_range[variable_bin],
+        range=(x_range[variable_bin] if not standardize_variables else (1.2*np.min(combined_variable), 1.2*np.max(combined_variable))),
+        weights=signal_branches["weight"],
     )
 
     fig, ax = get_canvas()
@@ -117,6 +132,8 @@ def draw_sig_and_bg_from_tuple(variable, era, category="", bsubset="", ssubset="
 
     output_directory = "../plots/sig_vs_bkg/" + category + "/" + "B" + bsubset +\
                         "_S" + ssubset + "/" + era + "/"
+    if standardize_variables:
+        output_directory = output_directory + "standardization/"
     output_directory = get_output_directory(variable, output_directory, variables_type)
 
     save_figure(fig, output_directory, variable + "_" + era + "_sig_vs_bkg")
