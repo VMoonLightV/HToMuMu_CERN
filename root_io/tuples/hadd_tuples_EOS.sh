@@ -3,7 +3,6 @@ TUPLES_VERSION="v1.1.0"
 EOS_PATH="/eos/uscms/store/group/lpchmumu/$USER/analyzer_HiggsMuMu_$ANALYZER_VERSION/tuples_$TUPLES_VERSION/"
 
 ##############  2022  ##############
-<<com
 hadd -f Data_2022_tuples.root ${EOS_PATH}Muon_2022C_2022_tuples.root ${EOS_PATH}Muon_2022D_2022_tuples.root ${EOS_PATH}SingleMuon_2022C_2022_tuples.root
 
 hadd -f DY_2022_tuples.root ${EOS_PATH}DY50to120_2022_tuples.root ${EOS_PATH}DY120to200_2022_tuples.root
@@ -68,7 +67,6 @@ hadd -f DiBoson_2024_tuples.root ${EOS_PATH}WZto2L2Q_2024_tuples.root ${EOS_PATH
 hadd -f ggH_2024_tuples.root ${EOS_PATH}ggH_2024_tuples.root
 hadd -f VBF_2024_tuples.root ${EOS_PATH}VBF_2024_tuples.root
 hadd -f ttH_2024_tuples.root ${EOS_PATH}ttH_2024_tuples.root 
-com
 
 ##############  2025  ##############
 

@@ -37,9 +37,9 @@ skip_pattern = [
 
 list_datasets = datasets_info.keys()
 # # Use in case you want to run over a specific list of datasets!
-# list_datasets = [
-#     "DY50to120_Summer23",
-# ]
+list_datasets = [
+     "Muon_2022C",
+ ]
 
 # cmsswReleaseVersion = "CMSSW_10_6_5"
 CMSSW_BASE_DIR = os.getenv('CMSSW_BASE')
@@ -52,6 +52,7 @@ Inputfiles_DIR = Analyzer_DIR + "list/"
 cmsswReleaseVersion = CMSSW_BASE_DIR.split("/")[-1]
 print("Using CMSSW version " + cmsswReleaseVersion)
 print("Running analysis version " + v.ANALYZER_VERSION_NUMBER)
+print("Analyzer: " + "%s/bin/%s"%(Analyzer_DIR, analyzer))
 
 # Create script to send all of the jobs directly
 send_all_jobs = open(Condor_BASE_DIR + "/condor_job_sender.sh", "w+")
@@ -120,8 +121,10 @@ for dataset_name in list_datasets:
     os.system("cp " + "%s/btagSF/DeepCSV_94XSF_V3_B_F.csv"%(Analyzer_Data_DIR) + " " + "%s/btagSF/"%(Job_Data_DIR))
     # os.system("mkdir -p " + Job_Data_DIR + "leptonSF/%s"%(year))
     # os.system("cp " + "%s/leptonSF/%s/*.root"%(Analyzer_Data_DIR, year) + " " + "%s/leptonSF/%s/"%(Job_Data_DIR, year))
-    os.system("mkdir -p " + Job_Data_DIR + "leptonSF/2016/")
-    os.system("cp " + "%s/leptonSF/2016/*.root"%(Analyzer_Data_DIR) + " " + "%s/leptonSF/2016/"%(Job_Data_DIR))
+    
+    if(year != "2025"):
+        os.system("mkdir -p " + Job_Data_DIR + "leptonSF/%s/"%(year))
+        os.system("cp " + "%s/leptonSF/%s/*.gz"%(Analyzer_Data_DIR, year) + " " + "%s/leptonSF/%s/"%(Job_Data_DIR, year))
     os.system("mkdir -p " + Job_Data_DIR + "pileup")
     pileup_file = "PileupReweight_Summer%s"%(year[2:])
     if not os.path.exists(Analyzer_Data_DIR + "/pileup/%s.root"%(pileup_file)):
@@ -152,19 +155,15 @@ for dataset_name in list_datasets:
     transfer_files += Job_Data_DIR + "/Rocco/RoccoR" + year + ".txt, "
     transfer_files += Job_Data_DIR + "/btagSF/DeepCSV_94XSF_V3_B_F.csv, "
 
-    transfer_files += Job_Data_DIR + "/leptonSF/2016/EfficienciesAndSF_RunBtoF.root, "
-    transfer_files += Job_Data_DIR + "/leptonSF/2016/EfficienciesAndSF_RunGtoH.root, "
-    transfer_files += Job_Data_DIR + "/leptonSF/2016/RunBCDEF_SF_ID.root, "
-    transfer_files += Job_Data_DIR + "/leptonSF/2016/RunBCDEF_SF_ISO.root, "
-    transfer_files += Job_Data_DIR + "/leptonSF/2016/RunGH_SF_ID.root, "
-    transfer_files += Job_Data_DIR + "/leptonSF/2016/RunGH_SF_ISO.root, "
+    if(year != "2025"):
+        transfer_files += Job_Data_DIR + "/leptonSF/" + year + "/muon_Z.json.gz, "
 
     transfer_files += Job_Data_DIR + "/pileup/" + pileup_file + ".root"
     jobfile_JDL.write("transfer_input_files = " + transfer_files + "\n")
 
     jobfile_JDL.write("should_transfer_files = YES" + "\n")
     jobfile_JDL.write("when_to_transfer_output = ON_EXIT" + "\n\n# Resources request\n")
-    jobfile_JDL.write("RequestMemory = 2100 \n\n# Jobs selection\n")
+    jobfile_JDL.write("RequestMemory = 3100 \n\n# Jobs selection\n")
 
     jobfile_JDL.write("Queue I from (")
     for i in range(1, n_jobs+1):

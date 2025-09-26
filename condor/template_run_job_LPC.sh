@@ -43,9 +43,10 @@ cp RoccoR${year}.txt ${DATA_FOLDER}/Rocco/
 mkdir -p ${DATA_FOLDER}/btagSF/
 cp DeepCSV_94XSF_V3_B_F.csv ${DATA_FOLDER}/btagSF/
 
-mkdir -p ${DATA_FOLDER}/leptonSF/2016/
-cp EfficienciesAndSF_*.root ${DATA_FOLDER}/leptonSF/2016/
-cp Run*_SF_*.root ${DATA_FOLDER}/leptonSF/2016/
+mkdir -p ${DATA_FOLDER}/leptonSF/${year}/
+if [ "$year" != "2025" ]; then 
+    cp muon_Z.json.gz ${DATA_FOLDER}/leptonSF/${year}/
+fi
 
 mkdir -p ${DATA_FOLDER}/pileup/
 cp Pileup*.root ${DATA_FOLDER}/pileup/
@@ -56,7 +57,10 @@ cp RunII_*.root ${DATA_FOLDER}/pileup/
 ########################################################################
 cp data/Rocco/RoccoR${year}.txt ${DATA_FOLDER}/Rocco/
 cp data/btagSF/DeepCSV_94XSF_V3_B_F.csv ${DATA_FOLDER}/btagSF/
-cp data/leptonSF/2016/*.root ${DATA_FOLDER}/leptonSF/2016/
+#cp data/leptonSF/2016/*.root ${DATA_FOLDER}/leptonSF/2016/
+if [ "$year" != "2025" ]; then 
+    cp data/leptonSF/${year}/muon_Z.json.gz ${DATA_FOLDER}/leptonSF/${year}/
+fi
 cp data/pileup/*.root ${DATA_FOLDER}/pileup/
 
 ###########################
@@ -66,6 +70,7 @@ cd $cmssw_version/src/
 eval `scram runtime -sh`
 tar vxzf input_list.tgz
 inputfilelist=input_list_${job_number}.txt
+echo "input file: " $inputfilelist
 
 ###################################
 # Copy input files ahead of time
@@ -77,6 +82,7 @@ echo "Copying Input File: " $i
 xrdcp $i ./inputs/
 done
 ls inputs/* > tmp_input_list.txt 
+#echo
 
 ###########################
 # Run executable
