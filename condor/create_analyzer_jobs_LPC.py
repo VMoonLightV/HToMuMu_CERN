@@ -37,9 +37,9 @@ skip_pattern = [
 
 list_datasets = datasets_info.keys()
 # # Use in case you want to run over a specific list of datasets!
-list_datasets = [
-     "Muon_2022C",
- ]
+#list_datasets = [
+#     "Muon_2022C",
+# ]
 
 # cmsswReleaseVersion = "CMSSW_10_6_5"
 CMSSW_BASE_DIR = os.getenv('CMSSW_BASE')

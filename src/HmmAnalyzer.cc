@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "correction.h"
 #include "../lib/LeptonEfficiencyCorrector.h"
@@ -69,11 +70,14 @@ void HmmAnalyzer::EventLoop() {
                 BTagEntry::FLAV_B, // btag flavour
                 "comb");           // measurement type
 
-                
+    std::cout << "Btag calibration loaded" << std::endl;           
     long nentries = fChain->GetEntriesFast();
-    //long nentries = 2500;
+    //nentries = 5;
     long nbytes = 0;
     long nb = 0;
+    
+    std::cout << "Number of entries to process: " << nentries << std::endl;
+    auto start_time = std::chrono::high_resolution_clock::now();
     for (long jentry = 0; jentry < nentries; jentry++) {
         long ientry = LoadTree(jentry);
         if (ientry < 0)
@@ -81,7 +85,9 @@ void HmmAnalyzer::EventLoop() {
 
         nb = fChain->GetEntry(jentry);
         nbytes += nb;
-        // if (Cut(ientry) < 0) continue;
+       
+        //std::cout << "-------------- Entry " << jentry << " --------------" << std::endl;
+
         if (jentry % 5000 == 0)
             std::cout << "entry: " << jentry << std::endl;
         clearTreeVectors();
@@ -91,6 +97,7 @@ void HmmAnalyzer::EventLoop() {
         // sum of genWeight and pileupweight
         float value_h_sumOfgpw = h_sumOfgpw->GetBinContent(1);
         float puWeight, puWeightUp, puWeightDown;
+
         if (!is_data) {
             value_h_sumOfgw = value_h_sumOfgw + genWeight;
             puWeight = getPileupWeight(Pileup_nTrueInt);
@@ -115,7 +122,7 @@ void HmmAnalyzer::EventLoop() {
              Flag_globalSuperTightHalo2016Filter && Flag_BadPFMuonFilter &&
              Flag_BadChargedCandidateFilter && trig_decision &&
              PV_npvsGood > 0);
-
+        
         if (!run_muChecks) {
             continue;
         }
@@ -147,8 +154,6 @@ void HmmAnalyzer::EventLoop() {
             pt_Roch_sys_down = 0;
             float ptErr_raw = Muon_ptErr[i];
 
-            //std::cout <<"pt "<<Muon_pt[i]<<" Err "<<Muon_ptErr[i] <<std::endl;
-
             float gen_pt = FLOAT_NULL_VALUE;
             if (!is_data) {
                 for (int j = 0; j < nGenPart; j++) {
@@ -164,9 +169,10 @@ void HmmAnalyzer::EventLoop() {
             CorrectPtRoch(_Roch_calib, false, mu_raw, ptErr_raw, pt_Roch, ptErr_Roch,
                           pt_Roch_sys_up, pt_Roch_sys_down, Muon_charge[i],
                           Muon_nTrackerLayers[i], gen_pt, is_data);
-            // std::cout <<"pt_Roch "<<pt_Roch<<std::endl;
+            
             mu_pt_Roch_corr.push_back(pt_Roch);
             mu_ptErr_Roch_corr.push_back(ptErr_Roch);
+
         }
 
         for (int muon_index_1 = 0; muon_index_1 < nMuon; muon_index_1++) {
@@ -197,11 +203,15 @@ void HmmAnalyzer::EventLoop() {
                 break;
         }
 
+        if(!two_valid_muons){
+            continue;
+        }
+
+
         for (int trigger_index = 0; trigger_index < nTrigObj; trigger_index++) {
             //  float dR_TrigObj = 999.;
             if (TrigObj_id[trigger_index] != 13)
                 continue;
-
             float dR_TrigObj;
             dR_TrigObj =
                 DeltaR(Muon_eta[index_mu1], Muon_phi[index_mu1],
@@ -225,9 +235,12 @@ void HmmAnalyzer::EventLoop() {
             }
         } // end of triger match, end of loop over trigger objects
 
-        if (!(two_valid_muons && trig_match)) {
+
+        if (!trig_match) {
             continue;
         }
+
+
 
         t_run = run;
         t_luminosityBlock = luminosityBlock;
@@ -280,10 +293,15 @@ void HmmAnalyzer::EventLoop() {
                 continue;
             }
 
-            //read run3 muon efficiency json files
+            if(year == "2024" || year == "2025"){
+                t_Mu_EffSF_TRIG->push_back(1);
+                t_Mu_EffSFErr_TRIG->push_back(0);
+            }
 
-            t_Mu_EffSF_TRIG->push_back(corrector.give_eff("Muon_eff_SF_TRIG", Muon_pt[i], Muon_eta[i]));
-            t_Mu_EffSFErr_TRIG->push_back(corrector.give_eff("Muon_eff_SFerr_TRIG", Muon_pt[i], Muon_eta[i]));
+            else{
+                t_Mu_EffSF_TRIG->push_back(corrector.give_eff("Muon_eff_SF_TRIG", Muon_pt[i], Muon_eta[i]));
+                t_Mu_EffSFErr_TRIG->push_back(corrector.give_eff("Muon_eff_SFerr_TRIG", Muon_pt[i], Muon_eta[i]));
+            }
 
             t_Mu_EffSF_ID->push_back(corrector.give_eff("Muon_eff_SF_ID", Muon_pt[i], Muon_eta[i]));
             t_Mu_EffSF_ID_stat->push_back(corrector.give_eff("Muon_eff_SF_ID_stat", Muon_pt[i], Muon_eta[i]));
@@ -292,6 +310,7 @@ void HmmAnalyzer::EventLoop() {
             t_Mu_EffSF_ISO->push_back(corrector.give_eff("Muon_eff_SF_ISO", Muon_pt[i], Muon_eta[i]));
             t_Mu_EffSF_ISO_stat->push_back(corrector.give_eff("Muon_eff_SF_ISO_stat", Muon_pt[i], Muon_eta[i]));
             t_Mu_EffSF_ISO_syst->push_back(corrector.give_eff("Muon_eff_SF_ISO_syst", Muon_pt[i], Muon_eta[i]));
+            //std::cout << "Corrector passed" << std::endl;
 
 
             // if (year == "2016") {
@@ -309,6 +328,7 @@ void HmmAnalyzer::EventLoop() {
             */
             //}
         }
+
 
         t_mu1 = t_index_mu1;
         t_mu2 = t_index_mu2;
@@ -356,9 +376,11 @@ void HmmAnalyzer::EventLoop() {
         t_SoftActivityJetHT2 = SoftActivityJetHT2;
         t_SoftActivityJetHT5 = SoftActivityJetHT5;
 
+
         if(t_diMuon_bsConstrainedMass < 70 || t_diMuon_bsConstrainedMass > 180){
-            continue; //not in signal range
+            continue; //not in signal + Z range
         }
+
 
         for (int j = 0; j < nJet; j++) {
             if (!isValidJet(j)) {
@@ -443,6 +465,7 @@ void HmmAnalyzer::EventLoop() {
             t_bJet_SFup->push_back(jet_scalefactor_up);
             t_bJet_SFdown->push_back(jet_scalefactor_do);
         }
+
         // if (t_Jet_pt->size() >= 2) {
         if (t_nJet >= 2) {
             // TLorentzVector j1, j2, jj;
@@ -477,6 +500,8 @@ void HmmAnalyzer::EventLoop() {
                 }
             }
         }
+
+
         for (int i = 0; i < nElectron; i++) {
             if (Electron_pt[i] < 5.0)
                 continue;
@@ -511,6 +536,7 @@ void HmmAnalyzer::EventLoop() {
                 Electron_mvaNoIso_WP90[i]);
             // t_Electron_mvaFall17noIso_WPL->push_back(Electron_mvaFall17V2noIso_WPL[i]);
         }
+
         // if (year != "2017") {
         //t_MET_pt = MET_pt
         //t_MET_phi = MET_phi;
@@ -560,6 +586,7 @@ void HmmAnalyzer::EventLoop() {
 
         t_Rho = Rho_fixedGridRhoFastjetAll;
 
+
         if (!is_data) {
             t_genWeight = genWeight;
             // t_puWeight = 1.0;     // puWeight;
@@ -604,4 +631,8 @@ void HmmAnalyzer::EventLoop() {
         }
         tree->Fill();
     }
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "Elapsed time: " << duration.count()/60000 << " minutes" << std::endl;
+    std::cout << "Time per event: " << duration.count()/nentries << " milliseconds" << std::endl;
 }
