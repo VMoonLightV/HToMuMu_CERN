@@ -25,14 +25,7 @@ for dataset_name in datasets_info.keys():
     jsonFile = open("tmpOutput.json", "r")
     data = json.load(jsonFile)
 
-    counter = 0
-    blockNum = 1
     for p in data:
-        counter += 1
-        if(counter % 500 == 0):
-            blockNum += 1
-            outputFile.close()
-            outputFile = open(dataset_name + "_Block" + str(blockNum) + ".list", "w")
         blockName = p["file"][0]["block.name"]
         fileName = p["file"][0]["name"]
         outputFile.write("root://cmsxrootd.fnal.gov/" + fileName + "\n")
