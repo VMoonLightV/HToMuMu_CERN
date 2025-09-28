@@ -14,7 +14,7 @@ The main goal is to show how to go from the NanoAOD tuples to the mass fits to o
 cmsrel CMSSW_14_0_14
 cd CMSSW_14_0_14/src
 cmsenv
-git clone git@github.com:MatBarria/HmmAnalysis.git
+git clone git@github.com:LPC-HH/HToMuMu.git
 cd HmmAnalysis
 make -j4
 ```
