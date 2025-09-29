@@ -6,3 +6,4 @@ ctuples*/
 condor_*sender*.sh
 # Ignore files created by condor job management
 docker_stderror
+error_datasets.txt
