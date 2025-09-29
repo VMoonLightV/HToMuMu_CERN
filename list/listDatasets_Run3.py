@@ -535,7 +535,7 @@ datasets_info = {
     # Top Backgrounds
     "TTto2L2Nu_Summer24": ["F", 2, "2024", "MC_background",
             "/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
-    "TTtoLNu2Q_Summer24": ["F", 2, "2024", "MC_background",
+    "TTtoLNu2Q_Summer24": ["F", 1, "2024", "MC_background",
             "/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
     
     #"TWminusto2L2Nu_Summer24": ["F", 2, "20234", "MC_background",
@@ -562,7 +562,7 @@ datasets_info = {
             "/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
     "WZto3LNu_Summer24": ["F", 2, "2024", "MC_background",
             "/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
-    "WZtoLNu2Q_Summer24": ["F", 2, "2024", "MC_background",
+    "WZtoLNu2Q_Summer24": ["F", 1, "2024", "MC_background",
             "/WZtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
     "ZZto2L2Nu_Summer24": ["F", 2, "2024", "MC_background",
             "/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
