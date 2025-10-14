@@ -53,7 +53,7 @@ def split_tuples_by_category(
         if use_bsConstrain:
             branches["CMS_hgg_mass"] = branches["diMuon_bsConstrainedMass"]
         else:
-            print("we here righr")
+            print("we here right")
             branches["CMS_hgg_mass"] = branches["diMuon_mass"]
         for category in range(len(bdt_cuts[channel]) - 1):
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         #    "ggH": [0.0, 0.20969230769230757, 0.44615384615384546, 1.0],
         #    "VBF": [0.0, 0.44603999999999994, 0.7559999999999996, 0.9450000000000007, 1.0], 
         #}
-        bdt_cuts = {"ggH" : [0.0, 0.197, 0.438, 1.0], "VBF": [0.0, 0.256, 0.615, 0.923, 1.0]}
+        bdt_cuts = {"ggH": [0.0, 0.19815384615384574, 0.4307692307692301, 1.0], "VBF": [0.0, 0.4822335000000003, 0.7654499999999995, 0.9450000000000007, 1.0]}
         print("here pls")
     else:
         #bdt_cuts = {

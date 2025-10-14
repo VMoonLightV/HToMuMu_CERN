@@ -1,20 +1,13 @@
 from utils.diMuon_mass_peak_EVE import draw_diMuon_mass_peak_EVE
 import sys
 
-if len(sys.argv) != 3:
-    print("Include argument with which peak to compare (Z or H), and channel")
-    exit()
+plot_version = "EVE_resolution_voigtian_merge_lowPt"
+root_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105/"
 
-peak_particle = sys.argv[1]
-if peak_particle != "H" and peak_particle != "Z":
-    raise Exception("No valid particle peak (choose H or Z)")
-
-channel = sys.argv[2]
-
-eras = ["2022", "2022EE", "2023", "2023BPix"]
-# eras = ["2022", "2022EE"]
-# eras = ["2023", "2023BPix"]
-# eras = ["2024"]
+eras = ["2025"]
+# ["2022", "2022EE", "2023", "2023BPix"]
+peak_particle = "Z"
 
 for era in eras:
-    draw_diMuon_mass_peak_EVE(peak_particle, era, channel)
+    for channel in ["Data"]:#, "DY"]:
+        draw_diMuon_mass_peak_EVE(peak_particle, era, channel, plot_version, root_dir)

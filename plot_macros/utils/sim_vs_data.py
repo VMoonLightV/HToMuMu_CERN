@@ -59,9 +59,13 @@ def get_histograms_from_tuple(
         print("Re scaling lumi")
         if era == "2024":
             era_reweight = 109.08 / 9.45
+            era = "2023BPix"
         if era == "2025":
             era_reweight = 802478 / 327501
-        era = "2023BPix"
+            era = "2023BPix"
+        if era == "Combined":
+            era_reweight = 109.08 / 61.74
+        
 
     variable_bin = variables[0]
 
@@ -262,7 +266,7 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era in ["2024", "2025"],
+        era in ["2024", "2025", "Combined"],
         Z_study=Z_study
     )
 

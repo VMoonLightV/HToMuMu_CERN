@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
         "is_VBF_category",
 	    "relative_diMuon_mass_error",
         "relative_diMuon_bsConstrainedMass_error",
+        "calibrated_diMuon_bsConstrainedMass_error",
     };
     for (auto VBF_branch : branches)
         tree_input->SetBranchStatus(VBF_branch, 1);

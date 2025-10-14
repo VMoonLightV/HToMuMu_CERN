@@ -1,32 +1,39 @@
 from utils.diMuon_mass_multi_reso import draw_diMuon_mass_multi_reso
-import sys
 
-if len(sys.argv) != 3:
-    print("Include argument with which peak to compare (Z or H), and channel")
-    exit()
+peak_particle = "Z"
+root_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105/"
 
-peak_particle = sys.argv[1]
-if peak_particle != "H" and peak_particle != "Z":
-    raise Exception("No valid particle peak (choose H or Z)")
+cali_root_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105_calibrated_all_channel/"
 
-channel = sys.argv[2]
-
-
-eras = ["2022", "2022EE", "2023", "2023BPix"]
+# eras = ["2022", "2022EE", "2023", "2023BPix"]  #
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
-# eras = ["2024"]
+eras = ["2025"]
 
-variables = ["relative_diMuon_bsConstrainedMass_error"]
+variableset = [
+    # ["relative_diMuon_bsConstrainedMass_error"],
+    # ["calibrated_diMuon_bsConstrainedMass_error"],
+     ["relative_diMuon_bsConstrainedMass_sigma"],
+    #["calibrated_diMuon_bsConstrainedMass_sigma"],
+]
 
 for era in eras:
-    for i in range(4):
-        draw_diMuon_mass_multi_reso(
-                
-            variables,
-            era,
-            channel,
-            i,
-            use_puweight=True,
-            
-        )
+    for channel in ["Data"]:#, "DY"]:
+        for i in range(4):
+            for variables in variableset:
+                if "cali" in variables[0]:
+                    draw_cali_root = True
+                    use_root_dir = cali_root_dir
+                else:
+                    draw_cali_root = False
+                    use_root_dir = root_dir
+
+                draw_diMuon_mass_multi_reso(
+                    variables,
+                    era,
+                    channel,
+                    i,
+                    draw_cali_root,
+                    use_root_dir,
+                    use_puweight=True,
+                )

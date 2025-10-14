@@ -63,7 +63,8 @@ int main(int argc, char *argv[]) {
                               "weight",
                               "is_ggH_category",
 			                  "relative_diMuon_mass_error",
-                              "relative_diMuon_bsConstrainedMass_error",
+                              "relative_diMuon_bsConstrainedMass_error",       
+                              "calibrated_diMuon_bsConstrainedMass_error",
                             })
         tree_input->SetBranchStatus(ggh_branches, 1);
 

@@ -10,8 +10,8 @@ output_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/ggH/"
 os.makedirs(output_directory, exist_ok=True)
 
 # eras = ["2022", "2022EE"]
-#eras = ["2024"]
-eras = ["2022EE", "2022", "2023", "2023BPix","2024"]
+# eras = ["2024"]
+eras = ["2022EE", "2022", "2023", "2023BPix", "2024"]
 
 
 # data_datasets = ["DoubleMuon_2022C", "Muon_2022C", "Muon_2022D", "Muon_2022E", "Muon_2022F", "Muon_2022G"]
@@ -34,25 +34,25 @@ background_datasets = [
     "TT",
     "DiBoson",
     "EWK",
-    #"WWW_4F",
+    # "WWW_4F",
 ]
 signal_datasets = [
-     "ggH",
-     "VBF",
-     "ttH",
+    "ggH",
+    "VBF",
+    "ttH",
 ]
 
 # List of input arguments
 input_arguments = []
 
 for era in eras:
-    input = base_input_directory + "Data_" + era + "_tuples.root"
+    input = base_input_directory + "Data_" + era + "_skim.root"
     input_arguments.append([input, output_directory, era, "Data", "T"])
     for dataset in signal_datasets:
-        input = base_input_directory + dataset + "_" + era + "_tuples.root"
+        input = base_input_directory + dataset + "_" + era + "_skim.root"
         input_arguments.append([input, output_directory, era, dataset, "F"])
     for dataset in background_datasets:
-        input = base_input_directory + dataset + "_" + era + "_tuples.root"
+        input = base_input_directory + dataset + "_" + era + "_skim.root"
         input_arguments.append([input, output_directory, era, dataset, "F"])
 print(input_arguments)
 

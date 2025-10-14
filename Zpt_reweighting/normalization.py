@@ -29,7 +29,7 @@ signal_datasets = [
 ]
 
 df = pd.read_csv(count_file)
-variable = 'diMuon_mass'
+variable = 'diMuon_bsConstrainedMass'
 
 if njet_arg == "nobin": njet_group = ["nobin_"]
 if njet_arg == "bin": njet_group = ["0","1","2"]

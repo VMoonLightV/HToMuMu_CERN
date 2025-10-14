@@ -1,28 +1,38 @@
 import pandas as pd
 
-channel = "DY"
-eras = ["2022", "2022EE", "2023", "2023BPix"]
+plot_version = "/eos/home-y/yulou/Fnal-hmm/plots_ole/EVE_resolution_voigtian_merge_lowPt"
 
-for era in eras:
-    
-    df1 = pd.read_csv(f"/eos/home-y/yulou/Fnal-hmm/plots/EVE_resolution/{channel}/{era}/BCS_Z_mass_multi_reso_median.csv")
-    df2 = pd.read_csv(f"/eos/home-y/yulou/Fnal-hmm/plots/EVE_resolution/{channel}/{era}/BSC_Z_mass_reso_results.csv")
+eras = ["2025"]
+# eras = ["2022", "2022EE", "2023", "2023BPix"]
 
-    df = pd.concat([df1, df2], axis=1)
+for channel in ["Data", "DY"]:
+    for era in eras:
 
-    columns_to_keep = ["muon1_pt_cut_low", "muon1_pt_cut_high", "region_1", "region_2", 
-                       "median_value", "BSC_res", "calibration_factors"]
-    
-    df["calibration_factors"] = df["BSC_res"]/df["median_value"]
+        df1 = pd.read_csv(
+            f"{plot_version}/{channel}/{era}/BCS_Z_mass_multi_median_rela_sigma.csv"
+        )
+        df2 = pd.read_csv(f"{plot_version}/{channel}/{era}/BSC_Z_mass_reso_results.csv")
 
-    final_df = df.loc[:, columns_to_keep]
+        df = pd.concat([df1, df2], axis=1)
 
-    print(final_df.head())
-    
-    csv_name = f"/eos/home-y/yulou/Fnal-hmm/plots/EVE_resolution/{channel}/{era}/BSC_Z_mass_reso_factors.csv"
+        columns_to_keep = [
+            "muon1_pt_cut_low",
+            "muon1_pt_cut_high",
+            "region_1",
+            "region_2",
+            "median_value_rela_sigma",
+            "BSC_voi_sigma",
+            "calibration_factors",
+        ]
 
-    final_df.to_csv(csv_name, index=False)
+        df["calibration_factors"] = df["BSC_voi_sigma"] / df["median_value_rela_sigma"]
 
-    print("\nsave EVE calibration factors in ", csv_name)
+        final_df = df.loc[:, columns_to_keep]
 
-        
+        print(final_df.head())
+
+        csv_name = f"{plot_version}/{channel}/{era}/BSC_Z_mass_reso_factors.csv"
+
+        final_df.to_csv(csv_name, index=False)
+
+        print("\nsave EVE calibration factors in ", csv_name)

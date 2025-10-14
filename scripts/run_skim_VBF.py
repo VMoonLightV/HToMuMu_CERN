@@ -3,21 +3,15 @@ import os
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/SkimTuples_VBF"
-#input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/tuples/"
+# input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/tuples/"
 input_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
 output_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/skim/VBF/"
 os.makedirs(output_directory, exist_ok=True)
 
-eras = [
-    "2022",
-    "2022EE",
-    "2023",
-    "2023BPix",
-    "2024"
-]
+eras = ["2022", "2022EE", "2023", "2023BPix", "2024"]
 
-background_datasets= [
-    "DY50to120",
+background_datasets = [
+    # "DY50to120",
     # "DY120to200",
     # "EWK_2L2J",
     # "TTto2L2Nu",
@@ -45,7 +39,6 @@ background_datasets= [
     # # "WWto4Q",
     # "WWtoLNu2Q",
     # "WWW_4F",
-
     # "TWminusto2L2Nu",
     # "TWminustoLNu2Q",
     # "TbarWplusto2L2Nu",
@@ -63,7 +56,7 @@ background_datasets= [
     "EWK",
 ]
 
-signal_datasets= [
+signal_datasets = [
     "ggH",
     "VBF",
     "ttH",
@@ -79,20 +72,20 @@ input_arguments = []
 # input_arguments.append([input_directory, "Data", era])
 
 for era in eras:
-    input = input_directory + "Data_" + era + "_tuples.root"
+    input = input_directory + "Data_" + era + "_skim.root"
     input_arguments.append([input, output_directory, era, "Data", "T"])
     for dataset in signal_datasets:
-        input = input_directory + dataset + "_" + era + "_tuples.root"
+        input = input_directory + dataset + "_" + era + "_skim.root"
         input_arguments.append([input, output_directory, era, dataset, "F"])
     for dataset in background_datasets:
-        input = input_directory + dataset + "_" + era + "_tuples.root"
+        input = input_directory + dataset + "_" + era + "_skim.root"
         input_arguments.append([input, output_directory, era, dataset, "F"])
 
 print(input_arguments)
 
 # Loop over each set of input arguments and execute the C++ program
 for args in input_arguments:
-    print("\n----- %s_%s -----"%(args[1], args[2]))
+    print("\n----- %s_%s -----" % (args[1], args[2]))
 
     # Run the C++ executable with the current arguments
     result = subprocess.run([cpp_executable] + args, capture_output=True, text=True)

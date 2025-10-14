@@ -6,13 +6,14 @@ import os
 
 # change to your own path
 base_input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/"
-output_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105_calibrated/"
-coeff_head = "/eos/home-y/yulou/Fnal-hmm/plots/EVE_resolution/"
+output_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105_calibrated_all_channel/"
+coeff_head = "/eos/home-y/yulou/Fnal-hmm/plots_ole/EVE_resolution_voigtian_merge_lowPt/"
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/EVE_mass_reso_calibration"
 
-eras = ["2022", "2022EE", "2023", "2023BPix"]
+eras = ["2025"]
+# eras = ["2022", "2022EE", "2023", "2023BPix"]
 
 background_datasets = [
     "DY",
@@ -21,27 +22,27 @@ background_datasets = [
     "EWK",
 ]
 signal_datasets = [
-     "ggH",
-     "VBF",
-     "ttH",
+    "ggH",
+    "VBF",
+    "ttH",
 ]
 
 input_arguments = []
 
 for era in eras:
-    coeff = coeff_head + f"Data/{era}/BSC_Z_mass_reso_factors.csv"
-    input = base_input_directory + "Data_" + era + "_tuples.root"
-    input_arguments.append([input, output_directory, era, "Data", "T",coeff])
-    
+    """
     for dataset in signal_datasets:
-        input = base_input_directory + dataset + "_" + era + "_tuples.root"        
-        coeff = coeff_head + f"DY/{era}/"
-        input_arguments.append([input, output_directory, era, dataset, "F",coeff])
+        input = base_input_directory + dataset + "_" + era + "_tuples.root"
+        coeff = coeff_head + f"DY/{era}/BSC_Z_mass_reso_factors.csv"
+        input_arguments.append([input, output_directory, era, dataset, "F", coeff])
     for dataset in background_datasets:
         input = base_input_directory + dataset + "_" + era + "_tuples.root"
-        coeff = coeff_head + f"DY/{era}/"
-        input_arguments.append([input, output_directory, era, dataset, "F",coeff])
-
+        coeff = coeff_head + f"DY/{era}/BSC_Z_mass_reso_factors.csv"
+        input_arguments.append([input, output_directory, era, dataset, "F", coeff])
+    """
+    coeff = coeff_head + f"Data/{era}/BSC_Z_mass_reso_factors.csv"
+    input = base_input_directory + "Data_" + era + "_tuples.root"
+    input_arguments.append([input, output_directory, era, "Data", "T", coeff])
 
 
 print(input_arguments)
@@ -54,4 +55,3 @@ for args in input_arguments:
     # Print the output and any error messages
     print("Output:", result.stdout)
     print("Errors:", result.stderr)
-
