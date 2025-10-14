@@ -1,14 +1,16 @@
 from utils.diMuon_mass_multi_reso import draw_diMuon_mass_multi_reso
 
+plot_version = "EVE_resolution_voigtian_merge_lowPt"
+
 peak_particle = "Z"
-root_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105/"
+root_dir = "../root_io/tuples/EVE_pt_eta/ZCR_75-105/"
 
-cali_root_dir = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105_calibrated_all_channel/"
+# if you have done the calibration step, you can draw the calibrated result together
+cali_root_dir = "../root_io/tuples/EVE_pt_eta/ZCR_75-105_calibrated_all_channel/"
 
-# eras = ["2022", "2022EE", "2023", "2023BPix"]  #
+eras = ["2022", "2022EE", "2023", "2023BPix"]  #
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
-eras = ["2025"]
 
 variableset = [
     # ["relative_diMuon_bsConstrainedMass_error"],
@@ -35,5 +37,6 @@ for era in eras:
                     i,
                     draw_cali_root,
                     use_root_dir,
+                    
                     use_puweight=True,
                 )

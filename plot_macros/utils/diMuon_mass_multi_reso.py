@@ -8,9 +8,6 @@ import csv
 
 merge_low_pt_eta = True
 
-plot_version = "EVE_resolution_voigtian_merge_lowPt"
-
-
 muon1_pt_cuts = [26.0, 45.0, 52.0, 62.0, 200.0]
 
 eta_cuts = {"B": [0.0, 0.9], "O": [0.9, 1.8], "E": [1.8, 2.4]}
@@ -339,6 +336,7 @@ def draw_diMuon_mass_multi_reso(
     muon1_region,
     draw_cali_root,
     root_dir,
+    plot_version,
     use_puweight=True,
 ):
     plt.style.use(hep.style.CMS)

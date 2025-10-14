@@ -1,17 +1,17 @@
 import pandas as pd
 
-plot_version = "/eos/home-y/yulou/Fnal-hmm/plots_ole/EVE_resolution_voigtian_merge_lowPt"
+plot_version = "EVE_resolution_voigtian_merge_lowPt"
 
-eras = ["2025"]
-# eras = ["2022", "2022EE", "2023", "2023BPix"]
+# eras = ["2025"]
+eras = ["2022", "2022EE", "2023", "2023BPix"]
 
 for channel in ["Data", "DY"]:
     for era in eras:
 
         df1 = pd.read_csv(
-            f"{plot_version}/{channel}/{era}/BCS_Z_mass_multi_median_rela_sigma.csv"
+            f"../plots/{plot_version}/{channel}/{era}/BCS_Z_mass_multi_median_rela_sigma.csv"
         )
-        df2 = pd.read_csv(f"{plot_version}/{channel}/{era}/BSC_Z_mass_reso_results.csv")
+        df2 = pd.read_csv(f"../plots/{plot_version}/{channel}/{era}/BSC_Z_mass_reso_results.csv")
 
         df = pd.concat([df1, df2], axis=1)
 
@@ -31,7 +31,7 @@ for channel in ["Data", "DY"]:
 
         print(final_df.head())
 
-        csv_name = f"{plot_version}/{channel}/{era}/BSC_Z_mass_reso_factors.csv"
+        csv_name = f"../plots/{plot_version}/{channel}/{era}/BSC_Z_mass_reso_factors.csv"
 
         final_df.to_csv(csv_name, index=False)
 

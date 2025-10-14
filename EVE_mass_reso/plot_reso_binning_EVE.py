@@ -264,7 +264,7 @@ def get_histograms_from_tuple(
     for i in range(len(mass_sigma_bin) - 1):
 
         with ur.open(
-            f"/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/{root_dir}/{channel}_"
+            f"../root_io/tuples/EVE_pt_eta/{root_dir}/{channel}_"
             + era
             + "_skim.root:tree_output"
         ) as data_file:
@@ -365,7 +365,7 @@ def draw_diMuon_mass_multi_reso(
         "measure_sigmas": measure_sigmas,
     }
 
-    output_directory = f"../plots_ole/{plot_version}/{channel}/{era}"
+    output_directory = f"../plots/{plot_version}/{channel}/{era}/"
     df = pd.DataFrame(data_to_save)
     output_filename = f"{output_directory}binned_BCS_Z_mass_multi_median_{csv_label[variables[0]]}_0-3.csv"
 
@@ -374,8 +374,8 @@ def draw_diMuon_mass_multi_reso(
     return df
 
 
-eras = ["2025"]
-# eras = ["2022", "2022EE", "2023", "2023BPix"]
+# eras = ["2025"]
+eras = ["2022", "2022EE", "2023", "2023BPix"]
 variableset = [
     # ["relative_diMuon_bsConstrainedMass_error"],
     # ["calibrated_diMuon_bsConstrainedMass_error"],
@@ -393,14 +393,14 @@ for era in eras:
             "Data",
             use_puweight=True,
         )
-        '''
+        
         df_DY = draw_diMuon_mass_multi_reso(
             variables,
             era,
             "DY",
             use_puweight=True,
         )
-        '''
+        
         
         x_label = f"median_value_{csv_label[variables[0]]}"
         y_measure_label = "measure_sigmas"
@@ -416,7 +416,7 @@ for era in eras:
             s=20,
             zorder=5,
         )
-        '''
+        
         ax.scatter(
             df_DY[x_label],
             df_DY[y_measure_label],
@@ -425,7 +425,6 @@ for era in eras:
             s=20,
             zorder=5,
         )
-        '''
 
         line_x = np.linspace(min_val, max_val, 101)
 
@@ -449,7 +448,7 @@ for era in eras:
         ax.set_xlim(min_val, max_val)
         ax.set_ylim(min_val, max_val)
 
-        plot_name = f"../plots_ole/{plot_version}/{era}_reso_binned_predicted_measured_{csv_label[variables[0]]}_0-3.png"
+        plot_name = f"../plots/{plot_version}/{era}_reso_binned_predicted_measured_{csv_label[variables[0]]}_0-3.png"
         plt.savefig(plot_name, dpi=300, bbox_inches="tight")
         plt.close(fig)
 

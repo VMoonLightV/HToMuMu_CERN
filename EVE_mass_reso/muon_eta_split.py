@@ -2,17 +2,16 @@ import os
 import uproot
 
 # directory where you store your Tuples
-base_input_directory = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
+base_input_directory = "../root_io/tuples/"
 # directory where your output files are
-output_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/EVE_pt_eta/ZCR_75-105/"
+output_directory = "../root_io/tuples/EVE_pt_eta/ZCR_75-105/"
 os.makedirs(output_directory, exist_ok=True)
 
 muon1_pt_cuts = [26.0, 45.0, 52.0, 62.0, 200.0]
 
 eta_cuts = {"B": [0.0, 0.9], "O": [0.9, 1.8], "E": [1.8, 2.4]}
 
-eras = ["2024"]
-# "2022", "2022EE", "2023", "2023BPix",
+eras = ["2022", "2022EE", "2023", "2023BPix"]
 background_datasets = [
     "DY",
     "TT",
