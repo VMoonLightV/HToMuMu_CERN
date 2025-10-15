@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 from scipy.special import voigt_profile
 
 plot_version = "EVE_resolution_voigtian_merge_lowPt"
-root_dir = "ZCR_75-105_calibrated_all_channel"
+root_dir = "EVE_resolution_calibrated_all_channel"
 mass_sigma_bin_old = [
     0.0,
     1.0,

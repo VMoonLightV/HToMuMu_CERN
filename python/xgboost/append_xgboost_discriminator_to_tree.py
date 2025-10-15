@@ -17,62 +17,77 @@ import uproot as uproot
 
 root.gROOT.Reset()
 
+use_skim = False
+if "--skim" in sys.argv:
+    sys.argv.remove("--skim")
+    print(" > Appending BDT to skim file instead of tuple!")
+    use_skim = True
+
 if len(sys.argv) < 4:
-    print("Arguments missing: Channel_under_study, era, file_type,\
-          background_subset, signal_subset")
+    print(
+        "Arguments missing: Channel_under_study, era, file_type,\
+          background_subset, signal_subset"
+    )
     exit()
 channel_US = sys.argv[1]
 era = sys.argv[2]
-file_type = sys.argv[3]
-if len(sys.argv) == 4:
+model_era = sys.argv[3]
+file_type = sys.argv[4]
+if len(sys.argv) == 5:
     background_subset = "Full"
     signal_subset = "NottH"
     print("Using default subsets:", background_subset, signal_subset)
-elif len(sys.argv) == 6:
-    background_subset = sys.argv[4]
-    signal_subset = sys.argv[5]
+elif len(sys.argv) == 7:
+    background_subset = sys.argv[5]
+    signal_subset = sys.argv[6]
 else:
     print("Include subset of background AND signal only.")
     exit()
-
 print("Channel under study: ", channel_US)
 print("Era: ", era)
 print("Background subset: ", background_subset)
 print("Signal subset: ", signal_subset)
 print("Type of file: ", file_type)
 
-subset_title = "B"+ background_subset + "_S" + signal_subset
-
-skim_path = "../../root_io/skim/" + channel_US +"/"
-BDT_path = skim_path + "BDT_score/"
-os.system("mkdir -p " + BDT_path)
-if channel_US == "VBF": skim_path += "merged/"
-
-skim_subset = ""
+subset_title = "B" + background_subset + "_S" + signal_subset
+tuple_subset = ""
 if file_type == "background" or file_type == "bkg":
-    skim_subset = background_subset
+    tuple_subset = background_subset
 elif file_type == "signal":
-    skim_subset = signal_subset
+    tuple_subset = signal_subset
 
-skim_name = file_type + "_" + era + "_skim" + skim_subset + ".root"
-BDT_name = file_type + "_" + era + "_skim_" + subset_title + ".root"
+if not use_skim:
+    tuple_path = "../../root_io/tuples/"
+    tuple_name = file_type + "_" + era + "_tuples.root"
+    BDT_path = tuple_path + "BDT_score/" + channel_US + "/" + subset_title + "/"
+    # BDT_name = file_type + "_" + era + "_tuples.root"
+    BDT_name = file_type + "_" + era + "_" + subset_title + ".root"
+else:
+    tuple_path = "../../root_io/skim/" + channel_US + "/"
+    tuple_name = file_type + "_" + era + "_skim_" + tuple_subset + ".root"
+    # BDT_path = tuple_path + "BDT_score/"
+    BDT_path = "../../root_io/skim/BDT_score/" + channel_US + "/"
+    BDT_name = file_type + "_" + era + "_skim_" + subset_title + ".root"
+    #if channel_US == "VBF":
+    #    tuple_path += "merged/"
+
+os.system("mkdir -p " + BDT_path)
 print("File name: ", BDT_name)
-os.system("cp " + skim_path + skim_name + " " + BDT_path + BDT_name)
+os.system("cp " + tuple_path + tuple_name + " " + BDT_path + BDT_name)
 
 FileName = BDT_path + BDT_name
 File = root.TFile(FileName, "update")
 Tree = File.Get("tree_output")
 
-model_name = channel_US +  "_" + era + "_" + subset_title
+#model_name = channel_US + "_" + era + "_" + subset_title
+model_name = channel_US + "_" + model_era + "_" + subset_title
 model_file = "./models/model_" + model_name + ".pkl"
 
 variables = [
     ["diMuon_rapidity", "diMuon_rapidity", r"$y_{\mu\mu}$"],
     ["diMuon_pt", "diMuon_pt", r"$p_T^{\mu\mu}$ [GeV]"],
-    ["mu1_pt_mass_ratio", "mu1_pt_mass_ratio",
-     r"$p_T^{\mu 1}/m_{\mu\mu}$"],
-    ["mu2_pt_mass_ratio", "mu2_pt_mass_ratio",
-     r"$p_T^{\mu 2}/m_{\mu\mu}$"],
+    ["mu1_pt_mass_ratio", "mu1_pt_mass_ratio", r"$p_T^{\mu 1}/m_{\mu\mu}$"],
+    ["mu2_pt_mass_ratio", "mu2_pt_mass_ratio", r"$p_T^{\mu 2}/m_{\mu\mu}$"],
     ["mu1_eta", "mu1_eta", r"$\eta_{\mu 1}$"],
     ["mu2_eta", "mu2_eta", r"$\eta_{\mu 2}$"],
     ["phi_CS", "phi_CS", r"$\phi_{CS}$"],
@@ -86,10 +101,16 @@ variables = [
     ["delta_eta_diJet", "delta_eta_diJet", r"$\Delta\eta_{jj}$"],
     ["delta_phi_diJet", "delta_phi_diJet", r"$\Delta\phi_{jj}$ [rad]"],
     ["z_zeppenfeld", "z_zeppenfeld", r"$Z^{*} Zeppendfeld$"],
-    ["min_delta_eta_diMuon_jet", "min_delta_eta_diMuon_jet",
-     r"min$|\Delta\eta_{\mu\mu,j}|$"],
-    ["min_delta_phi_diMuon_jet", "min_delta_phi_diMuon_jet",
-     r"min$|\Delta\phi_{\mu\mu,j}|$ [rad]"],
+    [
+        "min_delta_eta_diMuon_jet",
+        "min_delta_eta_diMuon_jet",
+        r"min$|\Delta\eta_{\mu\mu,j}|$",
+    ],
+    [
+        "min_delta_phi_diMuon_jet",
+        "min_delta_phi_diMuon_jet",
+        r"min$|\Delta\phi_{\mu\mu,j}|$ [rad]",
+    ],
 ]
 if channel_US == "VBF":
     variables += [

@@ -1,7 +1,7 @@
 from utils.data_vs_MC_2025 import draw_data_and_simul_and_ratio
-
-# from utils.Count_effs import draw_data_and_simul_and_ratio
 import sys
+
+# For quick test: plot 2025 data VS DY+TT, normalization has been done
 
 base_input_dir = "/eos/home-y/yulou/Fnal-hmm/root_io/tuples/"
 

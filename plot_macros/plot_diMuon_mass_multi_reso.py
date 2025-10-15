@@ -6,7 +6,7 @@ peak_particle = "Z"
 root_dir = "../root_io/tuples/EVE_pt_eta/ZCR_75-105/"
 
 # if you have done the calibration step, you can draw the calibrated result together
-cali_root_dir = "../root_io/tuples/EVE_pt_eta/ZCR_75-105_calibrated_all_channel/"
+cali_root_dir = "../root_io/tuples/EVE_pt_eta/EVE_resolution_calibrated_all_channel/"
 
 eras = ["2022", "2022EE", "2023", "2023BPix"]  #
 # eras = ["2022", "2022EE"]
@@ -20,7 +20,7 @@ variableset = [
 ]
 
 for era in eras:
-    for channel in ["Data"]:#, "DY"]:
+    for channel in ["Data", "DY"]:
         for i in range(4):
             for variables in variableset:
                 if "cali" in variables[0]:

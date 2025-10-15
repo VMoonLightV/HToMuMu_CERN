@@ -6,7 +6,7 @@ import os
 
 # change to your own path
 base_input_directory = "../root_io/tuples/"
-output_directory = "../root_io/tuples/EVE_pt_eta/ZCR_75-105_calibrated_all_channel/"
+output_directory = "../root_io/tuples/EVE_pt_eta/EVE_resolution_calibrated_all_channel/"
 coeff_head = "../plots/EVE_resolution_voigtian_merge_lowPt/"
 
 # Define the path to your C++ executable

@@ -18,11 +18,11 @@ python3 "run_eff_on_tuple_region.py"  bin(or nobin)  SR(or ZCR)
 2. Plot ZCR vars and count to do ZCR DY normalization 
 * Normalize DY with data/MC in ZCR for each era and Njet group 
     * Just make sure data and MC_bkg have same events counts. 
-    * The count file is produced by "plot_sim_vs_data_njet_Zpt.py"
+    * The count file is produced by "plot_sim_vs_data_general.py"
     * The events count table is saved in "scripts/event_counts_{region}.csv" by default
 
 ```
-python3 "plot_sim_vs_data_njet_Zpt.py" bin(or nobin)  ZCR
+python3 "plot_sim_vs_data_general.py" bin(or nobin)  ZCR
 Some plot region: ZCR, ZCR_normalization, ZCR_self_reweighting, SR, SR_reweighting
 
 python3 "normalization.py" bin(or nobin)  "count_file_name"
@@ -36,7 +36,7 @@ python3 "normalization.py" bin(or nobin)  "count_file_name"
     * the function info is saved in:
         * ../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/polynomial_{era}_coefficients.csv
 ```
-python3 "plot_sim_vs_data_njet_Zpt.py" bin(or nobin) ZCR_normalization
+python3 "plot_sim_vs_data_general.py" bin(or nobin) ZCR_normalization
 ```
 
 4. Apply the reweighting to ZCR itself and SR
