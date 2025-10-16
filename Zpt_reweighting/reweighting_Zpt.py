@@ -5,8 +5,8 @@ import shutil
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/reweighting_Zpt"
-base_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
-coeff_head = "/afs/cern.ch/user/y/yulou/CMSSW_14_0_14/src/A_test/plots/ratio/njet/"
+base_directory = "./root_io/tuples/"
+coeff_head = "./plots/ratio/njet/"
 
 njet_arg = sys.argv[1]
 region = sys.argv[2]

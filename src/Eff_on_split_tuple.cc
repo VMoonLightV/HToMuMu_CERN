@@ -17,21 +17,25 @@
 
 // g++ ./src/LeptonEfficiencyCorrector.cc ./src/Eff_on_split_tuple.cc -o ./bin/Eff_on_split_tuple  $(root-config --cflags --libs)  $(correction config --cflags --ldflags)
 
-
-bool checkCondition(UInt_t n_jet, const TString& njet) {
-        if (njet == "nobin_" || njet == "") {
-            return (n_jet >= 0); // no jet bin
-        } 
-        else if (njet == "0" || njet == "1") {
-            return (n_jet == std::stoi(njet.Data())); 
-        } 
-        else if (njet == "2") {
-            return (n_jet >= 2);
-        } 
-        else {
-            std::cerr << "Invalid njet value: " << njet << std::endl;
-            return false; 
-        }
+bool checkCondition(UInt_t n_jet, const TString &njet)
+{
+    if (njet == "nobin_" || njet == "")
+    {
+        return (n_jet >= 0); // no jet bin
+    }
+    else if (njet == "0" || njet == "1")
+    {
+        return (n_jet == std::stoi(njet.Data()));
+    }
+    else if (njet == "2")
+    {
+        return (n_jet >= 2);
+    }
+    else
+    {
+        std::cerr << "Invalid njet value: " << njet << std::endl;
+        return false;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -80,10 +84,10 @@ int main(int argc, char *argv[])
     float mu2_eta = 0;
     UInt_t n_jet = 0;
     tree_input->SetBranchAddress("weight", &weight);
-    tree_input->SetBranchAddress("diMuon_mass", &dimuon_mass);
-    tree_input->SetBranchAddress("mu1_pt", &mu1_pt);
+    tree_input->SetBranchAddress("diMuon_bsConstrainedMass", &dimuon_mass);
+    tree_input->SetBranchAddress("mu1_bsConstrainedPt", &mu1_pt);
     tree_input->SetBranchAddress("mu1_eta", &mu1_eta);
-    tree_input->SetBranchAddress("mu2_pt", &mu2_pt);
+    tree_input->SetBranchAddress("mu2_bsConstrainedPt", &mu2_pt);
     tree_input->SetBranchAddress("mu2_eta", &mu2_eta);
     tree_input->SetBranchAddress("n_jet", &n_jet);
 
@@ -147,7 +151,7 @@ int main(int argc, char *argv[])
                 DiMu_ISO_SF = Mu1_ISO_SF * Mu2_ISO_SF;
 
                 // this formul is for the trigger
-                //DiMu_TRIG_SF = 1 - (1 - Mu1_TRIG_SF) * (1 - Mu2_TRIG_SF);
+                // DiMu_TRIG_SF = 1 - (1 - Mu1_TRIG_SF) * (1 - Mu2_TRIG_SF);
                 DiMu_ID_ISO_SF = DiMu_ID_SF * DiMu_ISO_SF;
 
                 weight = weight * DiMu_ID_ISO_SF;
@@ -161,12 +165,12 @@ int main(int argc, char *argv[])
         }
     }
 
-output_file.cd();
-tree_output->Write();
-output_file.Close();
-inputFile.Close();
+    output_file.cd();
+    tree_output->Write();
+    output_file.Close();
+    inputFile.Close();
 
-std::cout << "file in: " << output_file_path << std::endl;
+    std::cout << "file in: " << output_file_path << std::endl;
 
-return 0;
+    return 0;
 }

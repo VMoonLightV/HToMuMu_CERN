@@ -5,8 +5,8 @@ import sys
 import os
 
 # change to your own path
-base_input_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
-base_output_directory = "/eos/home-y/yulou/Fnal-hmm/hmm-tuples/njet_test/"
+base_input_directory = "./root_io/tuples/"
+base_output_directory = "./root_io/tuples/"
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/normalization"

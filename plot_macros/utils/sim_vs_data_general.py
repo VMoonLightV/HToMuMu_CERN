@@ -669,7 +669,7 @@ def draw_data_and_simul_and_ratio(
     if ("ZCR_normalization" in region) & (variable == "diMuon_bsConstrainedPt"):
         axs[1].set_ylim(0.5, 1.5)
 
-        iter_dir = f"../plots/ratio/njet_nobin/{njet}jet_ratio_table_dimuon_pt_{region}/"
+        iter_dir = f"../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/"
         os.makedirs(iter_dir, exist_ok=True)
 
         bin_centers = 0.5 * (data_bins[:-1] + data_bins[1:])
@@ -704,7 +704,7 @@ def draw_data_and_simul_and_ratio(
 
         axs[1].legend(loc="best")
 
-    output_directory = f"../plots/ratio/njet_nobin/{njet}jet_{region}/" + era + "/"
+    output_directory = f"../plots/ratio/njet/{njet}jet_{region}/" + era + "/"
     if cali_draw:
         output_directory = f"../plots/ratio/EVE_pt_eta/{njet}jet_{region}/" + era + "/"
     if not use_puweight:

@@ -12,7 +12,7 @@ split njet and region
 
 we are not sure which we will use finally, you can use "bin or nobin" to chose it.
 ```
-python3 "run_eff_on_tuple_region.py"  bin(or nobin)  SR(or ZCR)
+python3 Zpt_reweighting/run_eff_on_tuple_region.py  bin(or nobin)  SR(or ZCR)
 ```
 
 2. Plot ZCR vars and count to do ZCR DY normalization 
@@ -22,10 +22,12 @@ python3 "run_eff_on_tuple_region.py"  bin(or nobin)  SR(or ZCR)
     * The events count table is saved in "scripts/event_counts_{region}.csv" by default
 
 ```
-python3 "plot_sim_vs_data_general.py" bin(or nobin)  ZCR
+cd plot_macros
+python3 plot_sim_vs_data_general.py bin(or nobin)  ZCR
 Some plot region: ZCR, ZCR_normalization, ZCR_self_reweighting, SR, SR_reweighting
 
-python3 "normalization.py" bin(or nobin)  "count_file_name"
+cd ..
+python3 Zpt_reweighting/normalization.py bin(or nobin)  "count_file_name"
 ```
 
 3. Plot ZCR_normalization and fitting corr_func, you can see the fitting curve in the ZCR_normalization dimuon_pt plot.
@@ -36,7 +38,8 @@ python3 "normalization.py" bin(or nobin)  "count_file_name"
     * the function info is saved in:
         * ../plots/ratio/njet/{njet}jet_ratio_table_dimuon_pt_{region}/polynomial_{era}_coefficients.csv
 ```
-python3 "plot_sim_vs_data_general.py" bin(or nobin) ZCR_normalization
+cd plot_macros
+python3 plot_sim_vs_data_general.py bin(or nobin) ZCR_normalization
 ```
 
 4. Apply the reweighting to ZCR itself and SR
@@ -44,6 +47,6 @@ python3 "plot_sim_vs_data_general.py" bin(or nobin) ZCR_normalization
     * weight = weight * Func_cor(dimuon_pt)
 
 ```
-python3 "reweighting_Zpt.py" bin SR_reweighting(or ZCR_self_reweighting)
+python3 Zpt_reweighting/reweighting_Zpt.py bin(or nobin) SR_reweighting(or ZCR_self_reweighting)
 ```
 
