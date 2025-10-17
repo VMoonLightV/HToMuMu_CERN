@@ -50,3 +50,8 @@ python3 plot_sim_vs_data_general.py bin(or nobin) ZCR_normalization
 python3 Zpt_reweighting/reweighting_Zpt.py bin(or nobin) SR_reweighting(or ZCR_self_reweighting)
 ```
 
+5. Then you can draw plots of SR_reweighting or ZCR_self_reweighting.
+```
+cd plot_macros
+python3 plot_sim_vs_data_general.py bin(or nobin) SR_reweighting(or ZCR_self_reweighting)
+```
