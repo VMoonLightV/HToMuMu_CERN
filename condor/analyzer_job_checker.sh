@@ -47,5 +47,5 @@ if [ "$fail_count" -eq 0 ]; then
     echo "No extra errors were thrown in any jobs"
     rm -f "$OUTFILE"
 else
-    echo "There are errors checkn $OUTFILE for a list of problematic eras"
+    echo "There are errors check $OUTFILE for a list of problematic eras"
 fi
