@@ -20,7 +20,7 @@ public :
 
    MainEvent(TTree * /*tree*/ =0) : fChain(0) { }
    ~MainEvent();
-   void    Init(TTree *tree);
+   void    Init(TTree *tree, TString nanoAODVersion);
    void    InitSimulationVariables(TTree *tree);
    Bool_t  Notify();
    Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
@@ -156,7 +156,7 @@ public :
    Float_t         Electron_sip3d[4];   //[nElectron]
    //Float_t         Electron_mvaTTH[4];   //[nElectron]
    Int_t           nFatJet;
-   UChar_t         FatJet_jetId[3];   //[nFatJet]
+   //UChar_t         FatJet_jetId[3];   //[nFatJet]
    UChar_t         FatJet_nConstituents[3];   //[nFatJet]
    Short_t         FatJet_subJetIdx1[3];   //[nFatJet]
    Short_t         FatJet_subJetIdx2[3];   //[nFatJet]
@@ -286,6 +286,8 @@ public :
    // Float_t         IsoTrack_miniPFRelIso_chg[31];   //[nIsoTrack]
    Int_t           nJet;
    UChar_t         Jet_jetId[14];   //[nJet]
+   UChar_t         Jet_chMultiplicity[14];   //[nJet]
+   UChar_t         Jet_neMultiplicity[14];   //[nJet]
    UChar_t         Jet_nConstituents[14];   //[nJet]
    UChar_t         Jet_nElectrons[14];   //[nJet]
    UChar_t         Jet_nMuons[14];   //[nJet]
@@ -551,7 +553,7 @@ public :
    Float_t         SoftActivityJetHT2;
    Float_t         SoftActivityJetHT5;
    Int_t           nSubJet;
-   Float_t         SubJet_btagDeepB[6];   //[nSubJet]
+   //Float_t         SubJet_btagDeepB[6];   //[nSubJet]
    Float_t         SubJet_eta[6];   //[nSubJet]
    Float_t         SubJet_mass[6];   //[nSubJet]
    Float_t         SubJet_n2b1[6];   //[nSubJet]
@@ -569,12 +571,12 @@ public :
    UChar_t         Tau_idAntiMu[7];   //[nTau]
    Bool_t          Tau_idDecayModeNewDMs[7];   //[nTau]
    Bool_t          Tau_idDecayModeOldDMs[7];   //[nTau]
-   UChar_t         Tau_idDeepTau2017v2p1VSe[7];   //[nTau]
-   UChar_t         Tau_idDeepTau2017v2p1VSjet[7];   //[nTau]
-   UChar_t         Tau_idDeepTau2017v2p1VSmu[7];   //[nTau]
-   UChar_t         Tau_idDeepTau2018v2p5VSe[7];   //[nTau]
-   UChar_t         Tau_idDeepTau2018v2p5VSjet[7];   //[nTau]
-   UChar_t         Tau_idDeepTau2018v2p5VSmu[7];   //[nTau]
+   //UChar_t         Tau_idDeepTau2017v2p1VSe[7];   //[nTau]
+   //UChar_t         Tau_idDeepTau2017v2p1VSjet[7];   //[nTau]
+   //UChar_t         Tau_idDeepTau2017v2p1VSmu[7];   //[nTau]
+   //UChar_t         Tau_idDeepTau2018v2p5VSe[7];   //[nTau]
+   //UChar_t         Tau_idDeepTau2018v2p5VSjet[7];   //[nTau]
+   //UChar_t         Tau_idDeepTau2018v2p5VSmu[7];   //[nTau]
    UChar_t         Tau_nSVs[7];   //[nTau]
    Short_t         Tau_charge[7];   //[nTau]
    Short_t         Tau_decayModePNet[7];   //[nTau]
@@ -603,12 +605,12 @@ public :
    Float_t         Tau_ptCorrPNet[7];   //[nTau]
    Float_t         Tau_puCorr[7];   //[nTau]
    Float_t         Tau_qConfPNet[7];   //[nTau]
-   Float_t         Tau_rawDeepTau2017v2p1VSe[7];   //[nTau]
-   Float_t         Tau_rawDeepTau2017v2p1VSjet[7];   //[nTau]
-   Float_t         Tau_rawDeepTau2017v2p1VSmu[7];   //[nTau]
-   Float_t         Tau_rawDeepTau2018v2p5VSe[7];   //[nTau]
-   Float_t         Tau_rawDeepTau2018v2p5VSjet[7];   //[nTau]
-   Float_t         Tau_rawDeepTau2018v2p5VSmu[7];   //[nTau]
+   //Float_t         Tau_rawDeepTau2017v2p1VSe[7];   //[nTau]
+   //Float_t         Tau_rawDeepTau2017v2p1VSjet[7];   //[nTau]
+   //Float_t         Tau_rawDeepTau2017v2p1VSmu[7];   //[nTau]
+   //Float_t         Tau_rawDeepTau2018v2p5VSe[7];   //[nTau]
+   //Float_t         Tau_rawDeepTau2018v2p5VSjet[7];   //[nTau]
+   //Float_t         Tau_rawDeepTau2018v2p5VSmu[7];   //[nTau]
    Float_t         Tau_rawIso[7];   //[nTau]
    // Float_t         Tau_rawIsodR03[7];   //[nTau]
    Float_t         Tau_rawPNetVSe[7];   //[nTau]
@@ -1117,7 +1119,7 @@ public :
    Bool_t          Flag_trkPOG_manystripclus53X;
    Bool_t          Flag_trkPOG_toomanystripclus53X;
    Bool_t          Flag_trkPOG_logErrorTooManyClusters;
-   Bool_t          Flag_METFilters;
+   //Bool_t          Flag_METFilters;
    Bool_t          L1Reco_step;
    Bool_t          L1simulation_step;
    Bool_t          HLTriggerFirstPath;
@@ -1998,7 +2000,7 @@ public :
    TBranch        *b_Electron_sip3d;   //!
    //TBranch        *b_Electron_mvaTTH;   //!
    TBranch        *b_nFatJet;   //!
-   TBranch        *b_FatJet_jetId;   //!
+   //TBranch        *b_FatJet_jetId;   //!
    TBranch        *b_FatJet_nConstituents;   //!
    TBranch        *b_FatJet_subJetIdx1;   //!
    TBranch        *b_FatJet_subJetIdx2;   //!
@@ -2128,6 +2130,8 @@ public :
    // TBranch        *b_IsoTrack_miniPFRelIso_chg;   //!
    TBranch        *b_nJet;   //!
    TBranch        *b_Jet_jetId;   //!
+   TBranch        *b_Jet_chMultiplicity;   //!
+   TBranch        *b_Jet_neMultiplicity;   //!
    TBranch        *b_Jet_nConstituents;   //!
    TBranch        *b_Jet_nElectrons;   //!
    TBranch        *b_Jet_nMuons;   //!
@@ -2393,7 +2397,7 @@ public :
    TBranch        *b_SoftActivityJetHT2;   //!
    TBranch        *b_SoftActivityJetHT5;   //!
    TBranch        *b_nSubJet;   //!
-   TBranch        *b_SubJet_btagDeepB;   //!
+   //TBranch        *b_SubJet_btagDeepB;   //!
    TBranch        *b_SubJet_eta;   //!
    TBranch        *b_SubJet_mass;   //!
    TBranch        *b_SubJet_n2b1;   //!
@@ -2411,12 +2415,12 @@ public :
    TBranch        *b_Tau_idAntiMu;   //!
    TBranch        *b_Tau_idDecayModeNewDMs;   //!
    TBranch        *b_Tau_idDecayModeOldDMs;   //!
-   TBranch        *b_Tau_idDeepTau2017v2p1VSe;   //!
-   TBranch        *b_Tau_idDeepTau2017v2p1VSjet;   //!
-   TBranch        *b_Tau_idDeepTau2017v2p1VSmu;   //!
-   TBranch        *b_Tau_idDeepTau2018v2p5VSe;   //!
-   TBranch        *b_Tau_idDeepTau2018v2p5VSjet;   //!
-   TBranch        *b_Tau_idDeepTau2018v2p5VSmu;   //!
+   //TBranch        *b_Tau_idDeepTau2017v2p1VSe;   //!
+   //TBranch        *b_Tau_idDeepTau2017v2p1VSjet;   //!
+   //TBranch        *b_Tau_idDeepTau2017v2p1VSmu;   //!
+   //TBranch        *b_Tau_idDeepTau2018v2p5VSe;   //!
+   //TBranch        *b_Tau_idDeepTau2018v2p5VSjet;   //!
+   //TBranch        *b_Tau_idDeepTau2018v2p5VSmu;   //!
    TBranch        *b_Tau_nSVs;   //!
    TBranch        *b_Tau_charge;   //!
    TBranch        *b_Tau_decayModePNet;   //!
@@ -2445,12 +2449,12 @@ public :
    TBranch        *b_Tau_ptCorrPNet;   //!
    TBranch        *b_Tau_puCorr;   //!
    TBranch        *b_Tau_qConfPNet;   //!
-   TBranch        *b_Tau_rawDeepTau2017v2p1VSe;   //!
-   TBranch        *b_Tau_rawDeepTau2017v2p1VSjet;   //!
-   TBranch        *b_Tau_rawDeepTau2017v2p1VSmu;   //!
-   TBranch        *b_Tau_rawDeepTau2018v2p5VSe;   //!
-   TBranch        *b_Tau_rawDeepTau2018v2p5VSjet;   //!
-   TBranch        *b_Tau_rawDeepTau2018v2p5VSmu;   //!
+   //TBranch        *b_Tau_rawDeepTau2017v2p1VSe;   //!
+   //TBranch        *b_Tau_rawDeepTau2017v2p1VSjet;   //!
+   //TBranch        *b_Tau_rawDeepTau2017v2p1VSmu;   //!
+   //TBranch        *b_Tau_rawDeepTau2018v2p5VSe;   //!
+   //TBranch        *b_Tau_rawDeepTau2018v2p5VSjet;   //!
+   //TBranch        *b_Tau_rawDeepTau2018v2p5VSmu;   //!
    TBranch        *b_Tau_rawIso;   //!
    // TBranch        *b_Tau_rawIsodR03;   //!
    TBranch        *b_Tau_rawPNetVSe;   //!
@@ -2959,7 +2963,7 @@ public :
    TBranch        *b_Flag_trkPOG_manystripclus53X;   //!
    TBranch        *b_Flag_trkPOG_toomanystripclus53X;   //!
    TBranch        *b_Flag_trkPOG_logErrorTooManyClusters;   //!
-   TBranch        *b_Flag_METFilters;   //!
+   //TBranch        *b_Flag_METFilters;   //!
    TBranch        *b_L1Reco_step;   //!
    TBranch        *b_L1simulation_step;   //!
    TBranch        *b_HLTriggerFirstPath;   //!
@@ -3731,7 +3735,7 @@ MainEvent::~MainEvent()
    delete fChain->GetCurrentFile();
 }
 
-void MainEvent::Init(TTree *tree)
+void MainEvent::Init(TTree *tree, TString nanoAODVersion)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -3852,7 +3856,7 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Electron_sip3d", Electron_sip3d, &b_Electron_sip3d);
    //fChain->SetBranchAddress("Electron_mvaTTH", Electron_mvaTTH, &b_Electron_mvaTTH);
    fChain->SetBranchAddress("nFatJet", &nFatJet, &b_nFatJet);
-   fChain->SetBranchAddress("FatJet_jetId", FatJet_jetId, &b_FatJet_jetId);
+   //fChain->SetBranchAddress("FatJet_jetId", FatJet_jetId, &b_FatJet_jetId);
    fChain->SetBranchAddress("FatJet_nConstituents", FatJet_nConstituents, &b_FatJet_nConstituents);
    fChain->SetBranchAddress("FatJet_subJetIdx1", FatJet_subJetIdx1, &b_FatJet_subJetIdx1);
    fChain->SetBranchAddress("FatJet_subJetIdx2", FatJet_subJetIdx2, &b_FatJet_subJetIdx2);
@@ -3921,7 +3925,17 @@ void MainEvent::Init(TTree *tree)
    // fChain->SetBranchAddress("IsoTrack_miniPFRelIso_all", IsoTrack_miniPFRelIso_all, &b_IsoTrack_miniPFRelIso_all);
    // fChain->SetBranchAddress("IsoTrack_miniPFRelIso_chg", IsoTrack_miniPFRelIso_chg, &b_IsoTrack_miniPFRelIso_chg);
    fChain->SetBranchAddress("nJet", &nJet, &b_nJet);
-   fChain->SetBranchAddress("Jet_jetId", Jet_jetId, &b_Jet_jetId);
+
+   if(nanoAODVersion == "v12"){
+      std::cout << "USING NANOAOD v12 BRANCHES" << std::endl;
+      fChain->SetBranchAddress("Jet_jetId", Jet_jetId, &b_Jet_jetId);
+   }
+   else if (nanoAODVersion == "v15"){
+      std::cout << "USING NANOAOD v15 BRANCHES" << std::endl;
+      fChain->SetBranchAddress("Jet_chMultiplicity", Jet_chMultiplicity, &b_Jet_chMultiplicity);
+      fChain->SetBranchAddress("Jet_neMultiplicity", Jet_neMultiplicity, &b_Jet_neMultiplicity);
+   }
+
    fChain->SetBranchAddress("Jet_nConstituents", Jet_nConstituents, &b_Jet_nConstituents);
    fChain->SetBranchAddress("Jet_nElectrons", Jet_nElectrons, &b_Jet_nElectrons);
    fChain->SetBranchAddress("Jet_nMuons", Jet_nMuons, &b_Jet_nMuons);
@@ -3954,6 +3968,7 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_chEmEF", Jet_chEmEF, &b_Jet_chEmEF);
    fChain->SetBranchAddress("Jet_chHEF", Jet_chHEF, &b_Jet_chHEF);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
+   //cout << "Jet eta: " << Jet_eta;
    fChain->SetBranchAddress("Jet_hfsigmaEtaEta", Jet_hfsigmaEtaEta, &b_Jet_hfsigmaEtaEta);
    fChain->SetBranchAddress("Jet_hfsigmaPhiPhi", Jet_hfsigmaPhiPhi, &b_Jet_hfsigmaPhiPhi);
    fChain->SetBranchAddress("Jet_mass", Jet_mass, &b_Jet_mass);
@@ -4147,7 +4162,7 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("SoftActivityJetHT2", &SoftActivityJetHT2, &b_SoftActivityJetHT2);
    fChain->SetBranchAddress("SoftActivityJetHT5", &SoftActivityJetHT5, &b_SoftActivityJetHT5);
    fChain->SetBranchAddress("nSubJet", &nSubJet, &b_nSubJet);
-   fChain->SetBranchAddress("SubJet_btagDeepB", SubJet_btagDeepB, &b_SubJet_btagDeepB);
+   //fChain->SetBranchAddress("SubJet_btagDeepB", SubJet_btagDeepB, &b_SubJet_btagDeepB);
    fChain->SetBranchAddress("SubJet_eta", SubJet_eta, &b_SubJet_eta);
    fChain->SetBranchAddress("SubJet_mass", SubJet_mass, &b_SubJet_mass);
    fChain->SetBranchAddress("SubJet_n2b1", SubJet_n2b1, &b_SubJet_n2b1);
@@ -4165,12 +4180,12 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Tau_idAntiMu", Tau_idAntiMu, &b_Tau_idAntiMu);
    fChain->SetBranchAddress("Tau_idDecayModeNewDMs", Tau_idDecayModeNewDMs, &b_Tau_idDecayModeNewDMs);
    fChain->SetBranchAddress("Tau_idDecayModeOldDMs", Tau_idDecayModeOldDMs, &b_Tau_idDecayModeOldDMs);
-   fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSe", Tau_idDeepTau2017v2p1VSe, &b_Tau_idDeepTau2017v2p1VSe);
-   fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSjet", Tau_idDeepTau2017v2p1VSjet, &b_Tau_idDeepTau2017v2p1VSjet);
-   fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSmu", Tau_idDeepTau2017v2p1VSmu, &b_Tau_idDeepTau2017v2p1VSmu);
-   fChain->SetBranchAddress("Tau_idDeepTau2018v2p5VSe", Tau_idDeepTau2018v2p5VSe, &b_Tau_idDeepTau2018v2p5VSe);
-   fChain->SetBranchAddress("Tau_idDeepTau2018v2p5VSjet", Tau_idDeepTau2018v2p5VSjet, &b_Tau_idDeepTau2018v2p5VSjet);
-   fChain->SetBranchAddress("Tau_idDeepTau2018v2p5VSmu", Tau_idDeepTau2018v2p5VSmu, &b_Tau_idDeepTau2018v2p5VSmu);
+   //fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSe", Tau_idDeepTau2017v2p1VSe, &b_Tau_idDeepTau2017v2p1VSe);
+   //fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSjet", Tau_idDeepTau2017v2p1VSjet, &b_Tau_idDeepTau2017v2p1VSjet);
+   //fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSmu", Tau_idDeepTau2017v2p1VSmu, &b_Tau_idDeepTau2017v2p1VSmu);
+   //fChain->SetBranchAddress("Tau_idDeepTau2018v2p5VSe", Tau_idDeepTau2018v2p5VSe, &b_Tau_idDeepTau2018v2p5VSe);
+   //fChain->SetBranchAddress("Tau_idDeepTau2018v2p5VSjet", Tau_idDeepTau2018v2p5VSjet, &b_Tau_idDeepTau2018v2p5VSjet);
+   //fChain->SetBranchAddress("Tau_idDeepTau2018v2p5VSmu", Tau_idDeepTau2018v2p5VSmu, &b_Tau_idDeepTau2018v2p5VSmu);
    fChain->SetBranchAddress("Tau_nSVs", Tau_nSVs, &b_Tau_nSVs);
    fChain->SetBranchAddress("Tau_charge", Tau_charge, &b_Tau_charge);
    fChain->SetBranchAddress("Tau_decayModePNet", Tau_decayModePNet, &b_Tau_decayModePNet);
@@ -4199,12 +4214,12 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Tau_ptCorrPNet", Tau_ptCorrPNet, &b_Tau_ptCorrPNet);
    fChain->SetBranchAddress("Tau_puCorr", Tau_puCorr, &b_Tau_puCorr);
    fChain->SetBranchAddress("Tau_qConfPNet", Tau_qConfPNet, &b_Tau_qConfPNet);
-   fChain->SetBranchAddress("Tau_rawDeepTau2017v2p1VSe", Tau_rawDeepTau2017v2p1VSe, &b_Tau_rawDeepTau2017v2p1VSe);
-   fChain->SetBranchAddress("Tau_rawDeepTau2017v2p1VSjet", Tau_rawDeepTau2017v2p1VSjet, &b_Tau_rawDeepTau2017v2p1VSjet);
-   fChain->SetBranchAddress("Tau_rawDeepTau2017v2p1VSmu", Tau_rawDeepTau2017v2p1VSmu, &b_Tau_rawDeepTau2017v2p1VSmu);
-   fChain->SetBranchAddress("Tau_rawDeepTau2018v2p5VSe", Tau_rawDeepTau2018v2p5VSe, &b_Tau_rawDeepTau2018v2p5VSe);
-   fChain->SetBranchAddress("Tau_rawDeepTau2018v2p5VSjet", Tau_rawDeepTau2018v2p5VSjet, &b_Tau_rawDeepTau2018v2p5VSjet);
-   fChain->SetBranchAddress("Tau_rawDeepTau2018v2p5VSmu", Tau_rawDeepTau2018v2p5VSmu, &b_Tau_rawDeepTau2018v2p5VSmu);
+   //fChain->SetBranchAddress("Tau_rawDeepTau2017v2p1VSe", Tau_rawDeepTau2017v2p1VSe, &b_Tau_rawDeepTau2017v2p1VSe);
+   //fChain->SetBranchAddress("Tau_rawDeepTau2017v2p1VSjet", Tau_rawDeepTau2017v2p1VSjet, &b_Tau_rawDeepTau2017v2p1VSjet);
+   //fChain->SetBranchAddress("Tau_rawDeepTau2017v2p1VSmu", Tau_rawDeepTau2017v2p1VSmu, &b_Tau_rawDeepTau2017v2p1VSmu);
+   //fChain->SetBranchAddress("Tau_rawDeepTau2018v2p5VSe", Tau_rawDeepTau2018v2p5VSe, &b_Tau_rawDeepTau2018v2p5VSe);
+   //fChain->SetBranchAddress("Tau_rawDeepTau2018v2p5VSjet", Tau_rawDeepTau2018v2p5VSjet, &b_Tau_rawDeepTau2018v2p5VSjet);
+   //fChain->SetBranchAddress("Tau_rawDeepTau2018v2p5VSmu", Tau_rawDeepTau2018v2p5VSmu, &b_Tau_rawDeepTau2018v2p5VSmu);
    fChain->SetBranchAddress("Tau_rawIso", Tau_rawIso, &b_Tau_rawIso);
    // fChain->SetBranchAddress("Tau_rawIsodR03", Tau_rawIsodR03, &b_Tau_rawIsodR03);
    fChain->SetBranchAddress("Tau_rawPNetVSe", Tau_rawPNetVSe, &b_Tau_rawPNetVSe);
@@ -4671,7 +4686,7 @@ void MainEvent::Init(TTree *tree)
    fChain->SetBranchAddress("Flag_trkPOG_manystripclus53X", &Flag_trkPOG_manystripclus53X, &b_Flag_trkPOG_manystripclus53X);
    fChain->SetBranchAddress("Flag_trkPOG_toomanystripclus53X", &Flag_trkPOG_toomanystripclus53X, &b_Flag_trkPOG_toomanystripclus53X);
    fChain->SetBranchAddress("Flag_trkPOG_logErrorTooManyClusters", &Flag_trkPOG_logErrorTooManyClusters, &b_Flag_trkPOG_logErrorTooManyClusters);
-   fChain->SetBranchAddress("Flag_METFilters", &Flag_METFilters, &b_Flag_METFilters);
+   //fChain->SetBranchAddress("Flag_METFilters", &Flag_METFilters, &b_Flag_METFilters);
    fChain->SetBranchAddress("L1Reco_step", &L1Reco_step, &b_L1Reco_step);
    fChain->SetBranchAddress("HLTriggerFirstPath", &HLTriggerFirstPath, &b_HLTriggerFirstPath);
    // fChain->SetBranchAddress("HLT_AK8PFJet360_TrimMass30", &HLT_AK8PFJet360_TrimMass30, &b_HLT_AK8PFJet360_TrimMass30);

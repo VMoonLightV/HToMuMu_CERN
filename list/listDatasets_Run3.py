@@ -525,6 +525,12 @@ datasets_info = {
     "DY120to200_Summer24": ["F", 2, "2024", "MC_background",
             "/DYto2Mu_Bin-MLL-120to200_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM"],
 
+    # Drell-Yan Backgrounds v13
+    #"DY50to120_Summer24v13": ["F", 2, "2024", "MC_background",
+    #        "/DYto2Mu_Bin-MLL-50to120_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+    #"DY120to200_Summer24v13": ["F", 2, "2024", "MC_background",
+    #        "/DYto2Mu_Bin-MLL-120to200_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAOD-140X_mcRun3_2024_realistic_v26-v2/NANOAODSIM"],
+
     #"DYto2L-2Jets_MLL-50_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer23BPix": ["F", 1, "2022EE", "MC_background",
     #        "/DYto2L-2Jets_MLL-50_0J_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/Run3Summer23BPixNanoAODv12-130X_mcRun3_2023_realistic_postBPix_v2-v3/NANOAODSIM"],
     #"DYJetstoLL_Summer24": ["F", 2, "2024", "MC_background",

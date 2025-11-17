@@ -5,3 +5,4 @@ plots/
 scripts/*.csv
 *.root
 scripts/makeDataPileupHist.sh
+Yuyang\ Tutorials/

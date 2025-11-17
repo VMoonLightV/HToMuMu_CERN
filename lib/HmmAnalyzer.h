@@ -45,6 +45,10 @@ constexpr float MUON_MASS = 0.1056583745;
 constexpr float FLOAT_NULL_VALUE = -999.;
 constexpr int INT_NULL_VALUE = -999;
 
+std::map<TString, TString> NANOAOD_VERSION = {
+    {"2022", "v12"},  {"2023", "v12"}, {"2024", "v15"}, {"2025", "v15"}
+};
+
 class HmmAnalyzer : public MainEvent {
   public:
     HmmAnalyzer(const TString &inputFileList = "foo.txt",
@@ -218,7 +222,7 @@ class HmmAnalyzer : public MainEvent {
     std::vector<float> *t_FatJet_tau2;
     std::vector<float> *t_FatJet_tau3;
     std::vector<float> *t_FatJet_tau4;
-    std::vector<int> *t_FatJet_jetId;
+    //std::vector<int> *t_FatJet_jetId;
     std::vector<int> *t_FatJet_subJetIdx1;
     std::vector<int> *t_FatJet_subJetIdx2;
 
@@ -253,6 +257,8 @@ class HmmAnalyzer : public MainEvent {
     std::vector<float> *t_Jet_pt;
     std::vector<float> *t_Jet_qgl;
     std::vector<int> *t_Jet_jetId;
+    std::vector<int> *t_Jet_chMultiplicity;
+    std::vector<int> *t_Jet_neMultiplicity;
     std::vector<int> *t_Jet_nConstituents;
     std::vector<int> *t_Jet_nElectrons;
     std::vector<int> *t_Jet_nMuons;
@@ -287,6 +293,8 @@ class HmmAnalyzer : public MainEvent {
     std::vector<float> *t_bJet_pt;
     std::vector<float> *t_bJet_qgl;
     std::vector<int> *t_bJet_jetId;
+    std::vector<int> *t_bJet_chMultiplicity;
+    std::vector<int> *t_bJet_neMultiplicity;
     std::vector<int> *t_bJet_nConstituents;
     std::vector<int> *t_bJet_nElectrons;
     std::vector<int> *t_bJet_nMuons;
@@ -513,7 +521,9 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
             std::cout << "Initiating analysis on MC" << endl;
     }
 
-    MainEvent::Init(tree);
+    std::cout << "NanoAOD Version: " << NANOAOD_VERSION[year] << std::endl;
+    MainEvent::Init(tree, NANOAOD_VERSION[year]);
+    //tree->Scan("Jet_jetId","","",5);
     if (!is_data) {
         MainEvent::InitSimulationVariables(tree);
     }
@@ -588,8 +598,30 @@ float HmmAnalyzer::getPileupWeightDown(int NPU) {
 }
 
 bool HmmAnalyzer::isValidJet(int index) {
+    bool Jet_passJetIdTight = false;
+    if(run < NANOAOD_SWITCH_RUN_NUMBER){ //nanoAODv12
+        if (fabs(Jet_eta[index]) <= 2.7) Jet_passJetIdTight = Jet_jetId[index] & (1 << 1);
+        else if (fabs(Jet_eta[index]) > 2.7 && fabs(Jet_eta[index]) <= 3.0) Jet_passJetIdTight = (Jet_jetId[index] & (1 << 1)) && (Jet_neHEF[index] < 0.99);
+        else if (fabs(Jet_eta[index]) > 3.0) Jet_passJetIdTight = (Jet_jetId[index] & (1 << 1)) && (Jet_neEmEF[index] < 0.4);
+    }
+
+    else{ //nanoAODv15
+        if (fabs(Jet_eta[index]) <= 2.6){
+            Jet_passJetIdTight = (Jet_neHEF[index] < 0.99) && (Jet_neEmEF[index] < 0.9) && (Jet_chMultiplicity[index]+Jet_neMultiplicity[index] > 1) && (Jet_chHEF[index] > 0.01) && (Jet_chMultiplicity[index] > 0);
+        }
+        else if (fabs(Jet_eta[index]) > 2.6 && abs(Jet_eta[index]) <= 2.7){
+            Jet_passJetIdTight = (Jet_neHEF[index] < 0.90) && (Jet_neEmEF[index] < 0.99);
+        }
+        else if (fabs(Jet_eta[index]) > 2.7 && fabs(Jet_eta[index]) <= 3.0){
+            Jet_passJetIdTight = (Jet_neHEF[index] < 0.99);
+        }
+        else if (fabs(Jet_eta[index]) > 3.0){
+            Jet_passJetIdTight = (Jet_neMultiplicity[index] >= 2) && (Jet_neEmEF[index] < 0.4);
+        }
+    }
+
     return (Jet_pt[index] > 25. && fabs(Jet_eta[index]) < 4.7 &&
-            Jet_jetId[index] >= 2 /* && Jet_puId[index]>=1 */);
+            Jet_passJetIdTight /* && Jet_puId[index]>=1 */);
 }
 
 void HmmAnalyzer::CorrectPtRoch(const RoccoR &_calib, const bool _doSys,
@@ -868,7 +900,7 @@ void HmmAnalyzer::clearTreeVectors() {
     t_FatJet_tau2->clear();
     t_FatJet_tau3->clear();
     t_FatJet_tau4->clear();
-    t_FatJet_jetId->clear();
+    //t_FatJet_jetId->clear();
     t_FatJet_subJetIdx1->clear();
     t_FatJet_subJetIdx2->clear();
 
@@ -903,6 +935,8 @@ void HmmAnalyzer::clearTreeVectors() {
     t_Jet_pt->clear();
     t_Jet_qgl->clear();
     t_Jet_jetId->clear();
+    t_Jet_chMultiplicity->clear();
+    t_Jet_neMultiplicity->clear();
     t_Jet_nConstituents->clear();
     t_Jet_nElectrons->clear();
     t_Jet_nMuons->clear();
@@ -927,6 +961,8 @@ void HmmAnalyzer::clearTreeVectors() {
     t_bJet_pt->clear();
     t_bJet_qgl->clear();
     t_bJet_jetId->clear();
+    t_bJet_chMultiplicity->clear();
+    t_bJet_neMultiplicity->clear();
     t_bJet_nConstituents->clear();
     t_bJet_nElectrons->clear();
     t_bJet_nMuons->clear();
@@ -1158,7 +1194,7 @@ void HmmAnalyzer::BookTreeBranches() {
     t_FatJet_tau2 = new std::vector<float>();
     t_FatJet_tau3 = new std::vector<float>();
     t_FatJet_tau4 = new std::vector<float>();
-    t_FatJet_jetId = new std::vector<int>();
+    //t_FatJet_jetId = new std::vector<int>();
     t_FatJet_subJetIdx1 = new std::vector<int>();
     t_FatJet_subJetIdx2 = new std::vector<int>();
 
@@ -1177,7 +1213,7 @@ void HmmAnalyzer::BookTreeBranches() {
     tree->Branch("t_FatJet_tau2", "vector<float>", &t_FatJet_tau2);
     tree->Branch("t_FatJet_tau3", "vector<float>", &t_FatJet_tau3);
     tree->Branch("t_FatJet_tau4", "vector<float>", &t_FatJet_tau4);
-    tree->Branch("t_FatJet_jetId", "vector<int>", &t_FatJet_jetId);
+    //tree->Branch("t_FatJet_jetId", "vector<int>", &t_FatJet_jetId);
     tree->Branch("t_FatJet_subJetIdx1", "vector<int>", &t_FatJet_subJetIdx1);
     tree->Branch("t_FatJet_subJetIdx2", "vector<int>", &t_FatJet_subJetIdx2);
 
@@ -1226,6 +1262,8 @@ void HmmAnalyzer::BookTreeBranches() {
     t_Jet_pt = new std::vector<float>();
     t_Jet_qgl = new std::vector<float>();
     t_Jet_jetId = new std::vector<int>();
+    t_Jet_chMultiplicity = new std::vector<int>();
+    t_Jet_neMultiplicity = new std::vector<int>();
     t_Jet_nConstituents = new std::vector<int>();
     t_Jet_nElectrons = new std::vector<int>();
     t_Jet_nMuons = new std::vector<int>();
@@ -1266,6 +1304,8 @@ void HmmAnalyzer::BookTreeBranches() {
     tree->Branch("t_Jet_pt", "vector<float>", &t_Jet_pt);
     tree->Branch("t_Jet_qgl", "vector<float>", &t_Jet_qgl);
     tree->Branch("t_Jet_jetId", "vector<int>", &t_Jet_jetId);
+    tree->Branch("t_Jet_chMultiplicity", "vector<int>", &t_Jet_chMultiplicity);
+    tree->Branch("t_Jet_neMultiplicity", "vector<int>", &t_Jet_neMultiplicity);
     tree->Branch("t_Jet_nConstituents", "vector<int>", &t_Jet_nConstituents);
     tree->Branch("t_Jet_nElectrons", "vector<int>", &t_Jet_nElectrons);
     tree->Branch("t_Jet_nMuons", "vector<int>", &t_Jet_nMuons);
@@ -1292,6 +1332,8 @@ void HmmAnalyzer::BookTreeBranches() {
     t_bJet_pt = new std::vector<float>();
     t_bJet_qgl = new std::vector<float>();
     t_bJet_jetId = new std::vector<int>();
+    t_bJet_chMultiplicity = new std::vector<int>();
+    t_bJet_neMultiplicity = new std::vector<int>();
     t_bJet_nConstituents = new std::vector<int>();
     t_bJet_nElectrons = new std::vector<int>();
     t_bJet_nMuons = new std::vector<int>();
@@ -1313,6 +1355,8 @@ void HmmAnalyzer::BookTreeBranches() {
     tree->Branch("t_bJet_pt", "vector<float>", &t_bJet_pt);
     tree->Branch("t_bJet_qgl", "vector<float>", &t_bJet_qgl);
     tree->Branch("t_bJet_jetId", "vector<int>", &t_bJet_jetId);
+    tree->Branch("t_bJet_chMultiplicity", "vector<int>", &t_bJet_chMultiplicity);
+    tree->Branch("t_bJet_neMultiplicity", "vector<int>", &t_bJet_neMultiplicity);
     tree->Branch("t_bJet_nConstituents", "vector<int>", &t_bJet_nConstituents);
     tree->Branch("t_bJet_nElectrons", "vector<int>", &t_bJet_nElectrons);
     tree->Branch("t_bJet_nMuons", "vector<int>", &t_bJet_nMuons);

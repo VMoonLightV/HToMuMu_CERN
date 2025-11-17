@@ -72,7 +72,7 @@ void HmmAnalyzer::EventLoop() {
 
     std::cout << "Btag calibration loaded" << std::endl;           
     long nentries = fChain->GetEntriesFast();
-    //nentries = 5;
+    //nentries = 5000;
     long nbytes = 0;
     long nb = 0;
     
@@ -123,7 +123,9 @@ void HmmAnalyzer::EventLoop() {
              Flag_BadChargedCandidateFilter && trig_decision &&
              PV_npvsGood > 0);
         
+        //std::cout << "Running muon checks" << std::endl; 
         if (!run_muChecks) {
+            //std::cout << "Muon checks valid" << std::endl; 
             continue;
         }
 
@@ -203,7 +205,9 @@ void HmmAnalyzer::EventLoop() {
                 break;
         }
 
+        //std::cout << "Checking 2 valid muons" << std::endl; 
         if(!two_valid_muons){
+            //std::cout << "No valid muons" << std::endl; 
             continue;
         }
 
@@ -235,8 +239,9 @@ void HmmAnalyzer::EventLoop() {
             }
         } // end of triger match, end of loop over trigger objects
 
-
+        //std::cout << "Checking trig match" << std::endl; 
         if (!trig_match) {
+            //std::cout << "No trig match" << std::endl; 
             continue;
         }
 
@@ -377,10 +382,9 @@ void HmmAnalyzer::EventLoop() {
         t_SoftActivityJetHT5 = SoftActivityJetHT5;
 
 
-        if(t_diMuon_bsConstrainedMass < 70 || t_diMuon_bsConstrainedMass > 180){
+        if(t_diMuon_bsConstrainedMass < 80 || t_diMuon_bsConstrainedMass > 180){
             continue; //not in signal + Z range
         }
-
 
         for (int j = 0; j < nJet; j++) {
             if (!isValidJet(j)) {
@@ -413,7 +417,7 @@ void HmmAnalyzer::EventLoop() {
             t_Jet_phi->push_back(Jet_phi[j]);
             t_Jet_pt->push_back(Jet_pt[j]);
             // t_Jet_qgl->push_back(Jet_qgl[j]);
-            t_Jet_jetId->push_back(Jet_jetId[j]);
+            // t_Jet_jetId->push_back(Jet_jetId[j]);
             t_Jet_nConstituents->push_back(Jet_nConstituents[j]);
             t_Jet_nElectrons->push_back(Jet_nElectrons[j]);
             t_Jet_nMuons->push_back(Jet_nMuons[j]);
@@ -558,14 +562,14 @@ void HmmAnalyzer::EventLoop() {
             t_FatJet_tau2->push_back(FatJet_tau2[i]);
             t_FatJet_tau3->push_back(FatJet_tau3[i]);
             t_FatJet_tau4->push_back(FatJet_tau4[i]);
-            t_FatJet_jetId->push_back(FatJet_jetId[i]);
+            //->push_back(FatJet_jetId[i]);
             t_FatJet_subJetIdx1->push_back(FatJet_subJetIdx1[i]);
             t_FatJet_subJetIdx2->push_back(FatJet_subJetIdx2[i]);
         }
         for (int i = 0; i < nSubJet; i++) {
             // t_SubJet_btagCMVA->push_back(SubJet_btagCMVA[i]);
             // t_SubJet_btagCSVV2->push_back(SubJet_btagCSVV2[i]);
-            t_SubJet_btagDeepB->push_back(SubJet_btagDeepB[i]);
+            //t_SubJet_btagDeepB->push_back(SubJet_btagDeepB[i]);
             t_SubJet_eta->push_back(SubJet_eta[i]);
             t_SubJet_mass->push_back(SubJet_mass[i]);
             t_SubJet_n2b1->push_back(SubJet_n2b1[i]);
