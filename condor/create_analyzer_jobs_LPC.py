@@ -11,6 +11,14 @@ analyzer = "HmmAnalyzer"
 analysis = "HiggsMuMu"
 outputfile = analysis + "_" + v.ANALYZER_VERSION_NUMBER
 
+golden_json = {
+        '2022':'Cert_Collisions2022_355100_362760_Golden.json',
+        '2022EE':'Cert_Collisions2022_355100_362760_Golden.json',
+        '2023':'Cert_Collisions2023_366442_370790_Golden.json',
+        '2023BPix':'Cert_Collisions2023_366442_370790_Golden.json',
+        '2024':'Cert_Collisions2024_378981_386951_Golden.json',
+        }
+
 # Skip these datasets
 skip_dataset = [
     "DoubleMuon_2022A",
@@ -37,13 +45,16 @@ skip_pattern = [
 
 list_datasets = datasets_info.keys()
 # # Use in case you want to run over a specific list of datasets!
-list_datasets = [
-     "TTtoLNu2Q_Summer24",
-     "WZtoLNu2Q_Summer24",
-]
+#list_datasets = [
+     #"DY50to120_Summer24",
+     #"DY120to200_Summer24",
+#     "WWtoLNu2Q_Summer22",
+#     "Muon_2022C",
+#]
 
 # cmsswReleaseVersion = "CMSSW_10_6_5"
 CMSSW_BASE_DIR = os.getenv('CMSSW_BASE')
+SCRAM_ARCH = os.getenv('SCRAM_ARCH')
 # Analyzer_DIR = CMSSW_BASE_DIR + "/src/HmmAna/HmmAna/"
 Condor_BASE_DIR = os.getcwd() + "/"
 Analyzer_DIR = Condor_BASE_DIR.split("condor/")[0]
@@ -122,6 +133,15 @@ for dataset_name in list_datasets:
     os.system("cp " + "%s/btagSF/DeepCSV_94XSF_V3_B_F.csv"%(Analyzer_Data_DIR) + " " + "%s/btagSF/"%(Job_Data_DIR))
     # os.system("mkdir -p " + Job_Data_DIR + "leptonSF/%s"%(year))
     # os.system("cp " + "%s/leptonSF/%s/*.root"%(Analyzer_Data_DIR, year) + " " + "%s/leptonSF/%s/"%(Job_Data_DIR, year))
+
+    #get RazorCommon as well
+    if(isData=="T" and year != "2025"):
+        os.system("mkdir -p " + Job_DIR + "RazorCommon/data/")
+        os.system("mkdir -p " + Job_DIR + "RazorCommon/bin/")
+        os.system("mkdir -p " + Job_DIR + "RazorCommon/python/")
+        os.system("cp -r " + "%s/RazorCommon/data/Run3/"%(Analyzer_DIR) + " " + "%s/RazorCommon/data/"%(Job_DIR))
+        os.system("cp " + "%s/bin/%s/FWLiteGoodLumi"%(CMSSW_BASE_DIR,SCRAM_ARCH) + " " "%s/RazorCommon/bin/"%(Job_DIR))
+        os.system("cp " + "%s/RazorCommon/python/loadJson.py"%(Analyzer_DIR) + " " "%s/RazorCommon/python/"%(Job_DIR))
     
     if(year != "2025"):
         os.system("mkdir -p " + Job_Data_DIR + "leptonSF/%s/"%(year))
@@ -158,13 +178,17 @@ for dataset_name in list_datasets:
 
     if(year != "2025"):
         transfer_files += Job_Data_DIR + "/leptonSF/" + year + "/muon_Z.json.gz, "
+        if isData=="T":
+            transfer_files += Job_DIR + "/RazorCommon/bin/FWLiteGoodLumi, "
+            transfer_files += Job_DIR + "/RazorCommon/data/Run3/" + golden_json[year] + ", "
+            transfer_files += Job_DIR + "/RazorCommon/python/loadJson.py, "
 
     transfer_files += Job_Data_DIR + "/pileup/" + pileup_file + ".root"
     jobfile_JDL.write("transfer_input_files = " + transfer_files + "\n")
 
     jobfile_JDL.write("should_transfer_files = YES" + "\n")
     jobfile_JDL.write("when_to_transfer_output = ON_EXIT" + "\n\n# Resources request\n")
-    jobfile_JDL.write("RequestMemory = 3100 \n\n# Jobs selection\n")
+    jobfile_JDL.write("RequestMemory = 4500 \n\n# Jobs selection\n")
 
     jobfile_JDL.write("Queue I from (")
     for i in range(1, n_jobs+1):

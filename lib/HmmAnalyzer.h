@@ -599,7 +599,7 @@ float HmmAnalyzer::getPileupWeightDown(int NPU) {
 
 bool HmmAnalyzer::isValidJet(int index) {
     bool Jet_passJetIdTight = false;
-    if(run < NANOAOD_SWITCH_RUN_NUMBER){ //nanoAODv12
+    if(NANOAOD_VERSION[year] == "v12"){ //nanoAODv12
         if (fabs(Jet_eta[index]) <= 2.7) Jet_passJetIdTight = Jet_jetId[index] & (1 << 1);
         else if (fabs(Jet_eta[index]) > 2.7 && fabs(Jet_eta[index]) <= 3.0) Jet_passJetIdTight = (Jet_jetId[index] & (1 << 1)) && (Jet_neHEF[index] < 0.99);
         else if (fabs(Jet_eta[index]) > 3.0) Jet_passJetIdTight = (Jet_jetId[index] & (1 << 1)) && (Jet_neEmEF[index] < 0.4);

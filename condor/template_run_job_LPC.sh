@@ -44,8 +44,14 @@ mkdir -p ${DATA_FOLDER}/btagSF/
 cp DeepCSV_94XSF_V3_B_F.csv ${DATA_FOLDER}/btagSF/
 
 mkdir -p ${DATA_FOLDER}/leptonSF/${year}/
+mkdir -p ${cmssw_version}/src/RazorCommon/data/
+mkdir -p ${cmssw_version}/src/RazorCommon/bin/
+mkdir -p ${cmssw_version}/src/RazorCommon/python/
 if [ "$year" != "2025" ]; then 
     cp muon_Z.json.gz ${DATA_FOLDER}/leptonSF/${year}/
+    cp FWLiteGoodLumi ${cmssw_version}/src/RazorCommon/bin/
+    cp Cert* ${cmssw_version}/src/RazorCommon/data/
+    cp loadJson.py ${cmssw_version}/src/RazorCommon/python/
 fi
 
 mkdir -p ${DATA_FOLDER}/pileup/
@@ -91,15 +97,37 @@ echo "Executing Analysis executable:"
 echo "./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${file_type}"
 ./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${file_type} ${is_data} ${year}
 
+###########################
+# Run goodLumi Validation
+###########################
+if [[ "$year" != "2025" && "$file_type" == "data" ]]; then
+    echo "Executing goodLumi check:"
+    cd RazorCommon/bin
+    cert_file=$(ls ../data/)
+
+    echo "./FWLiteGoodLumi ../python/loadJson.py ../../${output_name}_${job_number}.root ../../${output_name}_${job_number}_goodLumi.root"
+    sed -i "/JSONfile =/c\JSONfile = '../data/${cert_file}'" ../python/loadJson.py
+    ./FWLiteGoodLumi ../python/loadJson.py ../../${output_name}_${job_number}.root ../../${output_name}_${job_number}_goodLumi.root
+
+fi
+
 ls -l
 ################################################################
 # Copy output file to /eos space -- define in submitter code
 ################################################################
 echo ${output_Directory}
 xrdfs root://cmseos.fnal.gov mkdir -p /store/group/lpchmumu/${output_Directory}
-xrdcp -f ${output_name}_${job_number}.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root
-echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root"
-rm ${output_name}_${job_number}.root
+if [[ "$year" != "2025" && "$file_type" == "data" ]]; then
+    cd ../../
+    xrdcp -f ${output_name}_${job_number}_goodLumi.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}_goodLumi.root
+    echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}_goodLumi.root"
+    rm ${output_name}_${job_number}_goodLumi.root
+else
+    xrdcp -f ${output_name}_${job_number}.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root
+    echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root"
+    rm ${output_name}_${job_number}.root
+fi
+
 rm inputs -rv
 
 cd -

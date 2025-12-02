@@ -26,6 +26,7 @@ class CreateTuple {
      * input and output settings.
      *
      * @param input The full path of the input ROOT file containing the data.
+     * @param weightFile The full path of the input ROOT file containing the SumWeight.
      * @param output Directory path for the output ROOT file.
      * @param era The data collection era. (e.g. 2022, 2022EE, etc).
      * @param channel Analysis channel (e.g., DY50to120, ggH, 2022F, etc).
@@ -35,7 +36,7 @@ class CreateTuple {
      * @param is_signal_ Boolean flag indicating if the data pertains to signal
      * or background
      */
-    CreateTuple(TString input, TString output, TString era, TString channel,
+    CreateTuple(TString input, TString weightFile, TString output, TString era, TString channel,
                 bool is_data, bool is_signal_);
     /**
      * @brief Destructor for CreateTuple, cleaning up dynamically allocated
@@ -85,6 +86,7 @@ class CreateTuple {
     const float luminosity; /**< Luminosity of the era. */
     const float cross_section; /**< Cross-section of the process. */
     TString input_name;        /**< Path of the input file. */
+    TString weight_name;        /**< Path of the weight file. */
     TString output_name;       /**< Name of the output file. */
     TString output_directory;  /**< Directory for saving the output file. */
     TFile *output_file;        /**< Pointer to output TFile. */
@@ -142,20 +144,21 @@ class CreateTuple {
         pt_centrality, min_delta_eta_diMuon_jet, min_delta_phi_diMuon_jet;
 };
 
-CreateTuple::CreateTuple(TString input, TString output, TString era,
+CreateTuple::CreateTuple(TString input, TString weightFile, TString output, TString era,
                          TString channel, bool is_data, bool is_signal_)
     : luminosity(LUMINOSITY.at(era)), cross_section(CROSS_SECTION.at(channel)) {
 
     tree_input = new TChain("tree");
     tree_output = new TTree("tree_output", "tree_output");
     input_name = input;
+    weight_name = weightFile;
     output_directory = output;
     is_signal = is_signal_;
     output_name = channel + "_" + era + "_tuples.root";
     std::cout << "Luminosity: " << luminosity
               << ", cross section: " << cross_section << std::endl;
     if (!is_data) {
-        gen_weight_sum = GetGenWeightSum(input_name);
+        gen_weight_sum = GetGenWeightSum(weight_name);
         scale_factor =
             GetScaleFactor(luminosity, cross_section, gen_weight_sum);
         // is_data_int = 0;

@@ -20,6 +20,24 @@ fail_count=0
 for block in "$DIR"/*; do
     echo "Checking $block files"
     blockError=false
+    nFilesExpected=$(tail -n 2 $block/task.jdl | head -n 1)
+    #echo "$nFilesExpected expected files"
+    nFilesOut=$(ls $block/out/ | wc -l)
+    #echo "$nFilesOut out files"
+
+    if [[ "$nFilesExpected" == *"Queue"* ]]; then
+        nFilesExpected=1
+    fi
+    
+    if [ $nFilesExpected -ne $nFilesOut ]; then
+        #echo "************** Not all analyzer ran in $block **************"
+        blockError=true
+        ((fail_count++))
+        missingFiles=$((nFilesExpected - nFilesOut))
+        echo "$block has $missingFiles missing files" >> "$OUTFILE"
+    fi
+
+    #expectedFileNum=0
     for file in "$block"/err/*.err; do
         # Skip if no .err files exist
         [ -e "$file" ] || continue
@@ -28,17 +46,25 @@ for block in "$DIR"/*; do
         count=$(wc -l < "$file")
         #echo "File $file count $count"
 
-        if [ "$count" -ge 7 ]; then
-            #echo "File '$file' has length $count (greater than 6)"
+        last_line=$(tail -n 1 "$file")
+
+        if [[ "$last_line" != "cp: cannot stat 'data/pileup/*.root': No such file or directory" ]]; then
             blockError=true
             ((fail_count++))
             echo "$file" >> "$OUTFILE"
         fi
 
+        #if [ "$count" -ge 7 ]; then
+        #    #echo "File '$file' has length $count (greater than 6)"
+        #    blockError=true
+        #    ((fail_count++))
+        #    echo "$file" >> "$OUTFILE"
+        #fi
+
     done
 
     if $blockError; then
-        echo "**************Errors found in $block**************"
+        echo "************** Errors found in $block **************"
     fi
 
 done

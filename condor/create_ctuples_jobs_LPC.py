@@ -23,26 +23,32 @@ skip_pattern = [
     ## Unwanted sets
     "DYJetstoLL",
     "DYto2L-2Jets",
-    "4Q",
-    "TbarWplustoLNu2Q",
-    "2Q-t-channel",
-    "WZtoLNu2Q",
+    "TWminusto4Q",
+    "TWminustoLNu2Q",
+    "Tbar",
+    "TQbar",
+    "t-channel",
+    "s-channel",
     "ZZto2Nu2Q",
-    "WWtoLNu2Q",
+    "WWto4Q",
 ]
 
 list_datasets = datasets_info.keys()
 # # Use in case you want to run over a specific list of datasets!
-# list_datasets = [
-#     "DY120to200_Summer22",
-#     "DY50to120_Summer22",
-# ]
+#list_datasets = [
+#     "DY120to200_Summer24v13",
+#     "DY50to120_Summer24v13",
+     #"Muon0_2024E",
+     #"Muon1_2024E",
+     
+
+#]
 
 # Arguments
 if (len(sys.argv) == 1):
     recreate_hadded_file = False
 elif (len(sys.argv) > 2) or (sys.argv[1] not in ["T", "F"]):
-    print("One argument is required! Add T or F if you want to recreate the hadded file")
+    print("One argument is required! Add T or F if you want to recreate the tuple file")
     exit()
 else:
     recreate_hadded_file = True if (sys.argv[1] == "T") else False
@@ -51,6 +57,7 @@ else:
 CMSSW_BASE_DIR = os.getenv('CMSSW_BASE')
 CONDOR_BASE_DIR = os.getcwd() + "/"
 ANALYZER_DIR = CONDOR_BASE_DIR.split("condor/")[0]
+Inputfiles_DIR = ANALYZER_DIR + "list/"
 
 cmsswReleaseVersion = CMSSW_BASE_DIR.split("/")[-1]
 print("Using CMSSW version " + cmsswReleaseVersion)
@@ -67,26 +74,35 @@ for dataset_name in list_datasets:
 
     print("\n----- %s -----"%(dataset_name))
 
-    isData, _, era, type_info, _ = datasets_info[dataset_name]
+    #isData, _, era, type_info, _ = datasets_info[dataset_name]
+    isData, max_runs_per_job, era, type_info, _ = datasets_info[dataset_name]
     channel = dataset_name.split("_Summer")[0]
 
     user = os.getenv('LOGNAME')
     EOS_BASE_DIR = "/store/group/lpchmumu/" + user + "/analyzer_HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "/"
 
-    if(isData=='T'):
-        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight_goodLumi.root"
-        if("2025" in era): #Because 2025 doesn't have a good lumi file yet
-            INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
-    else:
-        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + "SumGenWeight.root"
-    if not os.path.exists("/eos/uscms/" + INPUT_FILE):
+    list_file = dataset_name + ".list"
+    if not os.path.exists(Inputfiles_DIR + list_file):
+        print("List file does not exist. Skipping!")
+        continue
+
+    list_all_runs = open(ANALYZER_DIR + "list/" + list_file, "r")
+
+    WEIGHT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + f"SumGenWeight.root"
+    if not os.path.exists("/eos/uscms/" + WEIGHT_FILE):
         print("Merged file does not exist. Skipping!")
         continue
 
-    OUTPUT_DIR = EOS_BASE_DIR + "tuples_" + v.TUPLES_VERSION_NUMBER + "/"
+    if(isData=='T'):
+        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + f"HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "_$(I)_goodLumi.root"
+    else:
+        INPUT_FILE = EOS_BASE_DIR + type_info + "/%s/"%(dataset_name) + f"HiggsMuMu_" + v.ANALYZER_VERSION_NUMBER + "_$(I).root"
+
+    OUTPUT_DIR = EOS_BASE_DIR + "tuples_" + v.TUPLES_VERSION_NUMBER  + "/%s/"%(dataset_name)
     os.system("xrdfs root://cmseos.fnal.gov mkdir -p "+ OUTPUT_DIR)
-    file_name = channel + "_" + era + "_tuples.root"
-    file_copy_name = channel + "_" + era + "_tuples_v1.root"
+
+    file_name = channel + "_" + era + "_$(I)" + "_tuples.root"
+    file_copy_name = channel + "_" + era + "_$(I)" + "_tuples_v1.root"
 
     hadd_exists = os.path.exists("/eos/uscms/" + OUTPUT_DIR + file_name)
     # print("Exists?", hadd_exists)
@@ -107,7 +123,7 @@ for dataset_name in list_datasets:
             print("Skipping.")
             continue
 
-    JOB_DIR = CONDOR_BASE_DIR + "ctuples_" + v.TUPLES_VERSION_NUMBER + "/" + "%s/"%(dataset_name)
+    JOB_DIR = CONDOR_BASE_DIR + "ctuples_" + v.TUPLES_VERSION_NUMBER + "/" + f"{dataset_name}/"# + "%s/"%(dataset_name) + blockString
 
     if os.path.exists(JOB_DIR):
         if len(os.listdir(JOB_DIR+"/log/")) != len(os.listdir(JOB_DIR+"/out/")):
@@ -121,11 +137,32 @@ for dataset_name in list_datasets:
             send_all_jobs.write(comm + "\n")
             continue
 
+    print("Input file: " + INPUT_FILE)
+    print("Job dir: " + JOB_DIR)
+    print("Output dir: " + OUTPUT_DIR)
+    print("Channel: " + channel)
+    print("Type info: " + type_info)
+    #continue
+
+    
     # Create condor directories
     os.system("mkdir -p " + JOB_DIR)
     os.system("mkdir -p " + JOB_DIR + "/log/")
     os.system("mkdir -p " + JOB_DIR + "/out/")
     os.system("mkdir -p " + JOB_DIR + "/err/")
+
+
+    n_runs_in_job = 0
+    n_jobs = 1
+    for run in list_all_runs:
+        # Close current list of runs and open the next one
+        if n_runs_in_job >= max_runs_per_job:
+            n_runs_in_job = 0
+            n_jobs += 1
+
+        # Save run path in list
+        n_runs_in_job += 1
+    # Pack all txt files in a single tar file
 
     ###################################################
     # Copy run script, executable, and required files
@@ -140,12 +177,12 @@ for dataset_name in list_datasets:
     jobfile_JDL.write("Universe  = vanilla" + "\n")
     jobfile_JDL.write("Executable = ./run_job_LPC.sh" + "\n")
 
-    args = INPUT_FILE + " " + OUTPUT_DIR + " " + era + " " + channel + " " + type_info + " " + cmsswReleaseVersion
+    args = INPUT_FILE + " " + WEIGHT_FILE + " " + OUTPUT_DIR + " " + era + " " + channel + " " + type_info + " " + cmsswReleaseVersion + " " + "$(I)"
     jobfile_JDL.write("Arguments = " + args + "\n")
 
-    jobfile_JDL.write("Log = log/job.$(Cluster).$(Process).log" + "\n")
-    jobfile_JDL.write("Output = out/job.$(Cluster).$(Process).out" + "\n")
-    jobfile_JDL.write("Error = err/job.$(Cluster).$(Process).err" + "\n")
+    jobfile_JDL.write("Log = log/jobR$(I).$(Cluster).$(Process).log" + "\n")
+    jobfile_JDL.write("Output = out/jobR$(I).$(Cluster).$(Process).out" + "\n")
+    jobfile_JDL.write("Error = err/jobR$(I).$(Cluster).$(Process).err" + "\n")
     jobfile_JDL.write("x509userproxy = $ENV(X509_USER_PROXY)" + "\n")
 
     transfer_files = JOB_DIR + "/run_job_LPC.sh, "
@@ -156,7 +193,10 @@ for dataset_name in list_datasets:
     jobfile_JDL.write("when_to_transfer_output = ON_EXIT" + "\n\n# Resources request\n")
     jobfile_JDL.write("RequestMemory = 4500 \n\n# Jobs selection\n")
 
-    jobfile_JDL.write("Queue 1\n")
+    jobfile_JDL.write("Queue I from (")
+    for i in range(1, n_jobs+1):
+        jobfile_JDL.write(str(i)+"\n")
+    jobfile_JDL.write(")\n")
     jobfile_JDL.close()
 
     print("Send single job with:")
