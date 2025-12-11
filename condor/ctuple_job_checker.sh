@@ -3,16 +3,16 @@
 ###############################
 # Define input parameters
 ###############################
-ANALYZER_VERSION_NUMBER=$1
+CTUPLE_VERSION_NUMBER=$1
 
 
 
-DIR="analyzer_HiggsMuMu_v$ANALYZER_VERSION_NUMBER"
+DIR="ctuples_v$CTUPLE_VERSION_NUMBER"
 
 #for file in "$DIR"/*/err/*.err; do
 
 # Output file for failures
-OUTFILE="analyzer_error_datasets.txt"
+OUTFILE="ctuple_error_datasets.txt"
 > "$OUTFILE"  # clear it at start
 
 fail_count=0
@@ -48,7 +48,7 @@ for block in "$DIR"/*; do
 
         last_line=$(tail -n 1 "$file")
 
-        if [[ "$last_line" != "cp: cannot stat 'data/pileup/*.root': No such file or directory" ]]; then
+        if [[ "$last_line" != "WARNING: In non-interactive mode release checks e.g. deprecated releases, production architectures are disabled." ]]; then
             blockError=true
             ((fail_count++))
             echo "$file" >> "$OUTFILE"

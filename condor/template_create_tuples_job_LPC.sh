@@ -50,7 +50,7 @@ eval `scram runtime -sh`
 ###########################
 # Run executable
 ###########################
-echo "Executing Analysis executable:"
+echo "Executing Create Tuple executable:"
 echo "./${executable} input_file.root weight_file.root ./ ${era} ${channel} ${is_data} ${is_signal}"
 ./${executable} input_file.root weight_file.root ./ ${era} ${channel} ${is_data} ${is_signal}
 
