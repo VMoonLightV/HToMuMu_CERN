@@ -36,8 +36,8 @@ skip_pattern = [
 list_datasets = datasets_info.keys()
 # # Use in case you want to run over a specific list of datasets!
 #list_datasets = [
-#     "DY120to200_Summer24v13",
-#     "DY50to120_Summer24v13",
+     #"DY120to200_Summer24v13",
+     #"DY50to120_Summer24v13",
      #"Muon0_2024E",
      #"Muon1_2024E",
      
@@ -137,9 +137,9 @@ for dataset_name in list_datasets:
             send_all_jobs.write(comm + "\n")
             continue
 
-    print("Input file: " + INPUT_FILE)
-    print("Job dir: " + JOB_DIR)
-    print("Output dir: " + OUTPUT_DIR)
+    #print("Input file: " + INPUT_FILE)
+    #print("Job dir: " + JOB_DIR)
+    #print("Output dir: " + OUTPUT_DIR)
     print("Channel: " + channel)
     print("Type info: " + type_info)
     #continue

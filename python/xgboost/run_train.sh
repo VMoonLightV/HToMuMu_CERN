@@ -12,7 +12,7 @@ declare -a bkg_subset=("Full")
 # declare -a sig_subset=("Full" "NottH" "VBF")
 declare -a sig_subset=("NottH")
 #declare -a sig_subset=(${HIGGS_CHANNEL})
-# declare -a eras=("2022" "2022EE" "2022Combined" "2023" "2023BPix" "2023Combined" "Combined")
+#declare -a eras=("Combined" "2022" "2022EE" "2022Combined" "2023" "2023BPix" "2023Combined" "2024")
 declare -a eras=("Combined")
 #declare -a eras=("2023BPix")
 
@@ -25,6 +25,7 @@ for bs in "${bkg_subset[@]}"; do
     for ss in "${sig_subset[@]}"; do
         echo "--------- B ${bs} - S ${ss} ---------"
         for era in "${eras[@]}"; do
+            echo "python3 train.py ${HIGGS_CHANNEL} ${era} ${bs} ${ss}"
             python3 train.py ${HIGGS_CHANNEL} ${era} ${bs} ${ss}
 
             #for type in "signal" "background" "data"; do

@@ -6,12 +6,13 @@ Go to https://uscms.org/uscms_at_work/computing/setup/gpu.shtml and follow the E
 
 If you are not in Fermilab you will need to setup a vpn. Here are the instructions: https://uscms.org/uscms_at_work/physics/computing/setup/remote.shtml#VPN
 
-Once you have access to the cluster and the grid, go to https://analytics-hub.fnal.gov, create a server (you can request a 20GB workspace in CMS CERN, for instance).
+Once you have access to the cluster and the grid, go to https://analytics-hub.fnal.gov, create a server (you can request a 20GB el9 workspace in CMS CERN, for instance).
 
 When you are in, do
 ```
 "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
 micromamba create -n xgboost_env xgboost python=3.10 krb5  curl cfitsio root tensorflow keras -c conda-forge
+micromamba activate xgboost_env
 pip3 install pandas 
 pip3 install uproot
 pip3 install matplotlib
@@ -35,7 +36,7 @@ cd /your_path/HmmAnalysis/python/xgboost
 
 Run the training (Make sure you generated the skim tuples first)
 ```
-python3 train.py era background_sources signal_sources
+python3 train.py channel era background_sources_subset signal_sources_subset
 ```
 
 You can append the BDT variable to the tuples running

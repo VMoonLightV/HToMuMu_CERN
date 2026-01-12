@@ -1,20 +1,23 @@
 import subprocess
+import os
 
 # Define the path to your C++ executable
 cpp_executable = "./bin/SkimTuples_VBF"
 #input_directory = "/eos/uscms/store/user/csanmart/analyzer_HiggsMuMu/tuples/"
 input_directory = "./root_io/tuples/"
 output_directory = "./root_io/skim/"
+os.makedirs(output_directory + "VBF/", exist_ok=True)
 
 eras = [
     "2022",
     "2022EE",
     "2023",
     "2023BPix",
+    "2024"
 ]
 
 background_datasets= [
-    "DY50to120",
+    #"DY50to120",
     # "DY120to200",
     # "EWK_2L2J",
     # "TTto2L2Nu",

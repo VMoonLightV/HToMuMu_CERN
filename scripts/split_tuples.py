@@ -16,7 +16,7 @@ def get_output_file_name(data_type, path):
 def get_input_file_name(data_type, path):
     return os.path.join(
         path,
-        {"data": "data_Combined.root", "signal": "signal_2023BPix.root"}[data_type],
+        {"data": "data_Combined.root", "signal": "signal_Combined.root"}[data_type],
     )
 
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     data_type = argv[1]
     channel = argv[2]
     branching_ratio = 2.176e-4
-    use_bsConstrain = False 
+    use_bsConstrain = True 
 
     if data_type not in ["data", "signal"]:
         print("[Error]: use data or signal for data_type")
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         #    "ggH": [0.0, 0.20969230769230757, 0.44615384615384546, 1.0],
         #    "VBF": [0.0, 0.44603999999999994, 0.7559999999999996, 0.9450000000000007, 1.0], 
         #}
-        bdt_cuts = {"ggH" : [0.0, 0.18615384615384592, 0.42307692307692246, 1.0], "VBF": [0.0, 0.3448846153846141, 0.7038461538461517, 0.938461538461536, 1.0]}
+        bdt_cuts = {"ggH" : [0.0, 0.19730769230769193, 0.4384615384615378, 1.0], "VBF": [0.0, 0.28600000000000037, 0.5720000000000012, 0.8800000000000007, 1.0]}
         print("here pls")
     else:
         #bdt_cuts = {
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             #"VBF" :[0.0, 0.3614625000000003, 0.7087499999999998, 0.9450000000000007, 1.0],
 
        # }
-        bdt_cuts = {"ggH" : [0.0, 0.18615384615384592, 0.42307692307692246, 1.0], "VBF": [0.0, 0.41277600000000014, 0.7370999999999996, 0.9450000000000007, 1.0]}
+        bdt_cuts = {"ggH" : [0.0, 0.19730769230769193, 0.4384615384615378, 1.0], "VBF": [0.0, 0.28600000000000037, 0.5720000000000012, 0.8800000000000007, 1.0]}
 
     input_file_name = get_input_file_name(data_type, input_path)
     output_file_name = get_output_file_name(data_type, out_path)

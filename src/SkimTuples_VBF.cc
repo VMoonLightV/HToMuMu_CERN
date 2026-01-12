@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
         "leading_jet_pt",
         "subleading_jet_pt",
         "leading_jet_eta",
+        "subleading_jet_eta",
         "diJet_mass",
         "delta_eta_diJet",
         "delta_phi_diJet",
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {
                       "RECREATE");
     TTree *tree_output = tree_input->CloneTree(0); // Clone the structure only
 
-    tree_output = tree_input->CopyTree("(is_VBF_category == 1) && ((diMuon_mass > 115. && diMuon_mass < 135.) || (diMuon_bsConstrainedMass > 115. && diMuon_bsConstrainedMass < 135.) )");
+    tree_output = tree_input->CopyTree("(is_VBF_category == 1) && ((diMuon_mass > 115. && diMuon_mass < 135.) || (diMuon_bsConstrainedMass > 115. && diMuon_bsConstrainedMass < 135.) ) && (abs(leading_jet_eta) < 2.5 || abs(leading_jet_eta) > 3) && (abs(subleading_jet_eta) < 2.5 || abs(subleading_jet_eta) > 3)");
 
     // Write the selected tree to the output file
     output_file.cd();

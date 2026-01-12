@@ -1,6 +1,8 @@
 #!/bin/bash
 
-path=./root_io/tuples/BDT_score/ggH/BFull_SNottH
+channel_US=$1
+
+path=./root_io/tuples/BDT_score/${channel_US}/BFull_SNottH
 echo $path
 
 cp ./scripts/hadd_template.sh $path/hadd.sh

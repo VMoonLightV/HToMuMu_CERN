@@ -14,7 +14,7 @@ import xgboost as xgb
 root.gROOT.Reset()
 matplotlib.use("Agg")
 plt.style.use(hep.style.CMS)
-use_skim = False
+use_skim = False ###SHOULD THIS BE SET TO TRUE
 root.gROOT.SetBatch(True)
 root.gStyle.SetOptStat(0)
 root.gStyle.SetOptFit(111)
@@ -27,6 +27,7 @@ luminosity = {
     "2023": 17.794,
     "2023BPix": 9.451,
     "2023Combined": 27.245,
+    "2024": 	109.08,
     # "Combined": 61.897,
     "Combined": 170.905,
 }
@@ -38,11 +39,11 @@ def copy_and_skim_tree(tuple_path, tuple_name, BDT_path, BDT_name, channel_US, u
     original_tree = original_file.Get("tree_output")
     if use_bsConstrain:
         cuts = (
-            "diMuon_bsConstrainedMass > 100 && diMuon_bsConstrainedMass < 180 && is_" + channel_US + "_category == 1"
+            "diMuon_bsConstrainedMass > 100 && diMuon_bsConstrainedMass < 180 && is_" + channel_US + "_category == 1" + " && (abs(leading_jet_eta) < 2.5 || abs(leading_jet_eta) > 3) && (abs(subleading_jet_eta) < 2.5 || abs(subleading_jet_eta) > 3)"
         )
     else:
         cuts = (
-            "diMuon_mass > 100 && diMuon_mass < 180 && is_" + channel_US + "_category == 1"
+            "diMuon_mass > 100 && diMuon_mass < 180 && is_" + channel_US + "_category == 1" + " && (abs(leading_jet_eta) < 2.5 || abs(leading_jet_eta) > 3) && (abs(subleading_jet_eta) < 2.5 || abs(subleading_jet_eta) > 3)"
         )
     skim_file = root.TFile.Open(BDT_path + BDT_name, "RECREATE")
     skim_tree = original_tree.CopyTree(cuts)
@@ -98,7 +99,7 @@ def append_BDT_score(
     file = root.TFile(file_name, "update")
     tree = file.Get("tree_output")
 
-    model_file = f"./models/model_{channel_US}_{model_era}_{subset_title}.pkl"
+    model_file = f"./models/model_{channel_US}_{model_era}_{subset_title}.pkl" ###SHOULD WE SWITCH TO ERA NOT MODEL ERA
     if use_bsConstrain:
         model_file = f"./models/model_{channel_US}_{model_era}_{subset_title}_bsC.pkl"
         

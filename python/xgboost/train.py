@@ -298,6 +298,48 @@ for file_type in tuples:
         DO_STANDARDIZATION,
         USE_BSCONSTRAIN,
     )
+    '''xgb_utils.append_BDT_score(
+        file_type,
+        channel_US,
+        "2022",
+        "Combined",
+        signal_subset,
+        background_subset,
+        variables[:-3],
+        mean_map,
+        std_map,
+        DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
+    )
+
+    xgb_utils.append_BDT_score(
+        file_type,
+        channel_US,
+        "2022EE",
+        "Combined",
+        signal_subset,
+        background_subset,
+        variables[:-3],
+        mean_map,
+        std_map,
+        DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
+    )
+
+    xgb_utils.append_BDT_score(
+        file_type,
+        channel_US,
+        "2023",
+        "Combined",
+        signal_subset,
+        background_subset,
+        variables[:-3],
+        mean_map,
+        std_map,
+        DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
+    )
+
     xgb_utils.append_BDT_score(
         file_type,
         channel_US,
@@ -311,17 +353,18 @@ for file_type in tuples:
         DO_STANDARDIZATION,
         USE_BSCONSTRAIN,
     )
-xgb_utils.append_BDT_score(
-    "Data",
-    channel_US,
-    "2024",
-    "Combined",
-    signal_subset,
-    background_subset,
-    variables[:-3],
-    mean_map,
-    std_map,
-    DO_STANDARDIZATION,
-    USE_BSCONSTRAIN,
-)
+    
+    xgb_utils.append_BDT_score(
+        file_type,
+        channel_US,
+        "2024",
+        "Combined",
+        signal_subset,
+        background_subset,
+        variables[:-3],
+        mean_map,
+        std_map,
+        DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
+    )'''
 

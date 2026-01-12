@@ -12,7 +12,7 @@ os.makedirs(output_directory + "ggH/", exist_ok=True)
 
 # eras = ["2022", "2022EE"]
 #eras = ["2024"]
-eras = ["2022EE", "2022", "2023", "2023BPix"]
+eras = ["2022EE", "2022", "2023", "2023BPix", "2024"]
 
 
 # data_datasets = ["DoubleMuon_2022C", "Muon_2022C", "Muon_2022D", "Muon_2022E", "Muon_2022F", "Muon_2022G"]
