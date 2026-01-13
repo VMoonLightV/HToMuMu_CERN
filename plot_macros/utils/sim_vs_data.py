@@ -2,6 +2,8 @@ import uproot as ur
 import mplhep as hep
 import numpy as np
 import matplotlib.pyplot as plt
+import awkward as ak
+
 
 from .labels import (
     x_labels,
@@ -67,16 +69,102 @@ def get_histograms_from_tuple(
         variable_bin += "_" + production_channel
 
     tuple_path = "../root_io/tuples/"
-    if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
+    if bdt_subset != "" or variables[0] == "BDT_" + production_channel:
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
 
     for source in sources:
         file_name = source + "_" + era + "_tuples.root:tree_output"
-        if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
+        if bdt_subset != "" or variables[0] == "BDT_" + production_channel:
             file_name = source + "_" + era + "_" + bdt_subset + ".root:tree_output"
 
+        if ((variables[0] == "diMuon_mass") | (variables[0] == "diMuon_bsConstrainedMass")) and Z_study:
+                number_of_bins = 80; 
+                x_range_histos = (85,100)
+        else:
+            number_of_bins = n_bins[variable_bin]
+            x_range_histos = x_range[variable_bin]
+
+        histogram, bins = np.histogram(
+                [],
+                bins=number_of_bins,
+                range=x_range_histos,
+        )
+
+        for branches in ur.iterate(tuple_path + file_name, variables, library="np", step_size="50 MB"):
+            print("TUPLE PATH in get Hist from tup_____: " + tuple_path)
+            bool_list = np.ones(len(branches[variables[0]]), dtype=bool)
+
+            if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
+                bool_list = (bool_list) & (branches["diMuon_bsConstrainedMass"] > 130) | (
+                    branches["diMuon_bsConstrainedMass"] < 120
+                )
+                if not Z_study:
+                    bool_list = (bool_list) & (branches["diMuon_bsConstrainedMass"] > 110) & (
+                        branches["diMuon_bsConstrainedMass"] < 150
+                    )
+
+
+            elif variables[0] != "diMuon_mass" and ("bsConstrained" not in variables[0]) and is_background:
+                bool_list = (bool_list) & (
+                    ((branches["diMuon_mass"] > 130) | (branches["diMuon_mass"] < 120))
+                )
+                if not Z_study:
+                    bool_list = (bool_list) & (branches["diMuon_mass"] > 110) & (
+                        branches["diMuon_mass"] < 150
+                    )
+
+            if production_channel != "":
+                bool_list = (bool_list) & (
+                    branches["is_" + production_channel + "_category"] == 1
+                )
+
+            if len(bdt_cuts) > 1:
+                bdt_bool = (branches["BDT_" + production_channel] > bdt_cuts[0]) & (
+                    branches["BDT_" + production_channel] < bdt_cuts[1]
+                )
+                bool_list = (bool_list) & (bdt_bool)
+
+            for var in variables:
+                branches[var] = branches[var][bool_list]
+
+            clean_null_values(branches, variables, variables_type)
+
+            if "delta_phi" in variables[0]:
+                branches[variables[0]] = np.absolute(branches[variables[0]])
+
+            TempHistogram, bins = np.histogram(
+                branches[variables[0]],
+                bins=number_of_bins,
+                range=x_range_histos,
+                weights=(
+                    branches["weight"] * era_reweight
+                    # branches["weight"] * (branches["pileup_weight_down"] / branches["pileup_weight"])
+                    if use_puweight
+                    else branches["weight"] / branches["pileup_weight"]
+                ),
+            )
+            histogram = histogram + TempHistogram
+        histograms_list.append(histogram)
+        bins_list.append(bins)
+
+    return histograms_list, bins_list
+
+
+
+
+
+
+
+
+
+
+
+
+'''        print(f"Trying to open {tuple_path + file_name}")
         with ur.open(tuple_path + file_name) as file:
+            print(f"{tuple_path + file_name} opened")
             branches = file.arrays(variables, library="np")
+            print("Branches loaded")
 
             bool_list = np.ones(len(branches[variables[0]]), dtype=bool)
 
@@ -138,7 +226,7 @@ def get_histograms_from_tuple(
             )
             histograms_list.append(histogram)
             bins_list.append(bins)
-    return histograms_list, bins_list
+    return histograms_list, bins_list'''
 
 
 def get_data_histograms_from_tuple(
@@ -151,11 +239,12 @@ def get_data_histograms_from_tuple(
 ):
     tuple_path = "../root_io/tuples/"
     file_name = "Data_" + era + "_tuples.root:tree_output"
-    if bdt_subset != "" and (len(bdt_cuts) != 0 or variables[0] == "BDT_" + production_channel):
+    if bdt_subset != "" or variables[0] == "BDT_" + production_channel:
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
         file_name = "Data_" + era + "_" + bdt_subset + ".root:tree_output"
 
     with ur.open(tuple_path + file_name) as data_file:
+        print("TUPLE PATH in get data Hist_____: " + tuple_path)
         branches = data_file.arrays(variables, library="np")
 
         variable_bin = variables[0]

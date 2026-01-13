@@ -45,7 +45,7 @@ if comparation_input != "Nominal":
     comparation_list.append("_runII")
 subset_title = "B" + background_subset + "_S" + signal_subset
 
-bdt_cuts = {"ggH" : [0.1793846153846151, 0.40769230769230713], "VBF": [0.31569538461538404, 0.6716923076923065, 0.9076923076923054]}
+bdt_cuts = {"ggH" : [0.0, 0.19730769230769193, 0.4384615384615378, 1.0], "VBF": [0.0, 0.3114000000000005, 0.6228000000000008, 0.8650000000000007, 1.0]}
 nominal = "_XSxLumi+m_res"
 draw_bdt_cuts = False
 log_x = False 

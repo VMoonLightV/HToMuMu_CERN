@@ -23,13 +23,15 @@ elif era_input == "2022":
     eras = ["2022", "2022EE", "2022Combined"]
 elif era_input == "2023":
     eras = ["2023", "2023BPix", "2023Combined"]
+elif era_input == "2024":
+    eras = ["2024"]
 elif era_input == "Combined":
     eras = ["Combined"]
 elif era_input == "All":
-    eras = ["2022", "2022EE", "2023", "2023BPix", "Combined"]
+    eras = ["2022", "2022EE", "2023", "2023BPix", "2024", "Combined"]
 else:
     print("Set era to be one of the available sets:")
-    print(" > 2022, 2023, Combined, All")
+    print(" > 2022, 2023, 2024, Combined, All")
     exit()
 
 if len(sys.argv) == 3:

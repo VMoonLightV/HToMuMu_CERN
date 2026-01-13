@@ -33,11 +33,13 @@ signal_sources = [
 bdt_selections = {
     "ggH": {
         # "BFull_SNottH": [0.0, 0.06461538461538464, 0.16153846153846155, 1.0],
-        "BFull_SNottH": [0.0, 0.052, 0.131, 1.0],
+        ##"BFull_SNottH": [0.0, 0.19730769230769193, 0.4384615384615378, 1.0],
+        "BFull_SNottH": [0.0, 0.19730769230769193, 0.4384615384615378, 1.0],
     },
     "VBF": {
-        "BFull_SNottH": [0.0, 0.38, 0.912, 0.977, 1.0],
-        "BNoDY50_SNottH": [0.0, 0.546, 0.935, 0.985, 1.0],
+        ##"BFull_SNottH": [0.0, 0.30789150000000015, 0.6283500000000011, 0.8850000000000007, 1.0],
+        #"BNoDY50_SNottH": [0.0, 0.546, 0.935, 0.985, 1.0],
+        "BFull_SNottH":[0.0, 0.28600000000000037, 0.5720000000000012, 0.8800000000000007, 1.0],
     },
     "": {"":""},
 }
@@ -97,13 +99,15 @@ variables = [
     "HT_pt10",
 ]
 
+variables = ["diMuon_bsConstrainedMass", "leading_jet_eta"]
+
 # eras = ["2022EE", "2022", "2023", "2023BPix", "2024"]#, "2025"]
-# eras = ["2022", "2022EE", "2023", "2023BPix","2024"]
+#eras = ["2022", "2022EE", "2023", "2023BPix", "2024"]
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
 #eras = ["2023BPix"]
-eras = ["2025"]
-#eras = ["Combined"]
+#eras = ["2024"]
+eras = ["Combined"]
 
 for era in eras:
     for variable in variables:
@@ -117,17 +121,17 @@ for era in eras:
             bdt_selections[production_channel][bdt_subset],
             bdt_subset,
         )
-    #draw_data_and_simul_and_ratio(
-    #        "diMuon_mass",
-    #        era,
-    #        background_sources,
-    #        signal_sources,
-    #        True,
-    #        production_channel,
-    #        bdt_selections[production_channel][bdt_subset],
-    #        bdt_subset,
-    #        True,
-    #    )
+    '''draw_data_and_simul_and_ratio(
+            "diMuon_bsConstrainedMass",
+            era,
+            background_sources,
+            signal_sources,
+            True,
+            production_channel,
+            bdt_selections[production_channel][bdt_subset],
+            bdt_subset,
+            True,
+        )'''
     #draw_data_and_simul_and_ratio(
     #        "diMuon_bsConstrainedMass",
     #        era,
