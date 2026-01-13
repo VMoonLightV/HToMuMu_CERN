@@ -7,10 +7,11 @@
 5. Run `python3 create_analyzer_jobs_LPC.py`. This will create an analyzer directory with a subfolder for each dataset in the list.
     - To submit a single job, run `condor_submit task.jdl` inside the corresponding dataset directory. Note that the output of step 2 provides a one-line command to do this!
     - You can also run `bash condor_job_sender.sh` to send the jobs for all of the new datasets!
-    - After the jobs have run, run `analyzer_job_checker.sh` in order to see if there were errors with any of the datasets. The problematic datasets are stored in an output text file.
+    - After the jobs have run, run ` bash analyzer_job_checker.sh` in order to see if there were errors with any of the datasets. The problematic datasets are stored in an output text file.
 7. Once all jobs have finished, compute the total SumGenWeight by running `python3 ../scripts/ComputeWeights.py <T/F>`
 8. Change tuples version number in utils/version.py
 9. Run the tuplizer with `python_create_ctuples_jobs.py`
+10. After the jobs have run, run `bash ctuple_job_checker.sh` in order to see if there were errors with any of the datasets. The problematic datasets are stored in an output text file.
 
 ## How to run histos
 1. Run `python3 create_histo_jobs_LPC.py`. 

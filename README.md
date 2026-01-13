@@ -11,6 +11,12 @@ cd HToMuMu
 make -j4
 ```
 
+## For jobs and dataset creation
+You need to have a CMS GRID certificate established
+```
+voms-proxy-init -voms cms
+```
+
 ## Run the analyzer 
 For simulations
 ```
@@ -36,6 +42,39 @@ For data/simulation
 
 To run over all the data sets look at condor/README.md to run it in condor jobs.   
 If you want to run it over a small dataset look at scripts/README.md
+
+## Using Condor jobs
+Analyzer and tuplizer should be run over all datasets using condor jobs. To do this, look at the README in condor/
+
+## Hadd Tuplizer output
+After you have the tuples, you need them locally to plot from and run the BDT on.
+
+```
+cd ./root_io/tuples/
+bash hadd_tuples_EOS.sh
+bash hadd_tuples.sh
+```
+
+The second hadd creates combined era tuple files
+
+## Skim tuples 
+
+BDT does not like big files, so we need to generate a tuples that contain just the events from that production mode and the training variables.
+To this use src/SkimTuples_VBF.cc  src/SkimTuplesggH.cc and the scripts ./scripts/run_skim_ggH.py ./scripts/run_skim_VBF.py
+You can change the datasets by changing the lists `eras`, `background_datasets`, and `signal_datasets` in the script.
+
+Run
+```
+python3 ./scripts/run_skim_ggH.py
+python3 ./scripts/run_skim_VBF.py
+```
+
+Once we have the skim tuples, you must hadd to have one background tuple and one signal sample, you can just do
+
+```
+cd ./root_io/skim/(ggH/VBF)
+bash hadd_skim.sh
+```
 
 ## BDT Training
 Look at python/xgboost/README.md
