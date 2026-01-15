@@ -1,0 +1,2 @@
+root://cmsxrootd.fnal.gov//store/data/Run2024F/Muon0/NANOAOD/MINIv6NANOv15-v1/2540000/7f4a3771-0ef4-4a84-a530-a0d4574056d4.root
+root://cmsxrootd.fnal.gov//store/data/Run2024F/Muon0/NANOAOD/MINIv6NANOv15-v1/2540000/4eda15c6-786a-4381-bead-7b5d18c41a2c.root
