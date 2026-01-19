@@ -49,10 +49,11 @@ mkdir -p ${cmssw_version}/src/RazorCommon/bin/
 mkdir -p ${cmssw_version}/src/RazorCommon/python/
 if [ "$year" != "2025" ]; then 
     cp muon_Z.json.gz ${DATA_FOLDER}/leptonSF/${year}/
-    cp FWLiteGoodLumi ${cmssw_version}/src/RazorCommon/bin/
-    cp Cert* ${cmssw_version}/src/RazorCommon/data/
-    cp loadJson.py ${cmssw_version}/src/RazorCommon/python/
 fi
+
+cp FWLiteGoodLumi ${cmssw_version}/src/RazorCommon/bin/
+cp Cert* ${cmssw_version}/src/RazorCommon/data/
+cp loadJson.py ${cmssw_version}/src/RazorCommon/python/
 
 mkdir -p ${DATA_FOLDER}/pileup/
 cp Pileup*.root ${DATA_FOLDER}/pileup/
@@ -100,7 +101,7 @@ echo "./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${fil
 ###########################
 # Run goodLumi Validation
 ###########################
-if [[ "$year" != "2025" && "$file_type" == "data" ]]; then
+if [[ "$file_type" == "data" ]]; then
     echo "Executing goodLumi check:"
     cd RazorCommon/bin
     cert_file=$(ls ../data/)
@@ -117,7 +118,7 @@ ls -l
 ################################################################
 echo ${output_Directory}
 xrdfs root://cmseos.fnal.gov mkdir -p /store/group/lpchmumu/${output_Directory}
-if [[ "$year" != "2025" && "$file_type" == "data" ]]; then
+if [[ "$file_type" == "data" ]]; then
     cd ../../
     xrdcp -f ${output_name}_${job_number}_goodLumi.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}_goodLumi.root
     echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}_goodLumi.root"

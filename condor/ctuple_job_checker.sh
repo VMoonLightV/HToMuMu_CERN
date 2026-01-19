@@ -116,10 +116,19 @@ for block in "$DIR"/*; do
         echo "************** Errors found in $block **************"
     fi
 
+    break
+
 done
 
 echo "------------------------------ $DIR ------------------------------"
-echo "Total job num: ${#total_job_times[@]}"
+#echo "Total job num: ${#total_job_times[@]}"
+EXPECTED_CTUPLE_JOBS=$(jq -r '.EXPECTED_CTUPLE_JOBS' expected_ctup_job_number.json)
+echo "Total job num: ${#total_job_times[@]} / $EXPECTED_CTUPLE_JOBS"
+
+if (( ${#total_job_times[@]} < $EXPECTED_CTUPLE_JOBS )); then
+    echo "THE TOTAL NUMBER OF EXPECTED JOBS HAVE NOT BEEN RUN: ${#total_job_times[@]} / $EXPECTED_CTUPLE_JOBS"
+    echo "THE TOTAL NUMBER OF EXPECTED JOBS HAVE NOT BEEN RUN: ${#total_job_times[@]} / $EXPECTED_CTUPLE_JOBS" >> "$OUTFILE"
+fi
 
 max_job_time=${total_job_times[0]}; for x in "${total_job_times[@]}"; do ((x>max_job_time)) && max_job_time=$x; done
 max_run_time=${running_job_times[0]}; for x in "${running_job_times[@]}"; do ((x>max_run_time)) && max_run_time=$x; done

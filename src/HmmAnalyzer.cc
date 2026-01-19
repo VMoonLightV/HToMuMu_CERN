@@ -38,8 +38,10 @@ int main(int argc, char *argv[]) {
     TString year_num = argv[5];
 
     //read run3 muon efficiency json files
-    LeptonEfficiencyCorrector corrector;
-    corrector.initializeCorrections(year_num.Data());
+    if (!is_data_input){
+        LeptonEfficiencyCorrector corrector;
+        corrector.initializeCorrections(year_num.Data());
+    }
 
     HmmAnalyzer Hmm(inputFileList, outFileName, data, is_data_input, year_num);
     std::cout << "Running on: " << std::endl;

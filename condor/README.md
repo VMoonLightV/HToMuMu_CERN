@@ -2,6 +2,7 @@
 ## How to run
 1. Make sure you have generated the list of runs of a dataset from `../list/makeListFromDAS_Run3.py`.
 2. Add/remove/update dataset list in `create_analyzer_jobs_LPC.py` using the corresponding `.list` file as the key.
+    - This also creates a json file to store the expected number of jobs as a check for later.
 3. Change analyzer version number in utils/version.py
 4. Make RazorCommon `cd ../RazorCommon` then `scramv1 b clean; scramv1 b` to have an up to date goodLumi check binary `FWLiteGoodLumi`
 5. Run `python3 create_analyzer_jobs_LPC.py`. This will create an analyzer directory with a subfolder for each dataset in the list.
@@ -11,6 +12,7 @@
 7. Once all jobs have finished, compute the total SumGenWeight by running `python3 ../scripts/ComputeWeights.py <T/F>`
 8. Change tuples version number in utils/version.py
 9. Run the tuplizer with `python3 create_ctuples_jobs.py`
+    - Similar to the analyzer job generator, this also creates a json file to store the expected number of jobs as a check for later.
 10. After the jobs have run, run `bash ctuple_job_checker.sh` in order to see if there were errors with any of the datasets. The problematic datasets are stored in an output text file.
 
 ## How to run histos

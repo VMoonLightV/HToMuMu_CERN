@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 sys.path.append('../list')
 from listDatasets_Run3 import datasets_info
 
@@ -17,6 +18,7 @@ golden_json = {
         '2023':'Cert_Collisions2023_366442_370790_Golden.json',
         '2023BPix':'Cert_Collisions2023_366442_370790_Golden.json',
         '2024':'Cert_Collisions2024_378981_386951_Golden.json',
+        '2025':'Cert_Collisions2025_391658_398903_Golden.json'
         }
 
 # Skip these datasets
@@ -49,7 +51,7 @@ list_datasets = datasets_info.keys()
      #"DY50to120_Summer24",
      #"DY120to200_Summer24",
 #     "WWtoLNu2Q_Summer22",
-#     "Muon_2022C",
+#     "Muon0_2025B",
 #]
 
 # cmsswReleaseVersion = "CMSSW_10_6_5"
@@ -68,6 +70,8 @@ print("Analyzer: " + "%s/bin/%s"%(Analyzer_DIR, analyzer))
 
 # Create script to send all of the jobs directly
 send_all_jobs = open(Condor_BASE_DIR + "/condor_job_sender.sh", "w+")
+
+total_job_number = 0
 
 # Create directory for condor jobs
 for dataset_name in list_datasets:
@@ -114,6 +118,7 @@ for dataset_name in list_datasets:
         # Save run path in list
         list_runs_in_job.write(run)
         n_runs_in_job += 1
+    total_job_number += n_jobs
     list_runs_in_job.close()
     # Pack all txt files in a single tar file
     os.system("cd " + Job_DIR + "; tar czf input_list.tgz input_list_*.txt")
@@ -135,7 +140,7 @@ for dataset_name in list_datasets:
     # os.system("cp " + "%s/leptonSF/%s/*.root"%(Analyzer_Data_DIR, year) + " " + "%s/leptonSF/%s/"%(Job_Data_DIR, year))
 
     #get RazorCommon as well
-    if(isData=="T" and year != "2025"):
+    if(isData=="T"):
         os.system("mkdir -p " + Job_DIR + "RazorCommon/data/")
         os.system("mkdir -p " + Job_DIR + "RazorCommon/bin/")
         os.system("mkdir -p " + Job_DIR + "RazorCommon/python/")
@@ -178,10 +183,10 @@ for dataset_name in list_datasets:
 
     if(year != "2025"):
         transfer_files += Job_Data_DIR + "/leptonSF/" + year + "/muon_Z.json.gz, "
-        if isData=="T":
-            transfer_files += Job_DIR + "/RazorCommon/bin/FWLiteGoodLumi, "
-            transfer_files += Job_DIR + "/RazorCommon/data/Run3/" + golden_json[year] + ", "
-            transfer_files += Job_DIR + "/RazorCommon/python/loadJson.py, "
+    if(isData=="T"):
+        transfer_files += Job_DIR + "/RazorCommon/bin/FWLiteGoodLumi, "
+        transfer_files += Job_DIR + "/RazorCommon/data/Run3/" + golden_json[year] + ", "
+        transfer_files += Job_DIR + "/RazorCommon/python/loadJson.py, "
 
     transfer_files += Job_Data_DIR + "/pileup/" + pileup_file + ".root"
     jobfile_JDL.write("transfer_input_files = " + transfer_files + "\n")
@@ -204,4 +209,9 @@ for dataset_name in list_datasets:
 print("\n----- End -----")
 print("Run all generated jobs with:")
 print(" > bash condor_job_sender.sh")
+print("Expected number of jobs: {}".format(total_job_number))
+
+with open("expected_ana_job_number.json", "w") as f:
+    json.dump({"EXPECTED_ANALYZER_JOBS": total_job_number}, f)
+    
 send_all_jobs.close()

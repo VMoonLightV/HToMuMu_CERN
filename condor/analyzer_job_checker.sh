@@ -81,13 +81,19 @@ for block in "$DIR"/*; do
 
     #Find analyzer timing information
     for file in "$block"/log/*.log; do
+        #echo "$file"
         first_line=$(head -n 1 "$file")
         second_line=$(head -n 3 "$file" | tail -n 1)
-        last_line=$(tail -n 2 "$file" | head -n 1)
+        last_line=$(tail -n 20 "$file" | head -n 1)
+        #echo "$last_line"
 
         submission_time=$(grep -oE '[0-9]{2}:[0-9]{2}:[0-9]{2}' <<< "$first_line")
         transfer_time=$(grep -oE '[0-9]{2}:[0-9]{2}:[0-9]{2}' <<< "$second_line")
         finish_time=$(grep -oE '[0-9]{2}:[0-9]{2}:[0-9]{2}' <<< "$last_line")
+
+        #echo "SubTime: $submission_time"
+        #echo "TransTime: $transfer_time"
+        #echo "FinTime: $finish_time"
 
         st=$(to_seconds "$submission_time")
         tt=$(to_seconds "$transfer_time")
@@ -106,6 +112,7 @@ for block in "$DIR"/*; do
 
         total_job_times+=( $total_job_time )
         running_job_times+=( $running_job_time )
+        #echo "$running_job_time"
     done
 
     if $blockError; then
@@ -116,7 +123,13 @@ done
 
 
 echo "------------------------------ $DIR ------------------------------"
-echo "Total job num: ${#total_job_times[@]}"
+EXPECTED_ANALYZER_JOBS=$(jq -r '.EXPECTED_ANALYZER_JOBS' expected_ana_job_number.json)
+echo "Total job num: ${#total_job_times[@]} / $EXPECTED_ANALYZER_JOBS"
+
+if (( ${#total_job_times[@]} < $EXPECTED_ANALYZER_JOBS )); then
+    echo "THE TOTAL NUMBER OF EXPECTED JOBS HAVE NOT BEEN RUN: ${#total_job_times[@]} / $EXPECTED_ANALYZER_JOBS"
+    echo "THE TOTAL NUMBER OF EXPECTED JOBS HAVE NOT BEEN RUN: ${#total_job_times[@]} / $EXPECTED_ANALYZER_JOBS" >> "$OUTFILE"
+fi
 
 max_job_time=${total_job_times[0]}; for x in "${total_job_times[@]}"; do ((x>max_job_time)) && max_job_time=$x; done
 max_run_time=${running_job_times[0]}; for x in "${running_job_times[@]}"; do ((x>max_run_time)) && max_run_time=$x; done

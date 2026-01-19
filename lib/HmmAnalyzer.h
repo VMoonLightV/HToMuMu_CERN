@@ -356,6 +356,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     muon_pt_cut["2023"] = 26.0;
     muon_pt_cut["2023BPix"] = 26.0;
     muon_pt_cut["2024"] = 26.0;
+    muon_pt_cut["2025"] = 26.0;
 
     // Define b-tagging scores
     // b-tag particleNet LOOSE score selection
@@ -364,6 +365,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     btagLoose_cut["2023"] = 0.0358;
     btagLoose_cut["2023BPix"] = 0.0359;
     btagLoose_cut["2024"] = 0.0359;// 2024 values NEED to be checked. Other values probaly too
+    btagLoose_cut["2025"] = 0.0359;
 
     // b-tag deepFlav MEDIUM score selection
     btagMedium_cut["2016"] = 0.6321;
@@ -375,6 +377,7 @@ HmmAnalyzer::HmmAnalyzer(const TString &inputFileList, const char *outFileName,
     btagMedium_cut["2023"] = 0.1917;
     btagMedium_cut["2023BPix"] = 0.1919;
     btagMedium_cut["2024"] = 0.1917;// 2024 values NEED to be checked. Other values probaly too
+    btagMedium_cut["2025"] = 0.1917;
 
     if (!is_data) {
         getPileupHistograms();
@@ -550,6 +553,9 @@ void HmmAnalyzer::getPileupHistograms() {
     } else if (yearst == "2024") {
         pileupWeightFile =
             new TFile("./data/pileup/PileupReweight_Summer24.root");
+    } else if (yearst == "2025") {
+        pileupWeightFile =
+            new TFile("./data/pileup/PileupReweight_Summer25.root");
     }
     if (pileupWeightFile) {
         pileupWeightHist = (TH1F *)pileupWeightFile->Get("npu_nominal");

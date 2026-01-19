@@ -11,6 +11,7 @@ json = {
         '2022':'Cert_Collisions2022_355100_362760_Golden.json',
         '2023':'Cert_Collisions2023_366442_370790_Golden.json',
         '2024':'Cert_Collisions2024_378981_386951_Golden.json',
+        '2025':'Cert_Collisions2025_391658_398903_Golden.json'
         }
 
 data_path = f'/eos/uscms/store/group/lpchmumu/esledge/analyzer_HiggsMuMu_{v.ANALYZER_VERSION_NUMBER}/Data/'
@@ -19,10 +20,7 @@ analyzer_output_files = [file for file in os.listdir(data_path) if "Higgs" in fi
 for era in os.listdir(data_path):
         year = era.split("_")[1][:4]
         print("Processing era: " + era)
-        if(year != '2025'): cert = golden_json_path + json[year]
-        else:
-                print("No Golden JSON file exists for 2025")
-                continue
+        cert = golden_json_path + json[year]
 
         analyzer_output_files = [file for file in os.listdir(data_path + era) if "Higgs" in file]
 

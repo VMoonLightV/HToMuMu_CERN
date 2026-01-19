@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 sys.path.append('../list')
 from listDatasets_Run3 import datasets_info
 
@@ -65,6 +66,8 @@ print("Running tuples version " + v.TUPLES_VERSION_NUMBER)
 
 # Create script to send all of the jobs directly
 send_all_jobs = open(CONDOR_BASE_DIR + "/condor_ctuple_job_sender.sh", "w+")
+
+total_job_number = 0
 
 # Create directory for condor jobs
 for dataset_name in list_datasets:
@@ -164,6 +167,8 @@ for dataset_name in list_datasets:
         n_runs_in_job += 1
     # Pack all txt files in a single tar file
 
+    total_job_number += n_jobs
+
     ###################################################
     # Copy run script, executable, and required files
     ###################################################
@@ -207,4 +212,10 @@ for dataset_name in list_datasets:
 print("\n----- End -----")
 print("Run all generated jobs with:")
 print(" > bash condor_ctuple_job_sender.sh")
+
+print("Expected number of jobs: {}".format(total_job_number))
+
+with open("expected_ctup_job_number.json", "w") as f:
+    json.dump({"EXPECTED_CTUPLE_JOBS": total_job_number}, f)
+
 send_all_jobs.close()
