@@ -23,15 +23,10 @@ pip3 install mplhep
 
 ## How to run
 
-Pick your node https://analytics-hub.fnal.gov/hub/home and activate the environment
-```
-eval "$(micromamba shell hook --shell bash)"
-micromamba activate xgboost_env
-```
-
-Go to the xgboost directory
+Pick your node https://analytics-hub.fnal.gov/hub/home and go to the xgboost directory
 ```
 cd /your_path/HmmAnalysis/python/xgboost
+source setup.sh #activates the xgboost_env
 ```
 
 Run the training (Make sure you generated the skim tuples first)
