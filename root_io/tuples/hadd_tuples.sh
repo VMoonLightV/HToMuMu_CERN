@@ -22,7 +22,7 @@ hadd -f VBF_2023Combined_tuples.root VBF_2023_tuples.root VBF_2023BPix_tuples.ro
 hadd -f ttH_2023Combined_tuples.root ttH_2023_tuples.root ttH_2023BPix_tuples.root
 
 #Combined
-hadd Data_Combined_tuples.root Data_2022_tuples.root Data_2022EE_tuples.root Data_2023_tuples.root Data_2023BPix_tuples.root Data_2024_tuples.root
+hadd -f Data_Combined_tuples.root Data_2022Combined_tuples.root Data_2023Combined_tuples.root Data_2024_tuples.root #Data_2025_tuples.root
 
 hadd DiBoson_Combined_tuples.root DiBoson_2022_tuples.root DiBoson_2022EE_tuples.root DiBoson_2023_tuples.root DiBoson_2023BPix_tuples.root DiBoson_2024_tuples.root
 

@@ -193,6 +193,12 @@ python3 scripts/split_tuples.py data (ggH/VBF)
 ```
 Inside the code, there is a variable called use_bsConstrain. If you train the BDT model using bsConstrain variable, set it to True, if you don't want to use bsConstrain variables set it to False. <span style="color:Orange"> Would be nice to add this as an input parameter.
 
+You can now run this together with
+
+```
+bash scripts/run_splitting.sh
+```
+
 ## Mass fits code
 
 Once you have the tuples set up, the [mass_fit_repo](https://github.com/MatBarria/flashggFinalFit) using the commands that are in the README

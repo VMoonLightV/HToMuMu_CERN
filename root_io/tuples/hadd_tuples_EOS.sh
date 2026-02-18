@@ -1,6 +1,7 @@
-ANALYZER_VERSION="v1.3"
-TUPLES_VERSION="v1.3.1"
+ANALYZER_VERSION="v1.4"
+TUPLES_VERSION="v1.4.2"
 EOS_PATH="/eos/uscms/store/group/lpchmumu/$USER/analyzer_HiggsMuMu_$ANALYZER_VERSION/tuples_$TUPLES_VERSION/"
+inEOS_PATH="/store/group/lpchmumu/$USER/analyzer_HiggsMuMu_$ANALYZER_VERSION/tuples_$TUPLES_VERSION/"
 
 ##############  2022  ##############
 hadd -f Data_2022_tuples.root ${EOS_PATH}Muon_2022{C..D}/*.root ${EOS_PATH}SingleMuon_2022C/*.root
@@ -70,4 +71,12 @@ hadd -f ttH_2024_tuples.root ${EOS_PATH}ttH_*24/*.root
 
 ##############  2025  ##############
 
-#hadd -f Data_2025_tuples.root ${EOS_PATH}Muon*_2025*/*.root
+hadd -f Data_2025_tuples.root ${EOS_PATH}Muon*_2025*/*.root
+
+
+###Copy back to LPC
+echo ${inEOS_PATH}
+echo eosmkdir ${inEOS_PATH}haddTuples/
+eosmkdir ${inEOS_PATH}haddTuples/
+echo eos cp *.root root://cmseos.fnal.gov//${inEOS_PATH}haddTuples/
+eos cp *.root root://cmseos.fnal.gov//${inEOS_PATH}haddTuples/

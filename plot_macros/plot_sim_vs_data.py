@@ -34,12 +34,12 @@ bdt_selections = {
     "ggH": {
         # "BFull_SNottH": [0.0, 0.06461538461538464, 0.16153846153846155, 1.0],
         ##"BFull_SNottH": [0.0, 0.19730769230769193, 0.4384615384615378, 1.0],
-        "BFull_SNottH": [0.0, 0.19730769230769193, 0.4384615384615378, 1.0],
+        "BFull_SNottH": [0.0, 0.46000000000000024, 0.6100000000000003, 0.7400000000000004, 0.8300000000000005, 0.9000000000000006, 1.0],
     },
     "VBF": {
         ##"BFull_SNottH": [0.0, 0.30789150000000015, 0.6283500000000011, 0.8850000000000007, 1.0],
         #"BNoDY50_SNottH": [0.0, 0.546, 0.935, 0.985, 1.0],
-        "BFull_SNottH":[0.0, 0.28600000000000037, 0.5720000000000012, 0.8800000000000007, 1.0],
+        "BFull_SNottH":[0.0, 0.6200000000000001, 0.7933333333333346, 0.8933333333333352, 0.9266666666666687, 0.9600000000000023, 1.0],
     },
     "": {"":""},
 }
@@ -99,15 +99,18 @@ variables = [
     "HT_pt10",
 ]
 
-variables = ["diMuon_bsConstrainedMass", "leading_jet_eta"]
+#variables = ["leading_jet_eta"]#, "subleading_jet_eta"]
+#variables = ["diMuon_bsConstrainedMass"]
+variables = []
 
 # eras = ["2022EE", "2022", "2023", "2023BPix", "2024"]#, "2025"]
-#eras = ["2022", "2022EE", "2023", "2023BPix", "2024"]
+eras = ["2022", "2022EE", "2023", "2023BPix", "2024", "2025", "Combined"]
 # eras = ["2022", "2022EE"]
 # eras = ["2023", "2023BPix"]
 #eras = ["2023BPix"]
-#eras = ["2024"]
-eras = ["Combined"]
+#eras = ["2024", "Combined"]
+#eras = ["Combined"]
+#eras = ["2025"]
 
 for era in eras:
     for variable in variables:
@@ -120,8 +123,34 @@ for era in eras:
             production_channel,
             bdt_selections[production_channel][bdt_subset],
             bdt_subset,
+            jet_pT_study=False
         )
-    '''draw_data_and_simul_and_ratio(
+    
+    draw_data_and_simul_and_ratio(
+        "leading_jet_pt",
+        era,
+        background_sources,
+        signal_sources,
+        True,
+        production_channel,
+        bdt_selections[production_channel][bdt_subset],
+        bdt_subset,
+        jet_pT_study=True
+    )
+    
+    draw_data_and_simul_and_ratio(
+        "subleading_jet_pt",
+        era,
+        background_sources,
+        signal_sources,
+        True,
+        production_channel,
+        bdt_selections[production_channel][bdt_subset],
+        bdt_subset,
+        jet_pT_study=True
+    )
+    '''
+    draw_data_and_simul_and_ratio(
             "diMuon_bsConstrainedMass",
             era,
             background_sources,

@@ -40,20 +40,31 @@ def split_tuples_by_category(
             f"BDT_{channel}",
             f"is_{channel}_category",
             "weight_no_lumi",
+            "weight",
+            "leading_jet_eta",
+            "subleading_jet_eta"
         ]
         print(f"[Info] Opening input file: {input_file_name}")
+
+        reweight = 1
+
+        if(data_type=="signal"):
+            print("Reweighting signal MC")
+            reweight = 281.7/170.97
+
         branches = uproot.open(input_file_name)["tree_output"].arrays(
             selected_branches, library="np"
         )
         # Changing the weight from gen_weight*pu*br*1000/SumGenweight to gen_weight/SumGenweight
-        branches["weight"] = branches["weight_no_lumi"] / (
-            1000 * branching_ratio * branches["pileup_weight"]
-        )
+        branches["weight"] = branches["weight"] / (
+            branching_ratio * branches["pileup_weight"]
+        ) * reweight
+        
         # Renameing the mass variable to use the hgg fits code
         if use_bsConstrain:
             branches["CMS_hgg_mass"] = branches["diMuon_bsConstrainedMass"]
         else:
-            print("we here righr")
+            #print("we here right")
             branches["CMS_hgg_mass"] = branches["diMuon_mass"]
         for category in range(len(bdt_cuts[channel]) - 1):
 
@@ -61,6 +72,15 @@ def split_tuples_by_category(
             selected_events = {}
             print(f"[Info] Inital events: {len(branches['diMuon_mass'])}")
             print(category)
+
+            eta_horn_cuts = (
+                (abs(branches["leading_jet_eta"]) > 2.5)
+                & (abs(branches["leading_jet_eta"]) < 3)
+                & (abs(branches["subleading_jet_eta"]) > 2.5)
+                & (abs(branches["subleading_jet_eta"]) < 3)
+            )
+
+            print(f"[Info] Initial events in horn: {len(branches['diMuon_mass'][eta_horn_cuts])}")
 
             cuts = (
                 (branches["BDT_" + channel] > bdt_cuts[channel][category])
@@ -72,7 +92,17 @@ def split_tuples_by_category(
 
             selected_events = {name: array[cuts] for name, array in branches.items()}
 
-            print(f"[Info] Final events: {len(branches['diMuon_mass'][cuts])}")
+            eta_horn_selected = (
+                (abs(selected_events["leading_jet_eta"]) > 2.5)
+                & (abs(selected_events["leading_jet_eta"]) < 3)
+                & (abs(selected_events["subleading_jet_eta"]) > 2.5)
+                & (abs(selected_events["subleading_jet_eta"]) < 3)
+            )
+
+            #print(f"[Info] Final events: {len(branches['diMuon_mass'][cuts])}")
+            #print(f"[Info] Final selected events: {len(selected_events['diMuon_mass'])}")
+
+            #print(f"[Info] Final selected events in horn: {len(selected_events['diMuon_mass'][eta_horn_selected])}")
 
             category_name = channel + "cat" + str(len(bdt_cuts[channel]) - category - 1)
 
@@ -105,7 +135,7 @@ if __name__ == "__main__":
     print(f"[Config] Branching Ratio = {branching_ratio}")
     print(f"[Config] Use bsConstrain = {use_bsConstrain}")
 
-    out_path = f"./root_io/tuples/split_tuples/{channel}"
+    out_path = f"./root_io/tuples/split_tuples_no_splitting/{channel}"
     input_path = f"./root_io/tuples/BDT_score/{channel}/BFull_SNottH/"
     os.makedirs(out_path, exist_ok=True)
     if use_bsConstrain:
@@ -113,8 +143,9 @@ if __name__ == "__main__":
         #    "ggH": [0.0, 0.20969230769230757, 0.44615384615384546, 1.0],
         #    "VBF": [0.0, 0.44603999999999994, 0.7559999999999996, 0.9450000000000007, 1.0], 
         #}
-        bdt_cuts = {"ggH" : [0.0, 0.19730769230769193, 0.4384615384615378, 1.0], "VBF": [0.0, 0.28600000000000037, 0.5720000000000012, 0.8800000000000007, 1.0]}
-        print("here pls")
+        bdt_cuts = {"ggH" : [0.0, 0.46000000000000024, 0.6100000000000003, 0.7400000000000004, 0.8300000000000005, 0.9000000000000006, 1.0], 
+                    "VBF": [0.0, 0.6200000000000001, 0.7933333333333346, 0.8933333333333352, 0.9266666666666687, 0.9600000000000023, 1.0]
+                    }
     else:
         #bdt_cuts = {
             #"ggH": [0.0, 0.18615384615384592, 0.42307692307692246, 1.0],
@@ -123,7 +154,7 @@ if __name__ == "__main__":
             #"VBF" :[0.0, 0.3614625000000003, 0.7087499999999998, 0.9450000000000007, 1.0],
 
        # }
-        bdt_cuts = {"ggH" : [0.0, 0.19730769230769193, 0.4384615384615378, 1.0], "VBF": [0.0, 0.28600000000000037, 0.5720000000000012, 0.8800000000000007, 1.0]}
+        bdt_cuts = {"ggH" : [0.0, 0.19730769230769193, 0.4384615384615378, 1.0], "VBF": [0.0, 0.19152000000000016, 0.5472000000000005, 0.8550000000000006, 1.0]}
 
     input_file_name = get_input_file_name(data_type, input_path)
     output_file_name = get_output_file_name(data_type, out_path)

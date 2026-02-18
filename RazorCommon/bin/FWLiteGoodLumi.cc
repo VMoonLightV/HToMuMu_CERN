@@ -18,8 +18,9 @@
 #include "FWCore/PythonParameterSet/interface/PyBind11ProcessDesc.h"
 #include "DataFormats/Provenance/interface/LuminosityBlockRange.h"
 
-std::string RUN_BRANCH = "t_run";
-std::string LUMI_BRANCH = "t_luminosityBlock";
+std::string RUN_BRANCH = "run";
+std::string LUMI_BRANCH = "luminosityBlock";
+std::string EVENTS_TREE = "Events";
 
 bool jsonContainsEvent (const std::vector< edm::LuminosityBlockRange > &jsonVec, unsigned int run, unsigned int lumi)
 {
@@ -46,6 +47,10 @@ int main(int argc, char ** argv){
     std::cout << "Use as follows: FWLiteGoodLumi <pythonFileWithGoodLumiJson> <inputDataFilename> <outputDataFilename> \n";
     return 0;
   }
+
+  std::cout << "Run Branch: " + RUN_BRANCH << std::endl;
+  std::cout << "Lumi Branch: " + LUMI_BRANCH << std::endl;
+  std::cout << "Events Tree: " + EVENTS_TREE << std::endl;
 
   std::vector<std::string> arguments(argv + 1, argv + argc);
   PyBind11ProcessDesc builder (argv[1], true, arguments);
@@ -93,6 +98,10 @@ int main(int argc, char ** argv){
     previous = key;
     
     TTree *inputTree = (TTree*)key->ReadObj();
+    if(inputTree->GetName() != EVENTS_TREE){
+      std::cout << "Tree " << inputTree->GetName() << " is not " << EVENTS_TREE << std::endl;
+      continue;
+    }
     std::cout << "Processing tree " << inputTree->GetName() << std::endl;
     
     //create new normalized tree

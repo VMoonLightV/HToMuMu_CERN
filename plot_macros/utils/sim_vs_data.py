@@ -43,6 +43,7 @@ def get_histograms_from_tuple(
     bdt_subset="",
     lumi_rescale=False,
     Z_study=False,
+    jet_pT_study=False,
 ):
     
     if not use_puweight:
@@ -60,8 +61,10 @@ def get_histograms_from_tuple(
     if lumi_rescale:
         print("Re scaling lumi")
         if era == "2025":
-            era_reweight = 802478 / 327501
-        era = "2023BPix"
+            era_reweight = float(luminosity["2025"]) / float(luminosity["2024"])
+            era = "2024"
+        if era == "Combined":
+            era_reweight = float(luminosity["Combined"]) / 170.97
 
     variable_bin = variables[0]
 
@@ -91,7 +94,7 @@ def get_histograms_from_tuple(
         )
 
         for branches in ur.iterate(tuple_path + file_name, variables, library="np", step_size="50 MB"):
-            print("TUPLE PATH in get Hist from tup_____: " + tuple_path)
+            #print("TUPLE PATH in get Hist from tup_____: " + tuple_path)
             bool_list = np.ones(len(branches[variables[0]]), dtype=bool)
 
             if variables[0] != "diMuon_bsConstrainedMass" and ("bsConstrained" in variables[0]) and is_background:
@@ -123,6 +126,10 @@ def get_histograms_from_tuple(
                     branches["BDT_" + production_channel] < bdt_cuts[1]
                 )
                 bool_list = (bool_list) & (bdt_bool)
+
+            if ("jet_pt" in variables[0]) and jet_pT_study:
+                etaVar = variables[0].split("_")[0] + "_jet_eta"
+                bool_list = (bool_list) & (branches[etaVar] >= 2.5) & (branches[etaVar] < 3)
 
             for var in variables:
                 branches[var] = branches[var][bool_list]
@@ -235,7 +242,8 @@ def get_data_histograms_from_tuple(
     production_channel,
     bdt_cuts,
     bdt_subset="",
-    Z_study=False
+    Z_study=False,
+    jet_pT_study=False,
 ):
     tuple_path = "../root_io/tuples/"
     file_name = "Data_" + era + "_tuples.root:tree_output"
@@ -243,11 +251,20 @@ def get_data_histograms_from_tuple(
         tuple_path += "BDT_score/" + production_channel + "/" + bdt_subset + "/"
         file_name = "Data_" + era + "_" + bdt_subset + ".root:tree_output"
 
-    with ur.open(tuple_path + file_name) as data_file:
-        print("TUPLE PATH in get data Hist_____: " + tuple_path)
-        branches = data_file.arrays(variables, library="np")
+    #with ur.open(tuple_path + file_name) as data_file:
 
-        variable_bin = variables[0]
+    variable_bin = variables[0]
+
+    if (( variables[0] == "diMuon_mass") | (variables[0] == "diMuon_bsConstrainedMass")) and Z_study:
+            number_of_bins = 80; 
+            x_range_histos = (85,100)
+    else:
+        number_of_bins = n_bins[variable_bin]
+        x_range_histos = x_range[variable_bin]
+
+    data_histogram = np.zeros(number_of_bins)
+
+    for branches in ur.iterate(tuple_path + file_name, variables, step_size=1000000, library="np"):
         if variable_bin + "_" + production_channel in x_range:
             variable_bin += "_" + production_channel
 
@@ -276,6 +293,12 @@ def get_data_histograms_from_tuple(
             )
             bool_list = (bool_list) & (bdt_bool)
 
+        if ("jet_pt" in variables[0]) and jet_pT_study:
+            #print("adding jet pt")
+            etaVar = variables[0].split("_")[0] + "_jet_eta"
+            bool_list = (bool_list) & (branches[etaVar] >= 2.5) & (branches[etaVar] < 3)
+        
+
         for var in variables:
             branches[var] = branches[var][bool_list]
 
@@ -284,18 +307,17 @@ def get_data_histograms_from_tuple(
         if "delta_phi" in variables[0]:
             branches[variables[0]] = np.absolute(branches[variables[0]])
 
-        if (( variables[0] == "diMuon_mass") | (variables[0] == "diMuon_bsConstrainedMass")) and Z_study:
-            number_of_bins = 80; 
-            x_range_histos = (85,100)
-        else:
-            number_of_bins = n_bins[variable_bin]
-            x_range_histos = x_range[variable_bin]
         
-        data_histogram, data_bins = np.histogram(
+        #print("Total number of Data Events: " + str(len(branches[variables[0]])))
+        data_histogram_chunk, data_bins = np.histogram(
             branches[variables[0]],
             bins=number_of_bins,
             range=x_range_histos,
         )
+
+        data_histogram += data_histogram_chunk
+
+        #print("Data events in the first bin: " + str(data_histogram[0]))
 
     return data_histogram, data_bins
 
@@ -310,6 +332,7 @@ def draw_data_and_simul_and_ratio(
     bdt_cuts=[],
     bdt_subset="",
     Z_study=False,
+    jet_pT_study=False,
 ):
     plt.style.use(hep.style.CMS)
 
@@ -322,6 +345,19 @@ def draw_data_and_simul_and_ratio(
         variables.append("diMuon_bsConstrainedMass")
     elif (variable != "diMuon_mass" and ("bsConstrained" not in variable)):
         variables.append("diMuon_mass")
+
+    etaVar=""
+    labelAdd=""
+    if(("leading_jet_pt" == variable) and (jet_pT_study)):
+        etaVar = "leading_jet_eta"
+        variables.append("leading_jet_eta")
+        labelAdd="inHorn"
+    elif(("subleading_jet_pt" == variable) and jet_pT_study):
+        etaVar = "subleading_jet_eta"
+        variables.append("subleading_jet_eta")
+        labelAdd="inHorn"
+
+
     # if variable != "diMuon_mass":
     if production_channel != "":
         variables.append("is_" + production_channel + "_category")
@@ -335,7 +371,9 @@ def draw_data_and_simul_and_ratio(
         bdt_cuts,
         bdt_subset,
         Z_study=Z_study,
+        jet_pT_study=jet_pT_study,
     )
+
 
     if variable == "diMuon_mass" or variable == "diMuon_bsConstrainedMass":
         data_histogram[data_histogram == 0] = -100.0
@@ -349,8 +387,9 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era in ["2025"],
-        Z_study=Z_study
+        era in ["2025", "Combined"],
+        Z_study=Z_study,
+        jet_pT_study=jet_pT_study,
     )
 
     signal_histograms_list, signal_bins_list = get_histograms_from_tuple(
@@ -362,8 +401,9 @@ def draw_data_and_simul_and_ratio(
         production_channel,
         bdt_cuts,
         bdt_subset,
-        era in ["2025"],
-        Z_study=Z_study
+        era in ["2025", "Combined"],
+        Z_study=Z_study,
+        jet_pT_study=jet_pT_study,
     )
 
     fig, axs = get_canvas(True)
@@ -432,6 +472,7 @@ def draw_data_and_simul_and_ratio(
             tot_bg_numpy_hist = tot_bg_numpy_hist + bg_hist
 
     ratio_hist, ratio_error = get_histograms_ratio(data_histogram, tot_bg_numpy_hist)
+    #print("Total event ratio D/B: " + str(np.sum(data_histogram) / np.sum(tot_bg_numpy_hist)))
 
     hep.histplot(
         ratio_hist,
@@ -444,7 +485,9 @@ def draw_data_and_simul_and_ratio(
     )
 
     if(era == "2025"):
-        axs[1].set_ylabel("Data/MC(2023BPix)", loc="center")
+        axs[1].set_ylabel("Data/MC(2024)", loc="center")
+    elif(era == "Combined"):
+        axs[1].set_ylabel("Data/MC(pre25)", loc="center")
     else:
         axs[1].set_ylabel("Data/MC", loc="center")
     axs[1].set_ylim(0.5, 1.5)
@@ -468,7 +511,7 @@ def draw_data_and_simul_and_ratio(
 
     output_directory = get_output_directory(variable, output_directory, variables_type)
 
-    save_figure(fig, output_directory, output_name)
+    save_figure(fig, output_directory, output_name+labelAdd)
 
     plt.close()
 
@@ -483,4 +526,5 @@ def draw_data_and_simul_and_ratio(
             bdt_cuts=bdt_cuts[1:],
             bdt_subset=bdt_subset,
             Z_study=Z_study,
+            jet_pT_study=jet_pT_study,
         )

@@ -298,9 +298,10 @@ luminosity = {
     "2023BPix": "9.45",
     "2023Combined": "27.24",
     "2024": "109.08",
-    "2025": "??",
+    "2025": "110.73",
     # "Combined": "61.89",
-    "Combined": "170.97",
+    # "Combined": "170.97",
+    "Combined": "281.7"
 }
 
 variables_type = {
