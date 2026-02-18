@@ -13,18 +13,20 @@ import shutil
 import uproot
 import sys
 
-if len(sys.argv) != 3 and len(sys.argv) != 5:
+if len(sys.argv) != 3 and len(sys.argv) != 6:
     print(
-        "[ERROR] python3 train.py <Channel_under_study> <era> [bkg_subset sig_subset]"
+        "[ERROR] python3 train.py <Channel_under_study> <era> <ifRetrain T/F> [bkg_subset sig_subset]"
     )
     exit()
 channel_US, era = sys.argv[1], sys.argv[2]
-background_subset = sys.argv[3] if len(sys.argv) == 5 else "Full"
-signal_subset = sys.argv[4] if len(sys.argv) == 5 else "NottH"
+ifRetrain = True if sys.argv[3] == "T" else False
+background_subset = sys.argv[4] if len(sys.argv) == 6 else "Full"
+signal_subset = sys.argv[5] if len(sys.argv) == 6 else "NottH"
 
 
 print("Channel under study: ", channel_US)
 print("Era: ", era)
+print("Retrain: ", ifRetrain)
 print("Background subset: ", background_subset)
 print("Signal subset: ", signal_subset)
 
@@ -40,6 +42,9 @@ TEST_SIZE = 0.4
 SAMPLE_SIZE = 1.0
 SIGNAL_REGION = (121, 129)
 
+variables = xgb_utils.get_variables(channel_US, USE_BSCONSTRAIN)
+print("number of variables", len(variables) - 3)
+
 test_name = f"{channel_US}_{era}_B{background_subset}_S{signal_subset}"
 plot_path = f"../../plots/xgboost/{channel_US}/B{background_subset}_S{signal_subset}/"
 data_directory = f"../../root_io/skim/{channel_US}/"
@@ -52,9 +57,6 @@ for subdir in ["training", "results", "scores", "variables"]:
     shutil.copy("../index.php", os.path.join(plot_path, subdir))
 os.makedirs("models", exist_ok=True)
 os.makedirs("roc", exist_ok=True)
-
-variables = xgb_utils.get_variables(channel_US, USE_BSCONSTRAIN)
-print("number of variables", len(variables) - 3)
 
 ##Getting ROOT files into pandas
 print("[INFO]: Creating data frames")
@@ -158,125 +160,126 @@ if DO_STANDARDIZATION:
 
 print("x_train standaried:", x_train)
 
-# fit model no training data
-model = xgb.XGBClassifier(
-    max_depth=3,
-    learning_rate=0.1,
-    n_estimators=400,
-    verbosity=2,
-    n_jobs=4,
-    reg_lambda=1.0,
-)
-
-print("weights: ", sample_weights_train)
-print("abs(weights): ", np.absolute(sample_weights_train[y_train == 1]))
-print("abs(weights) mean: ", sample_weights_train[y_train == 1].mean())
-print("relative_diMuon_mass_error: ", x_test_p[:, -2])
-print("new error : ", np.absolute(sample_weights_train) / np.array(x_train_p[:, -2]))
-
-if not USE_WEIGHT and not USE_WEIGHT_MASS_RES:
-    print("[Info]: Training without weights")
-    model.fit(x_train, y_train)
-if USE_WEIGHT:
-    print("[Info]: Training with regular  weights")
-    model.fit(x_train, y_train, sample_weight=np.absolute(sample_weights_train))
-if USE_WEIGHT_MASS_RES:
-    print("[Info]: Training with mass_res weights")
-    model.fit(
-        x_train,
-        y_train,
-        sample_weight=np.absolute(sample_weights_train) / np.array(x_train_p[:, -2]),
+if(ifRetrain):
+    # fit model no training data
+    model = xgb.XGBClassifier(
+        max_depth=3,
+        learning_rate=0.1,
+        n_estimators=400,
+        verbosity=2,
+        n_jobs=4,
+        reg_lambda=1.0,
     )
 
-y_pred = model.predict_proba(x_test)[:, 1]
-y_pred_train = model.predict_proba(x_train)[:, 1]
+    print("weights: ", sample_weights_train)
+    print("abs(weights): ", np.absolute(sample_weights_train[y_train == 1]))
+    print("abs(weights) mean: ", sample_weights_train[y_train == 1].mean())
+    print("relative_diMuon_mass_error: ", x_test_p[:, -2])
+    print("new error : ", np.absolute(sample_weights_train) / np.array(x_train_p[:, -2]))
 
-print("y_pred:", y_pred)
-print("y_test:", y_test)
-print("y_pred_train:", y_pred_train)
-predictions = [round(value) for value in y_pred]
-# evaluate predictions
-accuracy = accuracy_score(y_test, predictions)
-print("Accuracy: %.2f%%" % (accuracy * 100.0))
+    if not USE_WEIGHT and not USE_WEIGHT_MASS_RES:
+        print("[Info]: Training without weights")
+        model.fit(x_train, y_train)
+    if USE_WEIGHT:
+        print("[Info]: Training with regular  weights")
+        model.fit(x_train, y_train, sample_weight=np.absolute(sample_weights_train))
+    if USE_WEIGHT_MASS_RES:
+        print("[Info]: Training with mass_res weights")
+        model.fit(
+            x_train,
+            y_train,
+            sample_weight=np.absolute(sample_weights_train) / np.array(x_train_p[:, -2]),
+        )
 
-AUC = roc_auc_score(y_test, y_pred)
-print("AUC: " + str(AUC))
-diMuon_mass_test = x_test_p[:, -3]
-print(
-    "diMuon_mass: ",
-    diMuon_mass_test[(diMuon_mass_test < 130) & (diMuon_mass_test > 120)],
-)
+    y_pred = model.predict_proba(x_test)[:, 1]
+    y_pred_train = model.predict_proba(x_train)[:, 1]
 
-## Go back to the normal signal weight
-sample_weights_test[y_test == 1] = sample_weights_test[y_test == 1] * (
-    signal_weight_sum / bkg_weight_sum
-)
-sample_weights_train[y_train == 1] = sample_weights_train[y_train == 1] * (
-    signal_weight_sum / bkg_weight_sum
-)
+    print("y_pred:", y_pred)
+    print("y_test:", y_test)
+    print("y_pred_train:", y_pred_train)
+    predictions = [round(value) for value in y_pred]
+    # evaluate predictions
+    accuracy = accuracy_score(y_test, predictions)
+    print("Accuracy: %.2f%%" % (accuracy * 100.0))
 
-signal_region_test_cuts = (x_test_p[:, -3] > SIGNAL_REGION[0]) & (
-    x_test_p[:, -3] < SIGNAL_REGION[1]
-)
-fpr, tpr, thr = roc_curve(
-    y_test[signal_region_test_cuts],
-    y_pred[signal_region_test_cuts],
-    sample_weight=sample_weights_test[signal_region_test_cuts],
-)
-
-significance, effSignal, effBkg, thresholds = (
-    xgb_utils.extrac_information_from_roc_curve(
-        fpr, tpr, thr, test_name, signal_events, bkg_events
-    )
-)
-
-idx_max_significance = np.argmax(np.array(significance))
-print(
-    f"[INFO]: S = {signal_events:.3f}; B = {bkg_events:.3f}; S/sqrt(B) = {signal_events / math.sqrt(bkg_events):.3f}"
-)
-print(f"[INFO]: Max: Significance = {significance[idx_max_significance]}")
-print(f"[INFO]: Max: Threshold = {thresholds[idx_max_significance]}")
-print(f"[INFO]: Max: Signal Efficiency = {effSignal[idx_max_significance]}")
-print(f"[INFO]: Max: Background Efficiency ={effBkg[idx_max_significance]}")
-
-for wp in [0.90, 0.80]:
-    idx = np.argmin(np.abs(np.array(effSignal) - wp))
-    s_wp = signal_events * wp
-    b_wp = bkg_events * effBkg[idx]
-    print(f"[INFO]: WP{int(wp*100)}: Significance = {significance[idx]}")
-    print(f"[INFO]: WP{int(wp*100)}: Threshold = {thresholds[idx]}")
-    print(f"[INFO]: WP{int(wp*100)}: Signal Efficiency = {effSignal[idx]}")
-    print(f"[INFO]: WP{int(wp*100)}: Background Efficiency ={effBkg[idx]}")
+    AUC = roc_auc_score(y_test, y_pred)
+    print("AUC: " + str(AUC))
+    diMuon_mass_test = x_test_p[:, -3]
     print(
-        f"[INFO]: WP{int(wp*100)}: S = {signal_events:.3f}; B = {bkg_events:.3f}; S/sqrt(B) = {signal_events / math.sqrt(bkg_events):.3f}"
+        "diMuon_mass: ",
+        diMuon_mass_test[(diMuon_mass_test < 130) & (diMuon_mass_test > 120)],
     )
 
-xgb_utils.plot_discriminator(
-    y_test,
-    y_pred,
-    y_train,
-    y_pred_train,
-    sample_weights_test,
-    sample_weights_train,
-    era,
-    plot_path,
-    scale="log",
-)
-xgb_utils.plot_discriminator(
-    y_test,
-    y_pred,
-    y_train,
-    y_pred_train,
-    sample_weights_test,
-    sample_weights_train,
-    era,
-    plot_path,
-    scale="linear",
-)
-xgb_utils.draw_roc_curve(fpr, tpr, test_name, plot_path, era, AUC)
-xgb_utils.save_model(model, test_name, USE_BSCONSTRAIN)
-xgb_utils.plot_feature_importances(model, variables, test_name, plot_path)
-xgb_utils.plot_xgb_tree(model, variables, test_name, plot_path)
+    ## Go back to the normal signal weight
+    sample_weights_test[y_test == 1] = sample_weights_test[y_test == 1] * (
+        signal_weight_sum / bkg_weight_sum
+    )
+    sample_weights_train[y_train == 1] = sample_weights_train[y_train == 1] * (
+        signal_weight_sum / bkg_weight_sum
+    )
+
+    signal_region_test_cuts = (x_test_p[:, -3] > SIGNAL_REGION[0]) & (
+        x_test_p[:, -3] < SIGNAL_REGION[1]
+    )
+    fpr, tpr, thr = roc_curve(
+        y_test[signal_region_test_cuts],
+        y_pred[signal_region_test_cuts],
+        sample_weight=sample_weights_test[signal_region_test_cuts],
+    )
+
+    significance, effSignal, effBkg, thresholds = (
+        xgb_utils.extrac_information_from_roc_curve(
+            fpr, tpr, thr, test_name, signal_events, bkg_events
+        )
+    )
+
+    idx_max_significance = np.argmax(np.array(significance))
+    print(
+        f"[INFO]: S = {signal_events:.3f}; B = {bkg_events:.3f}; S/sqrt(B) = {signal_events / math.sqrt(bkg_events):.3f}"
+    )
+    print(f"[INFO]: Max: Significance = {significance[idx_max_significance]}")
+    print(f"[INFO]: Max: Threshold = {thresholds[idx_max_significance]}")
+    print(f"[INFO]: Max: Signal Efficiency = {effSignal[idx_max_significance]}")
+    print(f"[INFO]: Max: Background Efficiency ={effBkg[idx_max_significance]}")
+
+    for wp in [0.90, 0.80]:
+        idx = np.argmin(np.abs(np.array(effSignal) - wp))
+        s_wp = signal_events * wp
+        b_wp = bkg_events * effBkg[idx]
+        print(f"[INFO]: WP{int(wp*100)}: Significance = {significance[idx]}")
+        print(f"[INFO]: WP{int(wp*100)}: Threshold = {thresholds[idx]}")
+        print(f"[INFO]: WP{int(wp*100)}: Signal Efficiency = {effSignal[idx]}")
+        print(f"[INFO]: WP{int(wp*100)}: Background Efficiency ={effBkg[idx]}")
+        print(
+            f"[INFO]: WP{int(wp*100)}: S = {signal_events:.3f}; B = {bkg_events:.3f}; S/sqrt(B) = {signal_events / math.sqrt(bkg_events):.3f}"
+        )
+
+    xgb_utils.plot_discriminator(
+        y_test,
+        y_pred,
+        y_train,
+        y_pred_train,
+        sample_weights_test,
+        sample_weights_train,
+        era,
+        plot_path,
+        scale="log",
+    )
+    xgb_utils.plot_discriminator(
+        y_test,
+        y_pred,
+        y_train,
+        y_pred_train,
+        sample_weights_test,
+        sample_weights_train,
+        era,
+        plot_path,
+        scale="linear",
+    )
+    xgb_utils.draw_roc_curve(fpr, tpr, test_name, plot_path, era, AUC)
+    xgb_utils.save_model(model, test_name, USE_BSCONSTRAIN)
+    xgb_utils.plot_feature_importances(model, variables, test_name, plot_path)
+    xgb_utils.plot_xgb_tree(model, variables, test_name, plot_path)
 
 
 if not APPEND_VARIABLES:
@@ -284,6 +287,8 @@ if not APPEND_VARIABLES:
     exit()
 
 tuples = ["Data", "DY", "EWK", "TT", "DiBoson", "ggH", "VBF", "ttH"]
+if(era == "2025"):
+   tuples = ["Data"]
 for file_type in tuples:
     xgb_utils.append_BDT_score(
         file_type,
@@ -298,7 +303,8 @@ for file_type in tuples:
         DO_STANDARDIZATION,
         USE_BSCONSTRAIN,
     )
-    '''xgb_utils.append_BDT_score(
+    '''
+    xgb_utils.append_BDT_score(
         file_type,
         channel_US,
         "2022",

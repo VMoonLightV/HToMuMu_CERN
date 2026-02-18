@@ -31,7 +31,7 @@ source setup.sh #activates the xgboost_env
 
 Run the training (Make sure you generated the skim tuples first)
 ```
-python3 train.py channel era background_sources_subset signal_sources_subset
+python3 train.py channel era ifRetrain background_sources_subset signal_sources_subset
 ```
 
 You can append the BDT variable to the tuples running

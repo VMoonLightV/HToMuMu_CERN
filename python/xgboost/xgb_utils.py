@@ -39,11 +39,11 @@ def copy_and_skim_tree(tuple_path, tuple_name, BDT_path, BDT_name, channel_US, u
     original_tree = original_file.Get("tree_output")
     if use_bsConstrain:
         cuts = (
-            "diMuon_bsConstrainedMass > 100 && diMuon_bsConstrainedMass < 180 && is_" + channel_US + "_category == 1" + " && (abs(leading_jet_eta) < 2.5 || abs(leading_jet_eta) > 3) && (abs(subleading_jet_eta) < 2.5 || abs(subleading_jet_eta) > 3)"
+            "diMuon_bsConstrainedMass > 100 && diMuon_bsConstrainedMass < 180 && is_" + channel_US + "_category == 1"
         )
     else:
         cuts = (
-            "diMuon_mass > 100 && diMuon_mass < 180 && is_" + channel_US + "_category == 1" + " && (abs(leading_jet_eta) < 2.5 || abs(leading_jet_eta) > 3) && (abs(subleading_jet_eta) < 2.5 || abs(subleading_jet_eta) > 3)"
+            "diMuon_mass > 100 && diMuon_mass < 180 && is_" + channel_US + "_category == 1"
         )
     skim_file = root.TFile.Open(BDT_path + BDT_name, "RECREATE")
     skim_tree = original_tree.CopyTree(cuts)
@@ -503,3 +503,31 @@ def save_model(model, test_name, use_bsConstrain):
     model.get_booster().dump_model(f"models/model_{test_name}.txt")
     model.get_booster().save_model(f"models/model_{test_name}.xgb")
 
+'''
+if __name__ == "__main__":
+    import sys
+    HIGGS_CHANNEL = sys.argv[1]
+    ERA = sys.argv[2]
+    MODEL_ERA = sys.argv[3]
+    TUPLE_TYPE = sys.argv[4]
+    BKG_SUBSET = sys.argv[5]
+    SIG_SUBSET = sys.argv[6]
+
+    DO_STANDARDIZATION = True
+    USE_BSCONSTRAIN = True 
+
+    variables = xgb_utils.get_variables(HIGGS_CHANNEL, USE_BSCONSTRAIN)
+
+    xgb_utils.append_BDT_score(
+        TUPLE_TYPE,
+        HIGGS_CHANNEL,
+        ERA,
+        MODEL_ERA,
+        SIG_SUBSET,
+        BKG_SUBSET,
+        variables[:-3],
+        mean_map,
+        std_map,
+        DO_STANDARDIZATION,
+        USE_BSCONSTRAIN,
+    )'''
