@@ -51,7 +51,9 @@ list_datasets = datasets_info.keys()
      #"DY50to120_Summer24",
      #"DY120to200_Summer24",
 #     "WWtoLNu2Q_Summer22",
-#     "Muon0_2025B",
+#     "Muon_2022C",
+#     "Muon_2022D",
+#     "SingleMuon_2022C",
 #]
 
 # cmsswReleaseVersion = "CMSSW_10_6_5"

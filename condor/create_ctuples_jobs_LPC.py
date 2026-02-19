@@ -32,6 +32,9 @@ skip_pattern = [
     "s-channel",
     "ZZto2Nu2Q",
     "WWto4Q",
+    "WWtoLNu2Q",
+    "WZtoLNu2Q",
+    "DYto2Mu-2Jets",
 ]
 
 list_datasets = datasets_info.keys()
@@ -40,10 +43,13 @@ list_datasets = datasets_info.keys()
      #"DY120to200_Summer24v13",
      #"DY50to120_Summer24v13",
      #"Muon0_2024E",
-     #"Muon1_2024E",
+    # "Muon1_2024E",
      
 
 #]
+
+include_Z = "F"
+include_H = "T"
 
 # Arguments
 if (len(sys.argv) == 1):
@@ -182,7 +188,7 @@ for dataset_name in list_datasets:
     jobfile_JDL.write("Universe  = vanilla" + "\n")
     jobfile_JDL.write("Executable = ./run_job_LPC.sh" + "\n")
 
-    args = INPUT_FILE + " " + WEIGHT_FILE + " " + OUTPUT_DIR + " " + era + " " + channel + " " + type_info + " " + cmsswReleaseVersion + " " + "$(I)"
+    args = INPUT_FILE + " " + WEIGHT_FILE + " " + OUTPUT_DIR + " " + era + " " + channel + " " + type_info + " "  + include_Z + " " + include_H + " " + cmsswReleaseVersion + " " + "$(I)"
     jobfile_JDL.write("Arguments = " + args + "\n")
 
     jobfile_JDL.write("Log = log/jobR$(I).$(Cluster).$(Process).log" + "\n")

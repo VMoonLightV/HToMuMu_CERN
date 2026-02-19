@@ -5,3 +5,5 @@ plots/
 scripts/*.csv
 *.root
 scripts/makeDataPileupHist.sh
+*.log
+*.ipynb_checkpoints/

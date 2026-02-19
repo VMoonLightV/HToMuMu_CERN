@@ -92,13 +92,6 @@ ls inputs/* > tmp_input_list.txt
 #echo
 
 ###########################
-# Run executable
-###########################
-echo "Executing Analysis executable:"
-echo "./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${file_type}"
-./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${file_type} ${is_data} ${year}
-
-###########################
 # Run goodLumi Validation
 ###########################
 if [[ "$file_type" == "data" ]]; then
@@ -106,11 +99,29 @@ if [[ "$file_type" == "data" ]]; then
     cd RazorCommon/bin
     cert_file=$(ls ../data/)
 
-    echo "./FWLiteGoodLumi ../python/loadJson.py ../../${output_name}_${job_number}.root ../../${output_name}_${job_number}_goodLumi.root"
-    sed -i "/JSONfile =/c\JSONfile = '../data/${cert_file}'" ../python/loadJson.py
-    ./FWLiteGoodLumi ../python/loadJson.py ../../${output_name}_${job_number}.root ../../${output_name}_${job_number}_goodLumi.root
+    for file in "../../inputs/"*; do
+        echo "./FWLiteGoodLumi ../python/loadJson.py $file $outfile"
+        sed -i "/JSONfile =/c\JSONfile = '../data/${cert_file}'" ../python/loadJson.py
+        outfile="${file%.root}goodLumi.root"
+        echo "Output goodLumi file: " $outfile
+        ./FWLiteGoodLumi ../python/loadJson.py $file $outfile
 
+        echo "changing outfile to be named like infile"
+        mv $outfile $file
+    done
+
+    cd ../../
 fi
+
+#exit 1
+
+###########################
+# Run executable
+###########################
+echo "Executing Analysis executable:"
+echo "./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${file_type}"
+./${executable} tmp_input_list.txt ${output_name}_${job_number}.root ${file_type} ${is_data} ${year}
+
 
 ls -l
 ################################################################
@@ -118,16 +129,10 @@ ls -l
 ################################################################
 echo ${output_Directory}
 xrdfs root://cmseos.fnal.gov mkdir -p /store/group/lpchmumu/${output_Directory}
-if [[ "$file_type" == "data" ]]; then
-    cd ../../
-    xrdcp -f ${output_name}_${job_number}_goodLumi.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}_goodLumi.root
-    echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}_goodLumi.root"
-    rm ${output_name}_${job_number}_goodLumi.root
-else
-    xrdcp -f ${output_name}_${job_number}.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root
-    echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root"
-    rm ${output_name}_${job_number}.root
-fi
+
+xrdcp -f ${output_name}_${job_number}.root root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root
+echo "Output file saved in root://cmseos.fnal.gov//store/group/lpchmumu/${output_Directory}/${output_name}_${job_number}.root"
+rm ${output_name}_${job_number}.root
 
 rm inputs -rv
 

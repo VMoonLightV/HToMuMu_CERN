@@ -116,7 +116,7 @@ for block in "$DIR"/*; do
         echo "************** Errors found in $block **************"
     fi
 
-    break
+    #break
 
 done
 

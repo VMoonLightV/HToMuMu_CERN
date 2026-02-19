@@ -8,3 +8,7 @@ condor_*sender*.sh
 docker_stderror
 *error_datasets.txt
 *.json
+*.txt
+
+#files used in cross CMS synchronization
+sync*
