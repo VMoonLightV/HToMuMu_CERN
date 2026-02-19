@@ -13,6 +13,9 @@
 #include <cmath>
 #include <iostream>
 #include <math.h>
+#include <map>
+
+std::map<TString, int> MC_CAMPAIGN_MAP = { {"2022", 1}, {"2022EE", 2}, {"2023", 3}, {"2023BPix", 4}, {"2024", 5}, {"2025", 6}};
 
 /**
  * @class CreateTuple
@@ -35,9 +38,11 @@ class CreateTuple {
      *
      * @param is_signal_ Boolean flag indicating if the data pertains to signal
      * or background
+     * @param include_Z Boolean flag indicating if include Z region
+     * @param include_H Boolean flag indicating if include H region
      */
     CreateTuple(TString input, TString weightFile, TString output, TString era, TString channel,
-                bool is_data, bool is_signal_);
+                bool is_data, bool is_signal_,  bool include_Z, bool include_H);
     /**
      * @brief Destructor for CreateTuple, cleaning up dynamically allocated
      * objects.
@@ -81,6 +86,8 @@ class CreateTuple {
     TChain *tree_input; /**< Pointer to input TChain. */
     TTree *tree_output; /**< Pointer to output TTree. */
     bool is_signal; /**< Flag indicating if the input file is signal data. */
+    bool include_Z; /**< Flag indicating if save Z region. */
+    bool include_H; /**< Flag indicating if save H region. */
     long double
         gen_weight_sum;     /**< Sum of generator weights for normalization. */
     const float luminosity; /**< Luminosity of the era. */
@@ -90,6 +97,9 @@ class CreateTuple {
     TString output_name;       /**< Name of the output file. */
     TString output_directory;  /**< Directory for saving the output file. */
     TFile *output_file;        /**< Pointer to output TFile. */
+
+    /** MC Campaign variable: 1-22, 2-22EE, 3-23, 4-23BPix, 5-24, 6-25 */
+    int mc_campaign;
 
     /** Read event variables */
     float gen_weight, pileup_weight, pileup_weight_up, pileup_weight_down;
@@ -145,7 +155,8 @@ class CreateTuple {
 };
 
 CreateTuple::CreateTuple(TString input, TString weightFile, TString output, TString era,
-                         TString channel, bool is_data, bool is_signal_)
+                         TString channel, bool is_data, bool is_signal_, bool include_Z_,
+                        bool include_H_)
     : luminosity(LUMINOSITY.at(era)), cross_section(CROSS_SECTION.at(channel)) {
 
     tree_input = new TChain("tree");
@@ -154,6 +165,16 @@ CreateTuple::CreateTuple(TString input, TString weightFile, TString output, TStr
     weight_name = weightFile;
     output_directory = output;
     is_signal = is_signal_;
+    include_Z = include_Z_;
+    include_H = include_H_;
+
+    if(include_Z){
+        std::cout << "Z range included" << std::endl;
+    }
+    if(include_H){
+        std::cout << "H range included" << std::endl;
+    }
+
     output_name = channel + "_" + era + "_tuples.root";
     std::cout << "Luminosity: " << luminosity
               << ", cross section: " << cross_section << std::endl;
@@ -172,6 +193,8 @@ CreateTuple::CreateTuple(TString input, TString weightFile, TString output, TStr
     // is_data_int = 1;
     //}
 
+    mc_campaign = MC_CAMPAIGN_MAP.at(era);
+
     mu_charge = nullptr;
     mu_pt = nullptr;
     mu_bsConstrainedPt = nullptr;
@@ -184,6 +207,7 @@ CreateTuple::CreateTuple(TString input, TString weightFile, TString output, TStr
     jet_pt = nullptr;
     jet_phi = nullptr;
     jet_mass = nullptr;
+
 
     fillChain();
 }
@@ -229,6 +253,8 @@ void CreateTuple::setBranchesAddressesOutput() {
                         "is_ggH_category/i");
     tree_output->Branch("is_VBF_category", &is_VBF_category,
                         "is_VBF_category/i");
+
+    tree_output->Branch("mc_campaign", &mc_campaign, "mc_campaign/i");
 
     // DiMuon variables
     tree_output->Branch("diMuon_mass", &diMuon_mass, "diMuon_mass/f");
@@ -421,11 +447,26 @@ void CreateTuple::fillOutputTree() {
     TLorentzVector mu1BSC_vector;
     TLorentzVector mu2BSC_vector;
     std::pair<float, float> angles_CS;
+    std::cout << include_Z << std::endl;
+    std::cout << include_H << std::endl;
     for (int event_index = 0; event_index < total_entries; event_index++) {
         tree_input->GetEntry(event_index);
+        if ((include_Z && include_H) || (!include_Z && !include_H)){
+            if (diMuon_bsConstrainedMass < 70 || diMuon_bsConstrainedMass > 180)
+                continue;
+        }
+        else if (include_Z){
+            if(diMuon_bsConstrainedMass < 76 || diMuon_bsConstrainedMass > 106)
+                continue;
+        }
+        else{
+            //in Higgs region
+            if(diMuon_bsConstrainedMass < 100 || diMuon_bsConstrainedMass > 180)
+                continue;
+        }
         // if (diMuon_mass < 110 || diMuon_mass > 150)
         // if (diMuon_mass < 100 || diMuon_mass > 180)
-        if (diMuon_mass < 70 || diMuon_mass > 180)
+        if (diMuon_bsConstrainedMass < 70 || diMuon_bsConstrainedMass > 180)
             continue;
 
         weight = GetEventWeight(gen_weight, pileup_weight, scale_factor);
@@ -560,7 +601,7 @@ int CreateTuple::isVBFCategory() {
 
     if ((n_bjet == 0) && (n_bjet_Loose < 2) && (mu_pt->size() < 3) &&
         (elec_pt->size() == 0) && (n_jet >= 2) && leading_jet_pt > 35 &&
-        (diJet_mass > 400) && (DeltaEta(jet_eta->at(0), jet_eta->at(1)) > 2.5)) {
+        (diJet_mass >= 400) && (DeltaEta(jet_eta->at(0), jet_eta->at(1)) > 2.5)) {
         is_VBF_category = 1;
         return 1;
     } else {

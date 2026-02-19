@@ -100,7 +100,17 @@ class HmmAnalyzer : public MainEvent {
     std::vector<std::string> histo_names_TRIG, histo_names_ID,
         histo_names_ID_stat, histo_names_ID_syst, histo_names_ISO,
         histo_names_ISO_stat, histo_names_ISO_syst;
-    
+
+    //synchronization histograms
+    TH1D *h_nEntries = new TH1D("h_nEntries", "h_nEntries", 1, 0, 1);
+    TH1D *h_nTrigger = new TH1D("h_nTrigger", "h_nTrigger", 1, 0, 1);
+    TH1D *h_nTwoMuons = new TH1D("h_nTwoMuons", "h_nTwoMuons", 1, 0, 1);
+    TH1D *h_nNoExtraMuon = new TH1D("h_nNoExtraMuon", "h_nNoExtraMuon", 1, 0, 1);
+    TH1D *h_nNoExtraElectron = new TH1D("h_nNoExtraElectron", "h_nNoExtraElectron", 1, 0, 1);
+    TH1D *h_nTriggerMatch = new TH1D("h_nTriggerMatch", "h_nTriggerMatch", 1, 0, 1);
+    TH1D *h_nBjetRejection = new TH1D("h_nBjetRejection", "h_nBjetRejection", 1, 0, 1);
+    TH1D *h_nInZPeak= new TH1D("h_nInZPeak", "h_nInZPeak", 1, 0, 1);
+
     /*
     LeptonEfficiencyCorrector Mu_eff_SF_TRIG;
     LeptonEfficiencyCorrector Mu_eff_SF_ID;
@@ -766,6 +776,16 @@ HmmAnalyzer::~HmmAnalyzer() {
     h_sumOfgpw->Write();
     h_pileup->Write();
     h_pileup_nTrue->Write();
+
+    h_nEntries->Write();
+    h_nTrigger->Write();
+    h_nTwoMuons->Write();
+    h_nNoExtraMuon->Write();
+    h_nNoExtraElectron->Write();
+    h_nTriggerMatch->Write();
+    h_nBjetRejection->Write();
+    h_nInZPeak->Write();
+    
     oFile->Write();
     oFile->Close();
     if (!is_data) {

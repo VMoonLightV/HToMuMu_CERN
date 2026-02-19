@@ -74,7 +74,8 @@ void HmmAnalyzer::EventLoop() {
 
     std::cout << "Btag calibration loaded" << std::endl;           
     long nentries = fChain->GetEntriesFast();
-    //nentries = 5000;
+    //h_nEntries->SetBinContent(1, nentries);
+    //nentries = 500;
     long nbytes = 0;
     long nb = 0;
     
@@ -87,6 +88,8 @@ void HmmAnalyzer::EventLoop() {
 
         nb = fChain->GetEntry(jentry);
         nbytes += nb;
+
+        h_nEntries->Fill(0.5);
        
         //std::cout << "-------------- Entry " << jentry << " --------------" << std::endl;
 
@@ -118,12 +121,20 @@ void HmmAnalyzer::EventLoop() {
 
         bool trig_decision = (HLT_IsoMu24 == 1);
 
-        bool run_muChecks =
-            (nMuon >= 2 && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter &&
+        bool run_trig_checks = 
+            (trig_decision && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter &&
              Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_goodVertices &&
-             Flag_globalSuperTightHalo2016Filter && Flag_BadPFMuonFilter &&
-             Flag_BadChargedCandidateFilter && trig_decision &&
-             PV_npvsGood > 0);
+             Flag_globalSuperTightHalo2016Filter && PV_npvsGood > 0);
+
+        if(!run_trig_checks) {
+            continue;
+        }
+
+        h_nTrigger->Fill(0.5);
+
+        bool run_muChecks =
+            (nMuon >= 2 && Flag_BadPFMuonFilter &&
+             Flag_BadChargedCandidateFilter);
         
         //std::cout << "Running muon checks" << std::endl; 
         if (!run_muChecks) {
@@ -213,6 +224,57 @@ void HmmAnalyzer::EventLoop() {
             continue;
         }
 
+        h_nTwoMuons->Fill(0.5);
+
+        //Ensure only 3 Muons
+        if(mu_pt_Roch_corr.size() > 2){
+            continue;
+        }
+
+        h_nNoExtraMuon->Fill(0.5);
+
+
+        for (int i = 0; i < nElectron; i++) {
+            if (Electron_pt[i] < 5.0)
+                continue;
+            // t_El_genPartIdx->push_back(Electron_genPartIdx[i]);
+            // t_El_genPartFlav->push_back(Electron_genPartFlav[i]);
+            t_El_charge->push_back(Electron_charge[i]);
+            t_El_pt->push_back(Electron_pt[i]);
+            t_El_phi->push_back(Electron_phi[i]);
+            t_El_eta->push_back(Electron_eta[i]);
+            t_El_mass->push_back(Electron_mass[i]);
+            t_El_cutBased->push_back(Electron_cutBased[i]);
+            t_El_tightCharge->push_back(Electron_tightCharge[i]);
+            t_El_cutBased_HEEP->push_back(Electron_cutBased_HEEP[i]);
+            t_El_isPFcand->push_back(Electron_isPFcand[i]);
+            t_El_pfRelIso03_all->push_back(Electron_pfRelIso03_all[i]);
+            t_El_pfRelIso03_chg->push_back(Electron_pfRelIso03_chg[i]);
+            t_El_miniPFRelIso_all->push_back(Electron_miniPFRelIso_all[i]);
+            t_El_miniPFRelIso_chg->push_back(Electron_miniPFRelIso_chg[i]);
+            t_El_dxy->push_back(Electron_dxy[i]);
+            t_El_dxyErr->push_back(Electron_dxyErr[i]);
+            t_El_dz->push_back(Electron_dz[i]);
+            t_El_dzErr->push_back(Electron_dzErr[i]);
+            t_El_sip3d->push_back(Electron_sip3d[i]);
+            t_Electron_mvaFall17Iso->push_back(Electron_mvaIso[i]);
+            t_Electron_mvaFall17Iso_WP80->push_back(Electron_mvaIso_WP80[i]);
+            t_Electron_mvaFall17Iso_WP90->push_back(Electron_mvaIso_WP90[i]);
+            // t_Electron_mvaFall17Iso_WPL->push_back(Electron_mvaFall17V2Iso_WPL[i]);
+            t_Electron_mvaFall17noIso->push_back(Electron_mvaNoIso[i]);
+            t_Electron_mvaFall17noIso_WP80->push_back(
+                Electron_mvaNoIso_WP80[i]);
+            t_Electron_mvaFall17noIso_WP90->push_back(
+                Electron_mvaNoIso_WP90[i]);
+            // t_Electron_mvaFall17noIso_WPL->push_back(Electron_mvaFall17V2noIso_WPL[i]);
+        }
+
+        if (t_El_pt->size() > 0){
+            continue;
+        }
+
+        h_nNoExtraElectron->Fill(0.5);
+
 
         for (int trigger_index = 0; trigger_index < nTrigObj; trigger_index++) {
             //  float dR_TrigObj = 999.;
@@ -246,6 +308,8 @@ void HmmAnalyzer::EventLoop() {
             //std::cout << "No trig match" << std::endl; 
             continue;
         }
+
+        h_nTriggerMatch->Fill(0.5);
 
 
 
@@ -471,6 +535,13 @@ void HmmAnalyzer::EventLoop() {
             t_bJet_SFup->push_back(jet_scalefactor_up);
             t_bJet_SFdown->push_back(jet_scalefactor_do);
         }
+        if(t_nbJet_Loose > 1 || t_nbJet > 0){
+            continue;
+        }
+
+        h_nBjetRejection->Fill(0.5);
+
+
 
         // if (t_Jet_pt->size() >= 2) {
         if (t_nJet >= 2) {
@@ -505,42 +576,6 @@ void HmmAnalyzer::EventLoop() {
                         t_diJet_mass_mo = jj.M();
                 }
             }
-        }
-
-
-        for (int i = 0; i < nElectron; i++) {
-            if (Electron_pt[i] < 5.0)
-                continue;
-            // t_El_genPartIdx->push_back(Electron_genPartIdx[i]);
-            // t_El_genPartFlav->push_back(Electron_genPartFlav[i]);
-            t_El_charge->push_back(Electron_charge[i]);
-            t_El_pt->push_back(Electron_pt[i]);
-            t_El_phi->push_back(Electron_phi[i]);
-            t_El_eta->push_back(Electron_eta[i]);
-            t_El_mass->push_back(Electron_mass[i]);
-            t_El_cutBased->push_back(Electron_cutBased[i]);
-            t_El_tightCharge->push_back(Electron_tightCharge[i]);
-            t_El_cutBased_HEEP->push_back(Electron_cutBased_HEEP[i]);
-            t_El_isPFcand->push_back(Electron_isPFcand[i]);
-            t_El_pfRelIso03_all->push_back(Electron_pfRelIso03_all[i]);
-            t_El_pfRelIso03_chg->push_back(Electron_pfRelIso03_chg[i]);
-            t_El_miniPFRelIso_all->push_back(Electron_miniPFRelIso_all[i]);
-            t_El_miniPFRelIso_chg->push_back(Electron_miniPFRelIso_chg[i]);
-            t_El_dxy->push_back(Electron_dxy[i]);
-            t_El_dxyErr->push_back(Electron_dxyErr[i]);
-            t_El_dz->push_back(Electron_dz[i]);
-            t_El_dzErr->push_back(Electron_dzErr[i]);
-            t_El_sip3d->push_back(Electron_sip3d[i]);
-            t_Electron_mvaFall17Iso->push_back(Electron_mvaIso[i]);
-            t_Electron_mvaFall17Iso_WP80->push_back(Electron_mvaIso_WP80[i]);
-            t_Electron_mvaFall17Iso_WP90->push_back(Electron_mvaIso_WP90[i]);
-            // t_Electron_mvaFall17Iso_WPL->push_back(Electron_mvaFall17V2Iso_WPL[i]);
-            t_Electron_mvaFall17noIso->push_back(Electron_mvaNoIso[i]);
-            t_Electron_mvaFall17noIso_WP80->push_back(
-                Electron_mvaNoIso_WP80[i]);
-            t_Electron_mvaFall17noIso_WP90->push_back(
-                Electron_mvaNoIso_WP90[i]);
-            // t_Electron_mvaFall17noIso_WPL->push_back(Electron_mvaFall17V2noIso_WPL[i]);
         }
 
         // if (year != "2017") {
@@ -591,6 +626,11 @@ void HmmAnalyzer::EventLoop() {
         t_PV_npvsGood = PV_npvsGood;
 
         t_Rho = Rho_fixedGridRhoFastjetAll;
+
+
+        if(t_diMuon_bsConstrainedMass > 76 && t_diMuon_bsConstrainedMass < 106){
+            h_nInZPeak->Fill(0.5); //in Z +- 15
+        }
 
 
         if (!is_data) {
