@@ -199,6 +199,14 @@ You can now run this together with
 bash scripts/run_splitting.sh
 ```
 
+## Copy over to eos
+After the tuples have been split, you can copy over the BDT score tuples as well as the split tuples onto the EOS space to save them. There is a bash script for this, but you need to change the analyzer/tuplizer version in it.
+
+```
+cd root_io/tuples/
+bash copyBDTandSplitTuples.sh
+```
+
 ## Mass fits code
 
 Once you have the tuples set up, the [mass_fit_repo](https://github.com/MatBarria/flashggFinalFit) using the commands that are in the README

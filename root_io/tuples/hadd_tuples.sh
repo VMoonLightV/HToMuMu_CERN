@@ -1,6 +1,10 @@
-############  2022Combined  ###########
-hadd -f Data_2022Combined_tuples.root Data_2022_tuples.root Data_2022EE_tuples.root
+ANALYZER_VERSION="v1.4"
+TUPLES_VERSION="v1.4.2"
+inEOS_PATH="/store/group/lpchmumu/$USER/analyzer_HiggsMuMu_$ANALYZER_VERSION/tuples_$TUPLES_VERSION/"
 
+############  2022Combined  ###########
+'''
+hadd -f Data_2022Combined_tuples.root Data_2022_tuples.root Data_2022EE_tuples.root
 hadd -f DY_2022Combined_tuples.root DY_2022_tuples.root DY_2022EE_tuples.root
 hadd -f EWK_2022Combined_tuples.root EWK_2022_tuples.root EWK_2022EE_tuples.root
 hadd -f TT_2022Combined_tuples.root TT_2022_tuples.root TT_2022EE_tuples.root
@@ -35,3 +39,8 @@ hadd EWK_Combined_tuples.root EWK_2022_tuples.root EWK_2022EE_tuples.root EWK_20
 hadd ggH_Combined_tuples.root ggH_2022_tuples.root ggH_2022EE_tuples.root ggH_2023_tuples.root ggH_2023BPix_tuples.root ggH_2024_tuples.root
 hadd VBF_Combined_tuples.root VBF_2022_tuples.root VBF_2022EE_tuples.root VBF_2023_tuples.root VBF_2023BPix_tuples.root VBF_2024_tuples.root
 hadd ttH_Combined_tuples.root ttH_2022_tuples.root ttH_2022EE_tuples.root ttH_2023_tuples.root ttH_2023BPix_tuples.root ttH_2024_tuples.root
+'''
+echo eosmkdir ${inEOS_PATH}haddTuples/Combined/
+eosmkdir ${inEOS_PATH}haddTuples/Combined/
+echo eos cp *_Combined_*.root root://cmseos.fnal.gov//${inEOS_PATH}haddTuples/Combined/
+eos cp *_Combined_*.root root://cmseos.fnal.gov//${inEOS_PATH}haddTuples/Combined/
