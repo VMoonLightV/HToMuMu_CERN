@@ -1,35 +1,19 @@
 ## Note:
-yuyang-work branch is mainly based on elise-work, with some specific modification.
+Yuyang's work at CERN, summer 2025, Geneva, together with the research group of Caltech. His supervisor is Prof. Si Xie at FermiLab and Caltech, and his contributions focus on Zpt-reweighting, event-by-event mass resolution calibration, and analysis of significance of Higgs decay to dimuon.
 
-This code is based in the Run2 Analysis https://github.com/irenedutta23/HmmAna
+It was a lovely place, a lovely time.
 
-## Setup
+## Setup on CERN lxplus
+
+This code is based on the  Analysis https://github.com/LPC-HH/HToMuMu/tree/yuyang-work
 
 ```
 cmsrel CMSSW_14_0_14
 cd CMSSW_14_0_14/src
 cmsenv
-git clone git@github.com:LPC-HH/HToMuMu.git
-cd HToMuMu
+git clone https://github.com/VMoonLightV/HToMuMu_CERN.git
+cd HToMuMu_CERN
 make -j4
 ```
 
-## Run the analyzer 
-For simulations
-```
-./bin/HmmAnalyzer runList.txt out.root mc F 2016
-```
-
-For data
-```
-./bin/HmmAnalyzer runList.txt out.root data T 2016
-```
-
-## Run CreateHistograms 
-
-This will create a root file with the histogrmas filled with the corresponding weights.
-
-For data/simulation
-```
-./bin/HmmAnalyzer analyzer_output.root output_directory era channel T(data)/F(simulation)
-```
+For further tutorial, please see ./doc.
